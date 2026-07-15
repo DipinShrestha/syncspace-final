@@ -49,31 +49,31 @@ export default function Analytics({ workspaceId }: { workspaceId: string }) {
   if (!data) return <div className="p-8 text-white">No data available</div>;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 animate-fade-in-up">
       {/* Summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass p-4 rounded-xl">
-          <h3 className="text-sm text-gray-400">Total Tasks</h3>
-          <p className="text-2xl font-bold text-white">{data.summary.totalTasks}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-400">Total Tasks</h3>
+          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.totalTasks}</p>
         </div>
-        <div className="glass p-4 rounded-xl">
-          <h3 className="text-sm text-gray-400">Completed Tasks</h3>
-          <p className="text-2xl font-bold text-white">{data.summary.completedTasks}</p>
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-400">Completed Tasks</h3>
+          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.completedTasks}</p>
         </div>
-        <div className="glass p-4 rounded-xl">
-          <h3 className="text-sm text-gray-400">Completion Rate</h3>
-          <p className="text-2xl font-bold text-white">{data.summary.completionRate}%</p>
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-400">Completion Rate</h3>
+          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.completionRate}%</p>
         </div>
-        <div className="glass p-4 rounded-xl">
-          <h3 className="text-sm text-gray-400">Total Messages</h3>
-          <p className="text-2xl font-bold text-white">{data.summary.totalMessages}</p>
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-400">Total Messages</h3>
+          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.totalMessages}</p>
         </div>
       </div>
 
       {/* Member table */}
       <div className="glass p-4 rounded-xl">
-        <h2 className="text-xl font-semibold text-white mb-4">Member Contributions</h2>
-        <div className="overflow-x-auto">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Member Contributions</h2>
+        <div className="overflow-x-auto scrollbar-none">
           <table className="w-full text-sm text-left text-gray-300">
             <thead className="text-xs uppercase bg-gray-800">
               <tr>

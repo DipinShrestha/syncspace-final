@@ -137,94 +137,92 @@ export default function SettingsPage() {
   return (
     <>
       <Navbar />
-      <div className="pt-20 px-4 pb-8 max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-6">Settings</h1>
+      <div className="pt-20 px-4 sm:px-6 pb-8 max-w-4xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight">Settings</h1>
 
         {/* Profile Information */}
-        <div className="glass p-6 rounded-xl mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Profile Information</h2>
+        <div className="glass p-4 sm:p-6 rounded-xl mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Profile Information</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300">Name</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mt-1 text-white"
+                className="w-full glass-input rounded-lg p-2 text-white transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300">Avatar URL</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Avatar URL</label>
               <input
                 type="text"
                 value={avatar}
                 onChange={(e) => setAvatar(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mt-1 text-white"
+                className="w-full glass-input rounded-lg p-2 text-white transition-colors"
                 placeholder="https://example.com/avatar.jpg"
               />
             </div>
-            <button onClick={handleUpdateProfile} className="glass-btn px-4 py-2 rounded-lg text-sm">
+            <button onClick={handleUpdateProfile} className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95">
               Update Profile
             </button>
           </div>
         </div>
 
         {/* Change Password */}
-        <div className="glass p-6 rounded-xl mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Change Password</h2>
+        <div className="glass p-4 sm:p-6 rounded-xl mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Change Password</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300">Current Password</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Current Password</label>
               <input
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mt-1 text-white"
+                className="w-full glass-input rounded-lg p-2 text-white transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300">New Password</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">New Password</label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mt-1 text-white"
+                className="w-full glass-input rounded-lg p-2 text-white transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300">Confirm New Password</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Confirm New Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mt-1 text-white"
+                className="w-full glass-input rounded-lg p-2 text-white transition-colors"
               />
             </div>
-            <button onClick={handleChangePassword} className="glass-btn px-4 py-2 rounded-lg text-sm">
+            <button onClick={handleChangePassword} className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95">
               Change Password
             </button>
           </div>
         </div>
 
-    
-
         {/* Workspaces Management – same as before */}
-        <div className="glass p-6 rounded-xl">
-          <h2 className="text-xl font-semibold text-white mb-4">Your Workspaces</h2>
+        <div className="glass p-4 sm:p-6 rounded-xl mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Your Workspaces</h2>
           {ownedWorkspaces.length === 0 ? (
-            <p className="text-gray-400">You don't own any workspaces.</p>
+            <p className="text-gray-400 text-sm">You don't own any workspaces.</p>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {ownedWorkspaces.map(ws => (
-                <div key={ws._id} className="border border-gray-700 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">{ws.name}</h3>
-                      <p className="text-sm text-gray-400">{ws.description || 'No description'}</p>
+                <div key={ws._id} className="border border-gray-700 rounded-lg p-4 transition-colors hover:border-gray-600">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3 mb-2">
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-semibold text-white truncate">{ws.name}</h3>
+                      <p className="text-sm text-gray-400 line-clamp-2">{ws.description || 'No description'}</p>
                     </div>
                     <button
                       onClick={() => handleDeleteWorkspace(ws._id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                      className="self-start bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-medium transition-all active:scale-95 whitespace-nowrap"
                     >
                       Delete Workspace
                     </button>
@@ -237,12 +235,12 @@ export default function SettingsPage() {
                         const memberName = typeof member.user === 'string' ? memberId : member.user.name;
                         const isOwner = getOwnerId(ws) === memberId;
                         return (
-                          <li key={memberId} className="flex justify-between items-center bg-gray-800 p-2 rounded">
-                            <span className="text-sm text-gray-200">{memberName} {isOwner && '(Owner)'}</span>
+                          <li key={memberId} className="flex justify-between items-center bg-gray-800 p-2 rounded gap-2">
+                            <span className="text-sm text-gray-200 truncate">{memberName} {isOwner && '(Owner)'}</span>
                             {!isOwner && (
                               <button
                                 onClick={() => handleRemoveMember(ws._id, memberId, memberName)}
-                                className="text-red-400 hover:text-red-300 text-sm"
+                                className="text-red-400 hover:text-red-300 text-sm transition-colors flex-shrink-0"
                               >
                                 Remove
                               </button>
@@ -258,28 +256,28 @@ export default function SettingsPage() {
           )}
         </div>
         {/* Delete Account */}
-        <div className="glass p-6 rounded-xl mb-8 border border-red-500/30">
-          <h2 className="text-xl font-semibold text-red-200 mb-4">Delete Account</h2>
+        <div className="glass p-4 sm:p-6 rounded-xl mb-8 border border-red-500/30">
+          <h2 className="text-lg sm:text-xl font-semibold text-red-200 mb-4">Delete Account</h2>
           {!showDeleteConfirm ? (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
             >
               Delete Account
             </button>
           ) : (
-            <div className="space-y-3">
-              <p className="text-red-300">Are you sure? This action is irreversible.</p>
-              <div className="flex gap-3">
+            <div className="space-y-3 animate-fade-in-up">
+              <p className="text-red-300 text-sm">Are you sure? This action is irreversible.</p>
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleDeleteAccount}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
                 >
                   Yes, Delete My Account
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="glass-outline px-4 py-2 rounded-lg text-sm"
+                  className="glass-outline px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
                 >
                   Cancel
                 </button>

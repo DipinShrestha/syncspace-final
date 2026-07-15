@@ -103,8 +103,10 @@ export default function WorkspacePage() {
     <>
       <Navbar />
       <div className="pt-16 min-h-screen bg-gray-900">
-        <div className="flex h-[calc(100vh-4rem)]">
-          {/* Sidebar now carries workspaceId + workspaceName for the Members tab */}
+        <div className="flex flex-col md:flex-row md:h-[calc(100vh-4rem)]">
+          {/* Sidebar now carries workspaceId + workspaceName for the Members tab.
+              Stacks above the content as a horizontal tab strip on mobile,
+              sits as a fixed left column from md up. */}
           <WorkspaceSidebar
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -113,11 +115,11 @@ export default function WorkspacePage() {
           />
 
           <div className="flex-1 overflow-auto">
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Header — InviteMember removed; it now lives inside the Members tab */}
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-white">{workspace.name}</h1>
-                <p className="text-gray-400">{workspace.description || 'No description'}</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">{workspace.name}</h1>
+                <p className="text-sm sm:text-base text-gray-400">{workspace.description || 'No description'}</p>
               </div>
 
               {/* Boards */}

@@ -28,22 +28,23 @@ export default function WorkspaceSidebar({
   ];
 
   return (
-    <aside className="w-64 bg-black/40 backdrop-blur-sm border-r border-white/10 p-4 h-full flex flex-col">
-      <div className="mb-8">
+    <aside className="w-full md:w-64 bg-black/40 backdrop-blur-sm border-b md:border-b-0 md:border-r border-white/10 p-2 md:p-4 flex-shrink-0 flex flex-col">
+      <div className="hidden md:block mb-8">
         <h2 className="text-lg font-semibold text-white truncate">{workspaceName}</h2>
       </div>
-      <nav className="space-y-2">
+      {/* Horizontal scrollable tab strip on mobile, vertical stack from md up */}
+      <nav className="flex md:flex-col gap-1.5 md:gap-2 overflow-x-auto md:overflow-visible pb-1 md:pb-0 -mx-2 px-2 md:mx-0 md:px-0 scrollbar-none">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${
+            className={`flex-shrink-0 flex items-center gap-2 md:gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap ${
               activeTab === item.id
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-300 hover:bg-white/10'
+                ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                : 'text-gray-300 hover:bg-white/10 hover:text-white active:scale-95'
             }`}
           >
-            <span>{item.icon}</span>
+            <span aria-hidden>{item.icon}</span>
             <span>{item.label}</span>
           </button>
         ))}

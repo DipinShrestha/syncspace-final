@@ -23,14 +23,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
-      <div className="max-w-md w-full p-8 rounded-2xl glass">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-black px-4 py-12">
+      <div className="max-w-md w-full p-6 sm:p-8 rounded-2xl glass animate-fade-in-up">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold">Welcome back</h2>
-          <p className="text-gray-400 mt-2">Login to your SyncSpace account</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Welcome back</h2>
+          <p className="text-gray-400 mt-2 text-sm sm:text-base">Login to your SyncSpace account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
             <input
@@ -38,7 +38,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
             />
           </div>
           <div>
@@ -48,21 +48,21 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full glass-btn py-2 rounded-lg text-white font-semibold transition disabled:opacity-50"
+            className="w-full glass-btn py-2.5 rounded-lg text-white font-semibold transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Logging in…' : 'Login'}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-400 mt-6">
           Don't have an account?{' '}
-          <Link href="/register" className="text-blue-400 hover:underline">
+          <Link href="/register" className="text-blue-400 hover:text-blue-300 hover:underline transition-colors">
             Register
           </Link>
         </p>

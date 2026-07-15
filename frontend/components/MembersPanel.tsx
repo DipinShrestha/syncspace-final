@@ -80,8 +80,8 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
   if (loading) return <div className="p-4 text-gray-400">Loading members...</div>;
 
   return (
-    <div className="max-w-lg">
-      <h2 className="text-xl font-bold text-white mb-6">Members</h2>
+    <div className="max-w-lg animate-fade-in-up">
+      <h2 className="text-lg sm:text-xl font-bold text-white mb-6">Members</h2>
 
       {/* Owner row */}
       {owner && (
@@ -117,7 +117,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               return (
                 <div
                   key={m.user._id}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 transition-colors hover:bg-white/[0.08]"
                 >
                   <div className="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {m.user.name.charAt(0).toUpperCase()}
@@ -135,7 +135,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
                   {canManage && !isOwnerRow && (
                     <button
                       onClick={() => handleRemove(m.user._id, m.user.name)}
-                      className="ml-1 text-gray-500 hover:text-red-400 text-xs transition flex-shrink-0"
+                      className="ml-1 text-gray-500 hover:text-red-400 text-xs transition-colors flex-shrink-0 p-1"
                       title={`Remove ${m.user.name}`}
                     >
                       ✕
@@ -159,12 +159,12 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={handleInvite}
               disabled={inviting}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+              className="bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
             >
               {inviting ? 'Sending…' : 'Invite'}
             </button>

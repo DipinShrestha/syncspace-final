@@ -87,18 +87,18 @@ console.log(add(5, 3));
   return (
     <div className="flex flex-col h-full gap-4">
       <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
-        <div className="bg-gray-800 px-4 py-2 text-sm font-medium text-white flex justify-between items-center">
-          <span>JavaScript Editor</span>
+        <div className="bg-gray-800 px-3 sm:px-4 py-2 text-sm font-medium text-white flex justify-between items-center gap-2">
+          <span className="truncate">JavaScript Editor</span>
           <button
             onClick={runCode}
             disabled={isRunning}
-            className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm disabled:opacity-50"
+            className="bg-green-600 hover:bg-green-700 active:scale-95 px-3 py-1 rounded text-sm font-medium transition-all disabled:opacity-50 disabled:active:scale-100 whitespace-nowrap flex-shrink-0"
           >
-            {isRunning ? 'Running...' : 'Run Code'}
+            {isRunning ? 'Running…' : 'Run Code'}
           </button>
         </div>
         <Editor
-          height="400px"
+          height="min(400px, 45vh)"
           defaultLanguage="javascript"
           value={code}
           onChange={(value) => setCode(value || '')}
@@ -107,8 +107,8 @@ console.log(add(5, 3));
         />
       </div>
       <div className="bg-gray-900 rounded-lg border border-gray-700">
-        <div className="bg-gray-800 px-4 py-2 text-sm font-medium text-white">Output</div>
-        <pre className="p-4 text-sm text-gray-300 font-mono whitespace-pre-wrap overflow-auto max-h-64">
+        <div className="bg-gray-800 px-3 sm:px-4 py-2 text-sm font-medium text-white">Output</div>
+        <pre className="p-3 sm:p-4 text-sm text-gray-300 font-mono whitespace-pre-wrap break-words overflow-auto max-h-64">
           {output || 'Click "Run Code" to see output here.'}
         </pre>
       </div>

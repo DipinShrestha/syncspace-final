@@ -56,22 +56,29 @@ export default function DocumentEditor({ document, onUpdate }: DocumentEditorPro
   }
 };
 
+  // Shared toolbar button styling — text color was previously unset, which
+  // relied on inherited page color. Now explicit so it stays readable
+  // regardless of the app's (fixed dark) global theme.
+  const btnBase = 'p-2 rounded text-sm text-gray-700 transition-colors';
+  const btnActive = 'bg-gray-200 text-gray-900';
+  const btnIdle = 'hover:bg-gray-100 hover:text-gray-900';
+
   return (
-    <div className="flex-1 flex flex-col bg-white rounded-lg shadow p-4">
+    <div className="flex-1 flex flex-col bg-white rounded-lg shadow-lg p-3 sm:p-4">
       <div className="border-b pb-3 mb-3">
-        <input type="text" value={title} onChange={e => setTitle(e.target.value)} onBlur={saveTitle} className="text-2xl font-bold w-full border-none focus:outline-none focus:ring-0 p-0 text-gray-900" placeholder="Document title" />
-        <div className="text-xs text-gray-400 mt-1">{saving ? 'Saving...' : lastSaved ? `Saved at ${lastSaved.toLocaleTimeString()}` : 'Auto-save enabled'}</div>
+        <input type="text" value={title} onChange={e => setTitle(e.target.value)} onBlur={saveTitle} className="text-xl sm:text-2xl font-bold w-full border-none focus:outline-none focus:ring-0 p-0 text-gray-900 bg-transparent" placeholder="Document title" />
+        <div className="text-xs text-gray-400 mt-1">{saving ? 'Saving…' : lastSaved ? `Saved at ${lastSaved.toLocaleTimeString()}` : 'Auto-save enabled'}</div>
       </div>
       <div className="flex flex-wrap gap-1 border-b pb-2 mb-2">
-        <button onClick={() => editor?.chain().focus().toggleBold().run()} className={`p-2 rounded ${editor?.isActive('bold') ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>Bold</button>
-        <button onClick={() => editor?.chain().focus().toggleItalic().run()} className={`p-2 rounded ${editor?.isActive('italic') ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>Italic</button>
-        <button onClick={() => editor?.chain().focus().toggleUnderline().run()} className={`p-2 rounded ${editor?.isActive('underline') ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>Underline</button>
-        <button onClick={() => editor?.chain().focus().setTextAlign('left').run()} className="p-2 rounded hover:bg-gray-100">Left</button>
-        <button onClick={() => editor?.chain().focus().setTextAlign('center').run()} className="p-2 rounded hover:bg-gray-100">Center</button>
-        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={`p-2 rounded ${editor?.isActive('heading', { level: 1 }) ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>H1</button>
-        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={`p-2 rounded ${editor?.isActive('heading', { level: 2 }) ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>H2</button>
-        <button onClick={() => editor?.chain().focus().toggleBulletList().run()} className={`p-2 rounded ${editor?.isActive('bulletList') ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>Bullet List</button>
-        <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={`p-2 rounded ${editor?.isActive('orderedList') ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>Numbered List</button>
+        <button onClick={() => editor?.chain().focus().toggleBold().run()} className={`${btnBase} ${editor?.isActive('bold') ? btnActive : btnIdle} font-bold`}>Bold</button>
+        <button onClick={() => editor?.chain().focus().toggleItalic().run()} className={`${btnBase} ${editor?.isActive('italic') ? btnActive : btnIdle} italic`}>Italic</button>
+        <button onClick={() => editor?.chain().focus().toggleUnderline().run()} className={`${btnBase} ${editor?.isActive('underline') ? btnActive : btnIdle} underline`}>Underline</button>
+        <button onClick={() => editor?.chain().focus().setTextAlign('left').run()} className={`${btnBase} ${btnIdle}`}>Left</button>
+        <button onClick={() => editor?.chain().focus().setTextAlign('center').run()} className={`${btnBase} ${btnIdle}`}>Center</button>
+        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={`${btnBase} ${editor?.isActive('heading', { level: 1 }) ? btnActive : btnIdle}`}>H1</button>
+        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={`${btnBase} ${editor?.isActive('heading', { level: 2 }) ? btnActive : btnIdle}`}>H2</button>
+        <button onClick={() => editor?.chain().focus().toggleBulletList().run()} className={`${btnBase} ${editor?.isActive('bulletList') ? btnActive : btnIdle}`}>Bullet List</button>
+        <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={`${btnBase} ${editor?.isActive('orderedList') ? btnActive : btnIdle}`}>Numbered List</button>
       </div>
       <EditorContent editor={editor} className="flex-1 min-h-[400px]" />
     </div>

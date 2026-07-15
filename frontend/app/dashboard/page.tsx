@@ -73,12 +73,12 @@ export default function DashboardPage() {
   return (
     <>
       <Navbar />
-      <div className="pt-16 px-4 pb-8 max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+      <div className="pt-16 px-4 sm:px-6 pb-8 max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-6 sm:mb-8 flex-wrap gap-4 pt-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Dashboard</h1>
           <button
             onClick={() => setShowModal(true)}
-            className="glass-btn px-4 py-2 rounded-lg text-sm"
+            className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
           >
             + New Workspace
           </button>
@@ -86,24 +86,25 @@ export default function DashboardPage() {
 
         {/* Your Workspaces (owned) */}
         <div className="mb-10">
-          <h2 className="text-xl font-semibold text-white mb-4">Your Workspaces</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Your Workspaces</h2>
           {ownedWorkspaces.length === 0 ? (
-            <p className="text-gray-400">You haven't created any workspaces yet.</p>
+            <p className="text-gray-400 text-sm sm:text-base">You haven't created any workspaces yet.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ownedWorkspaces.map((ws) => (
+              {ownedWorkspaces.map((ws, i) => (
                 <div
                   key={ws._id}
                   onClick={() => router.push(`/workspace/${ws._id}`)}
-                  className="glass p-4 rounded-xl cursor-pointer hover:scale-[1.02] transition"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                  className="animate-fade-in-up glass p-4 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.99]"
                 >
-                  <h3 className="text-lg font-semibold text-white">{ws.name}</h3>
-                  <p className="text-sm text-gray-400">{ws.description || 'No description'}</p>
+                  <h3 className="text-lg font-semibold text-white truncate">{ws.name}</h3>
+                  <p className="text-sm text-gray-400 line-clamp-2">{ws.description || 'No description'}</p>
                   <div className="flex justify-between items-center mt-3 text-xs text-gray-400">
                     <span>{new Date(ws.updatedAt).toLocaleDateString()}</span>
                     <span>{ws.members?.length || 1} members</span>
                   </div>
-                  <span className="text-xs text-blue-400 mt-2 inline-block">(Owner)</span>
+                  <span className="text-xs text-blue-400 mt-2 inline-block font-medium">Owner</span>
                 </div>
               ))}
             </div>
@@ -112,19 +113,20 @@ export default function DashboardPage() {
 
         {/* Workspaces You're a Member Of */}
         <div>
-          <h2 className="text-xl font-semibold text-white mb-4">Workspaces You're a Member Of</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Workspaces You're a Member Of</h2>
           {memberWorkspaces.length === 0 ? (
-            <p className="text-gray-400">You are not a member of any other workspaces.</p>
+            <p className="text-gray-400 text-sm sm:text-base">You are not a member of any other workspaces.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {memberWorkspaces.map((ws) => (
+              {memberWorkspaces.map((ws, i) => (
                 <div
                   key={ws._id}
                   onClick={() => router.push(`/workspace/${ws._id}`)}
-                  className="glass p-4 rounded-xl cursor-pointer hover:scale-[1.02] transition"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                  className="animate-fade-in-up glass p-4 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.99]"
                 >
-                  <h3 className="text-lg font-semibold text-white">{ws.name}</h3>
-                  <p className="text-sm text-gray-400">{ws.description || 'No description'}</p>
+                  <h3 className="text-lg font-semibold text-white truncate">{ws.name}</h3>
+                  <p className="text-sm text-gray-400 line-clamp-2">{ws.description || 'No description'}</p>
                   <div className="flex justify-between items-center mt-3 text-xs text-gray-400">
                     <span>{new Date(ws.updatedAt).toLocaleDateString()}</span>
                     <span>{ws.members?.length || 1} members</span>
@@ -135,35 +137,35 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Modal (unchanged) */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-            <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md">
+          <div className="modal-overlay fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="modal-panel bg-gray-900 rounded-xl p-6 w-full max-w-md">
               <h2 className="text-xl font-bold mb-4 text-white">Create Workspace</h2>
               <input
                 type="text"
                 placeholder="Name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-3 text-white"
+                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-3 text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
               />
               <textarea
                 placeholder="Description (optional)"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
-                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-4 text-white"
+                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-4 text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={2}
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300"
+                  className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-all active:scale-95 text-sm font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreate}
-                  className="px-4 py-2 bg-blue-600 rounded-lg text-white"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-all active:scale-95 text-sm font-medium"
                 >
                   Create
                 </button>

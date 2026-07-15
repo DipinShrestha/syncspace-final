@@ -75,6 +75,42 @@ module.exports = (io) => {
       });
     });
 
+    // ── Video call (WebRTC) signaling ─────────────────────────────────────
+    // BUG FIX: VideoCall.tsx has always emitted these events, but the handlers
+    // only existed in backend/signalingServer.js, which was never mounted on
+    // the running `io` instance (server.js only ever called chatSocket(io)).
+    // Result: join-room/offer/answer/ice-candidate went nowhere, so peers
+    // never connected — video calling was completely non-functional.
+    // Moved here (the socket server that's actually running) and the dead
+    // signalingServer.js file has been removed.
+
+    // Join a video-call room (separate from the chat workspace room so
+    // joining a call doesn't disturb the chat 'join-workspace' room state).
+    socket.on('join-room', (roomId, userId) => {
+      socket.join(`call-${roomId}`);
+      socket.to(`call-${roomId}`).emit('user-connected', userId);
+
+      // Let the other party know when this user leaves the call.
+      socket.on('disconnect', () => {
+        socket.to(`call-${roomId}`).emit('user-disconnected', userId);
+      });
+    });
+
+    // Forward call offer to the other user in the room
+    socket.on('offer', (data) => {
+      socket.to(`call-${data.roomId}`).emit('offer', data.offer, data.userId);
+    });
+
+    // Forward call answer to the other user in the room
+    socket.on('answer', (data) => {
+      socket.to(`call-${data.roomId}`).emit('answer', data.answer, data.userId);
+    });
+
+    // Forward ICE candidates to the other user in the room
+    socket.on('ice-candidate', (data) => {
+      socket.to(`call-${data.roomId}`).emit('ice-candidate', data.candidate, data.userId);
+    });
+
     socket.on('disconnect', () => {
       console.log('🔴 Client disconnected:', socket.id);
     });

@@ -82,13 +82,14 @@ export const changePassword = (data: { currentPassword: string; newPassword: str
 
 export const deleteAccount = () => api.delete('/auth/account');
 
-export const uploadAvatar = (file: File) => {
-  const formData = new FormData();
-  formData.append('avatar', file);
-  return api.post('/upload/avatar', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-};
+// NOTE: avatar upload used to go through /upload/avatar via a manually-set
+// 'Content-Type: multipart/form-data' header, which breaks multipart parsing
+// because axios never gets the chance to attach the required boundary. The
+// route was also never mounted on the backend, and the Settings page uses a
+// plain avatar URL field instead — so the dead, broken function was removed
+// rather than fixed. If avatar file upload is added back, use the same
+// pattern as the working /upload endpoint (lib/api.ts callers pass FormData
+// and let axios/fetch set Content-Type automatically — never set it by hand).
 
 export default api;
 

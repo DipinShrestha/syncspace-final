@@ -75,28 +75,33 @@ export default function Chat({ workspaceId }: ChatProps) {
   };
 
   return (
-    <div className="flex flex-col h-[70vh] bg-white rounded-lg shadow">
-      <div className="border-b p-4 bg-gray-50 rounded-t-lg">
-        <h2 className="font-semibold">Workspace Chat</h2>
-        <p className="text-xs text-gray-500">{isConnected ? '🟢 Connected' : '🔴 Disconnected'}</p>
+    <div className="flex flex-col h-[60vh] sm:h-[70vh] bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="border-b p-3 sm:p-4 bg-gray-50 rounded-t-lg">
+        <h2 className="font-semibold text-gray-900 text-sm sm:text-base">Workspace Chat</h2>
+        <p className="text-xs text-gray-500 mt-0.5">
+          <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${isConnected ? 'bg-emerald-500' : 'bg-red-500'}`} />
+          {isConnected ? 'Connected' : 'Disconnected'}
+        </p>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-400 mt-10">No messages yet. Say hello!</div>
+          <div className="text-center text-gray-400 mt-10 text-sm">No messages yet. Say hello!</div>
         ) : (
           messages.map((msg) => (
             <div
               key={msg._id}
-              className={`flex ${msg.sender._id === user?._id ? 'justify-end' : 'justify-start'}`}
+              className={`flex animate-fade-in-up ${msg.sender._id === user?._id ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                className={`max-w-[85%] sm:max-w-[70%] rounded-lg px-4 py-2 ${
                   msg.sender._id === user?._id
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-800'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-900'
                 }`}
               >
-                <div className="text-xs font-medium mb-1">{msg.sender.name}</div>
+                <div className={`text-xs font-medium mb-1 ${msg.sender._id === user?._id ? 'text-blue-100' : 'text-gray-500'}`}>
+                  {msg.sender.name}
+                </div>
                 <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>
               </div>
             </div>
@@ -104,21 +109,21 @@ export default function Chat({ workspaceId }: ChatProps) {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="border-t p-4 bg-gray-50 rounded-b-lg">
+      <div className="border-t p-3 sm:p-4 bg-gray-50 rounded-b-lg">
         <div className="flex gap-2">
           <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Type a message..."
-            className="flex-1 border rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 placeholder-gray-400 bg-white resize-none transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
             rows={1}
             disabled={!isConnected}
           />
           <button
             onClick={sendMessage}
             disabled={!isConnected || !newMessage.trim()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
           >
             Send
           </button>

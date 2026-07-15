@@ -6,7 +6,6 @@ import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/types/board';
 import { deleteCard } from '@/lib/api';
 import toast from 'react-hot-toast';
-import CardCodeModal from './CardCodeModal';
 import TaskDetailsModal from './TaskDetailsModal';
 
 interface BoardCardProps {
@@ -31,7 +30,6 @@ const BoardCard: React.FC<BoardCardProps> = ({
   onMoveStage,
   currentListTitle = '',
 }) => {
-  const [showCodeModal, setShowCodeModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -72,60 +70,49 @@ const BoardCard: React.FC<BoardCardProps> = ({
       <div
         ref={setNodeRef}
         style={style}
-        className="bg-white p-3 rounded-md shadow-sm border border-gray-200 hover:bg-gray-50 relative"
+        className="group bg-white p-3 rounded-md shadow-sm border border-gray-200 transition-all duration-150 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 relative"
       >
         {/* Drag handle – small area on the left */}
         <div
           {...attributes}
           {...listeners}
-          className="absolute left-1 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600"
+          className="absolute left-1 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 transition-colors"
         >
           ⋮⋮
         </div>
-        {/* Main content area – clickable */}
+        {/* Main content area – clickable. Opens the single task detail modal
+            (code editor + file upload + comments), which enforces that only
+            the assigned member can edit — there used to be a second modal
+            (CardCodeModal) reachable from this same click that let anyone
+            edit code/upload files with no permission check. Removed. */}
         <div
           className="ml-6 cursor-pointer"
-          onClick={() => setShowCodeModal(true)}
+          onClick={() => setShowEditModal(true)}
         >
           <p className="text-sm font-medium text-gray-800 pr-12">{card.title}</p>
           {card.assignedTo && (
             <div className="mt-1 text-xs text-gray-500">👤 Assigned</div>
           )}
         </div>
-        <div className="absolute top-2 right-2 flex gap-1">
+        <div className="absolute top-2 right-2 flex gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
           {nextStage && (
             <button
               onClick={handleMoveStage}
-              className="text-gray-400 hover:text-green-500 text-xs"
+              className="text-gray-400 hover:text-emerald-600 text-xs transition-colors p-1"
               title={`Move to ${nextStage}`}
             >
               →
             </button>
           )}
           <button
-            onClick={(e) => { e.stopPropagation(); setShowEditModal(true); }}
-            className="text-gray-400 hover:text-white text-xs"
-            title="Edit task details"
-          >
-            ✎
-          </button>
-          <button
             onClick={handleDelete}
-            className="text-gray-400 hover:text-red-500 text-xs"
+            className="text-gray-400 hover:text-red-500 text-xs transition-colors p-1"
             title="Delete card"
           >
             ✕
           </button>
         </div>
       </div>
-
-      {showCodeModal && (
-        <CardCodeModal
-          card={card}
-          onClose={() => setShowCodeModal(false)}
-          onUpdate={onCardUpdated || (() => {})}
-        />
-      )}
 
       {showEditModal && (
         <TaskDetailsModal

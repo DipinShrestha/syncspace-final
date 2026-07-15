@@ -180,19 +180,19 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+      className="modal-overlay fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="bg-gray-900 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        className="modal-panel bg-gray-900 rounded-xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-5">
 
           {/* Header */}
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-xl font-bold text-white">{card.title}</h2>
+          <div className="flex justify-between items-start gap-3">
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-xl font-bold text-white break-words">{card.title}</h2>
               {assignedMemberName && (
                 <p className="text-sm text-gray-400 mt-0.5">
                   👤 Assigned to <span className="text-blue-400">{assignedMemberName}</span>
@@ -227,7 +227,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                 placeholder="Description"
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white"
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-gray-400 mb-1">Due Date</label>
                   <input
@@ -386,7 +386,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
               <button
                 onClick={handlePostComment}
                 disabled={postingComment || !commentText.trim()}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+                className="bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:opacity-40 disabled:active:scale-100 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all"
               >
                 {postingComment ? '…' : 'Post'}
               </button>
@@ -394,10 +394,10 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
           </div>
 
           {/* ── ACTION BUTTONS ────────────────────────────────────────────── */}
-          <div className="flex justify-end gap-3 pt-2 border-t border-gray-700">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2 border-t border-gray-700">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800"
+              className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 active:scale-95 transition-all text-sm font-medium"
             >
               Close
             </button>
@@ -405,7 +405,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg text-white text-sm font-medium"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 rounded-lg text-white text-sm font-medium transition-all"
               >
                 {saving ? 'Saving…' : 'Save Changes'}
               </button>

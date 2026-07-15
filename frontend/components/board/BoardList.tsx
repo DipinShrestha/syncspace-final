@@ -54,8 +54,8 @@ const BoardList: React.FC<BoardListProps> = ({
   };
 
   return (
-    <div className="bg-gray-100 rounded-md p-3 w-80 flex-shrink-0 flex flex-col max-h-full">
-      <h3 className="font-semibold text-gray-700 mb-3 px-1">{list.title}</h3>
+    <div className="bg-gray-100 rounded-md p-3 w-[82vw] sm:w-80 flex-shrink-0 flex flex-col max-h-full transition-shadow">
+      <h3 className="font-semibold text-gray-700 mb-3 px-1 text-sm sm:text-base">{list.title}</h3>
 
       {/* FIX: attach both the sortable context AND the droppable ref to the
           card container so dropping onto an empty column works correctly. */}
@@ -91,14 +91,14 @@ const BoardList: React.FC<BoardListProps> = ({
             onChange={(e) => setNewCardTitle(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddCard()}
             placeholder="Enter card title..."
-            className="w-full p-2 border rounded-md text-sm mb-2"
+            className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             autoFocus
           />
           {members.length > 0 && (
             <select
               value={selectedAssignee}
               onChange={(e) => setSelectedAssignee(e.target.value)}
-              className="w-full p-2 border rounded-md text-sm mb-2 bg-white"
+              className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Unassigned</option>
               {members.map((m) => (

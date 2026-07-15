@@ -411,22 +411,22 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
           </button>
         </div>
         {showNewBoardModal && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <div className="glass rounded-lg p-6 w-96">
-              <h2 className="text-xl mb-4 text-white">Create New Board</h2>
+          <div className="modal-overlay fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="modal-panel glass rounded-lg p-6 w-full max-w-96">
+              <h2 className="text-xl mb-4 text-white font-semibold">Create New Board</h2>
               <input
                 type="text"
                 placeholder="Board title"
                 value={newBoardTitle}
                 onChange={(e) => setNewBoardTitle(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mb-4 text-white"
+                className="w-full glass-input rounded-lg p-2 mb-4 text-white placeholder-gray-400"
                 autoFocus
               />
               <div className="flex justify-end gap-2">
-                <button onClick={() => setShowNewBoardModal(false)} className="px-4 py-2 glass-outline rounded-lg">
+                <button onClick={() => setShowNewBoardModal(false)} className="px-4 py-2 glass-outline rounded-lg transition-all active:scale-95 text-sm font-medium">
                   Cancel
                 </button>
-                <button onClick={handleCreateBoard} className="px-4 py-2 glass-btn rounded-lg">
+                <button onClick={handleCreateBoard} className="px-4 py-2 glass-btn rounded-lg transition-all active:scale-95 text-sm font-medium">
                   Create
                 </button>
               </div>
@@ -440,11 +440,11 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
   return (
     <div>
       {/* Filter Bar */}
-      <div className="flex flex-wrap gap-4 mb-4 p-2 glass rounded-lg">
+      <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 p-2 glass rounded-lg">
         <select
           value={filterAssignee}
           onChange={(e) => setFilterAssignee(e.target.value)}
-          className="glass-input rounded px-2 py-1 text-white text-sm"
+          className="glass-input rounded px-2 py-1.5 text-white text-sm transition-colors"
         >
           <option value="">All Assignees</option>
           {members.map((m) => (
@@ -454,7 +454,7 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
         <select
           value={filterLabel}
           onChange={(e) => setFilterLabel(e.target.value)}
-          className="glass-input rounded px-2 py-1 text-white text-sm"
+          className="glass-input rounded px-2 py-1.5 text-white text-sm transition-colors"
         >
           <option value="">All Labels</option>
           <option value="bug">Bug</option>
@@ -465,27 +465,27 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
           type="date"
           value={filterDueDate}
           onChange={(e) => setFilterDueDate(e.target.value)}
-          className="glass-input rounded px-2 py-1 text-white text-sm"
+          className="glass-input rounded px-2 py-1.5 text-white text-sm transition-colors"
         />
         <button
           onClick={() => { setFilterAssignee(''); setFilterLabel(''); setFilterDueDate(''); }}
-          className="px-2 py-1 glass-outline rounded text-sm"
+          className="px-2 py-1.5 glass-outline rounded text-sm transition-all active:scale-95"
         >
           Clear Filters
         </button>
       </div>
 
       {/* Board tabs + Add List */}
-      <div className="flex flex-wrap justify-between items-center mb-4 border-b border-white/20 pb-4">
-        <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row flex-wrap justify-between sm:items-center gap-3 mb-4 border-b border-white/20 pb-4">
+        <div className="flex flex-wrap gap-2 overflow-x-auto scrollbar-none">
           {boards.map((board) => (
             <button
               key={board._id}
               onClick={() => setCurrentBoard(board)}
-              className={`px-3 py-1 rounded-lg text-sm transition ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 currentBoard._id === board._id
                   ? 'glass-active text-white'
-                  : 'glass text-gray-300 hover:bg-white/10'
+                  : 'glass text-gray-300 hover:bg-white/10 active:scale-95'
               }`}
             >
               {board.title}
@@ -493,19 +493,19 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
           ))}
           <button
             onClick={() => setShowNewBoardModal(true)}
-            className="px-3 py-1 glass-btn rounded-lg text-sm"
+            className="px-3 py-1.5 glass-btn rounded-lg text-sm font-medium transition-all active:scale-95 whitespace-nowrap"
           >
             + New Board
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+        <div className="flex flex-wrap gap-2">
           <input
             type="text"
             placeholder="Add a list..."
             value={newListTitle}
             onChange={(e) => setNewListTitle(e.target.value)}
-            className="glass-input rounded-md px-2 py-1 text-sm w-32 sm:w-auto"
+            className="glass-input rounded-md px-2 py-1.5 text-sm flex-1 sm:flex-none sm:w-auto transition-colors"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && newListTitle.trim()) {
                 handleAddList(currentBoard._id, newListTitle);
@@ -514,7 +514,7 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
           />
           <button
             onClick={() => { if (newListTitle.trim()) handleAddList(currentBoard._id, newListTitle); }}
-            className="glass-btn rounded-md px-3 py-1 text-sm"
+            className="glass-btn rounded-md px-3 py-1.5 text-sm font-medium transition-all active:scale-95 whitespace-nowrap"
           >
             Add List
           </button>
