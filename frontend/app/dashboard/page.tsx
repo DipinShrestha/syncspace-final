@@ -104,7 +104,7 @@ export default function DashboardPage() {
                     <span>{new Date(ws.updatedAt).toLocaleDateString()}</span>
                     <span>{ws.members?.length || 1} members</span>
                   </div>
-                  <span className="text-xs text-blue-400 mt-2 inline-block font-medium">Owner</span>
+                  <span className="text-xs text-dusty-300 mt-2 inline-block font-medium">Owner</span>
                 </div>
               ))}
             </div>
@@ -146,14 +146,14 @@ export default function DashboardPage() {
                 placeholder="Name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-3 text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-3 text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
                 autoFocus
               />
               <textarea
                 placeholder="Description (optional)"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
-                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-4 text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-700 bg-gray-800 rounded-lg p-2 mb-4 text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
                 rows={2}
               />
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                 </button>
                 <button
                   onClick={handleCreate}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-all active:scale-95 text-sm font-medium"
+                  className="px-4 py-2 bg-dusty-600 hover:bg-dusty-700 rounded-lg text-white transition-all active:scale-95 text-sm font-medium"
                 >
                   Create
                 </button>

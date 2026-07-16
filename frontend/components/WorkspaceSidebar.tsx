@@ -40,7 +40,7 @@ export default function WorkspaceSidebar({
             onClick={() => setActiveTab(item.id)}
             className={`flex-shrink-0 flex items-center gap-2 md:gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap ${
               activeTab === item.id
-                ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                ? 'bg-dusty-600 text-white shadow-sm shadow-dusty-600/30'
                 : 'text-gray-300 hover:bg-white/10 hover:text-white active:scale-95'
             }`}
           >

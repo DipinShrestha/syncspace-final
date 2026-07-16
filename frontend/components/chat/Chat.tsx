@@ -79,7 +79,7 @@ export default function Chat({ workspaceId }: ChatProps) {
       <div className="border-b p-3 sm:p-4 bg-gray-50 rounded-t-lg">
         <h2 className="font-semibold text-gray-900 text-sm sm:text-base">Workspace Chat</h2>
         <p className="text-xs text-gray-500 mt-0.5">
-          <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${isConnected ? 'bg-emerald-500' : 'bg-red-500'}`} />
+          <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${isConnected ? 'bg-sage-500' : 'bg-red-500'}`} />
           {isConnected ? 'Connected' : 'Disconnected'}
         </p>
       </div>
@@ -95,11 +95,11 @@ export default function Chat({ workspaceId }: ChatProps) {
               <div
                 className={`max-w-[85%] sm:max-w-[70%] rounded-lg px-4 py-2 ${
                   msg.sender._id === user?._id
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-dusty-600 text-white'
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
-                <div className={`text-xs font-medium mb-1 ${msg.sender._id === user?._id ? 'text-blue-100' : 'text-gray-500'}`}>
+                <div className={`text-xs font-medium mb-1 ${msg.sender._id === user?._id ? 'text-dusty-100' : 'text-gray-500'}`}>
                   {msg.sender.name}
                 </div>
                 <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>
@@ -116,14 +116,14 @@ export default function Chat({ workspaceId }: ChatProps) {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Type a message..."
-            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 placeholder-gray-400 bg-white resize-none transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
+            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 placeholder-gray-400 bg-white resize-none transition-shadow focus:outline-none focus:ring-2 focus:ring-dusty-500 disabled:bg-gray-100 disabled:text-gray-400"
             rows={1}
             disabled={!isConnected}
           />
           <button
             onClick={sendMessage}
             disabled={!isConnected || !newMessage.trim()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+            className="bg-dusty-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-all hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
           >
             Send
           </button>

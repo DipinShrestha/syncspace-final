@@ -98,7 +98,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
           {nextStage && (
             <button
               onClick={handleMoveStage}
-              className="text-gray-400 hover:text-emerald-600 text-xs transition-colors p-1"
+              className="text-gray-400 hover:text-sage-600 text-xs transition-colors p-1"
               title={`Move to ${nextStage}`}
             >
               →

@@ -38,7 +38,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500/30"
             />
           </div>
           <div>
@@ -48,7 +48,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500/30"
             />
           </div>
           <button
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-400 mt-6">
           Don't have an account?{' '}
-          <Link href="/register" className="text-blue-400 hover:text-blue-300 hover:underline transition-colors">
+          <Link href="/register" className="text-dusty-300 hover:text-dusty-200 hover:underline transition-colors">
             Register
           </Link>
         </p>

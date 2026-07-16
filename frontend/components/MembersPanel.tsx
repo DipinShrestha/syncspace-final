@@ -88,14 +88,14 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
         <div className="mb-4">
           <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Owner</p>
           <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-            <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-dusty-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
               {owner.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{owner.name}</p>
               <p className="text-xs text-gray-400 truncate">{owner.email}</p>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600/30 text-blue-300">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-dusty-600/30 text-dusty-200">
               owner
             </span>
           </div>
@@ -119,7 +119,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
                   key={m.user._id}
                   className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 transition-colors hover:bg-white/[0.08]"
                 >
-                  <div className="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-sage-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {m.user.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -159,12 +159,12 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
             />
             <button
               onClick={handleInvite}
               disabled={inviting}
-              className="bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
+              className="bg-dusty-600 hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
             >
               {inviting ? 'Sending…' : 'Invite'}
             </button>

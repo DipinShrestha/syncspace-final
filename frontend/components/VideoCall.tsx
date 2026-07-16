@@ -97,7 +97,7 @@ export default function VideoCall({ roomId, userId }: VideoCallProps) {
   return (
     <div className="flex flex-col items-center gap-4 p-4">
       {!callActive ? (
-        <button onClick={startCall} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <button onClick={startCall} className="bg-dusty-600 hover:bg-dusty-700 text-white font-bold py-2 px-4 rounded">
           Start Video Call
         </button>
       ) : (

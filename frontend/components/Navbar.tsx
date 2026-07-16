@@ -32,22 +32,22 @@ export default function Navbar() {
       <nav className="hidden md:flex items-center space-x-6 uppercase text-sm font-medium">
         {!user ? (
           <>
-            <Link href="/login" className="nav-link relative transition-colors hover:text-blue-400">Login</Link>
-            <Link href="/register" className="nav-link relative transition-colors hover:text-blue-400">Register</Link>
+            <Link href="/login" className="nav-link relative transition-colors hover:text-dusty-300">Login</Link>
+            <Link href="/register" className="nav-link relative transition-colors hover:text-dusty-300">Register</Link>
           </>
         ) : (
           <>
-            <Link href="/dashboard" className="nav-link relative transition-colors hover:text-blue-400">Dashboard</Link>
-            <Link href="/#features" className="nav-link relative transition-colors hover:text-blue-400">Features</Link>
-            <Link href="/#about" className="nav-link relative transition-colors hover:text-blue-400">About</Link>
-            <Link href="/#support" className="nav-link relative transition-colors hover:text-blue-400">Support</Link>
-            <Link href="/#notifications" className="nav-link relative transition-colors hover:text-blue-400">Notification</Link>
-            <button onClick={logout} className="nav-link relative transition-colors hover:text-blue-400">Logout</button>
+            <Link href="/dashboard" className="nav-link relative transition-colors hover:text-dusty-300">Dashboard</Link>
+            <Link href="/#features" className="nav-link relative transition-colors hover:text-dusty-300">Features</Link>
+            <Link href="/#about" className="nav-link relative transition-colors hover:text-dusty-300">About</Link>
+            <Link href="/#support" className="nav-link relative transition-colors hover:text-dusty-300">Support</Link>
+            <Link href="/#notifications" className="nav-link relative transition-colors hover:text-dusty-300">Notification</Link>
+            <button onClick={logout} className="nav-link relative transition-colors hover:text-dusty-300">Logout</button>
             {/* Avatar dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-semibold transition-transform hover:scale-105 active:scale-95 focus:outline-none"
+                className="w-8 h-8 rounded-full bg-dusty-600 flex items-center justify-center text-sm font-semibold transition-transform hover:scale-105 active:scale-95 focus:outline-none"
               >
                 {user.name?.charAt(0).toUpperCase()}
               </button>
@@ -93,17 +93,17 @@ export default function Navbar() {
         <nav className="flex flex-col items-center space-y-6 uppercase text-sm font-medium">
           {!user ? (
             <>
-              <Link href="/login" className="text-white transition-colors hover:text-blue-400" onClick={() => setMenuOpen(false)}>Login</Link>
-              <Link href="/register" className="text-white transition-colors hover:text-blue-400" onClick={() => setMenuOpen(false)}>Register</Link>
+              <Link href="/login" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Login</Link>
+              <Link href="/register" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Register</Link>
             </>
           ) : (
             <>
-              <Link href="/dashboard" className="text-white transition-colors hover:text-blue-400" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-              <Link href="/#features" className="text-white transition-colors hover:text-blue-400" onClick={() => setMenuOpen(false)}>Features</Link>
-              <Link href="/#about" className="text-white transition-colors hover:text-blue-400" onClick={() => setMenuOpen(false)}>About</Link>
-              <Link href="/#support" className="text-white transition-colors hover:text-blue-400" onClick={() => setMenuOpen(false)}>Support</Link>
-              <Link href="/#notifications" className="text-white transition-colors hover:text-blue-400" onClick={() => setMenuOpen(false)}>Notification</Link>
-              <button className="text-white transition-colors hover:text-blue-400" onClick={() => { logout(); setMenuOpen(false); }}>Logout</button>
+              <Link href="/dashboard" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+              <Link href="/#features" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Features</Link>
+              <Link href="/#about" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>About</Link>
+              <Link href="/#support" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Support</Link>
+              <Link href="/#notifications" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Notification</Link>
+              <button className="text-white transition-colors hover:text-dusty-300" onClick={() => { logout(); setMenuOpen(false); }}>Logout</button>
             </>
           )}
         </nav>

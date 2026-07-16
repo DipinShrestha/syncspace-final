@@ -10,15 +10,43 @@
  * were completely invisible. Locking the theme to dark, always, fixes it.
  */
 :root {
-  --background: #0a0a0c;
-  --foreground: #f2f2f4;
+  --background: #0e1211;
+  --foreground: #f2f4f2;
 }
 
+/*
+ * Brand palette: dusty blue (primary accent — buttons, links, focus states)
+ * + sage green (secondary accent — positive/success states, highlights).
+ * Replaces the old generic blue/emerald/purple mix used across the app so
+ * every screen pulls from the same two-tone palette.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-dusty-50: #f1f5f8;
+  --color-dusty-100: #dfe8ee;
+  --color-dusty-200: #c1d3de;
+  --color-dusty-300: #9cb7c9;
+  --color-dusty-400: #7a9cb3;
+  --color-dusty-500: #63879f;
+  --color-dusty-600: #517087;
+  --color-dusty-700: #445c6f;
+  --color-dusty-800: #3a4c5b;
+  --color-dusty-900: #32404c;
+
+  --color-sage-50: #f4f6f0;
+  --color-sage-100: #e5eadb;
+  --color-sage-200: #cbd6ba;
+  --color-sage-300: #adbe92;
+  --color-sage-400: #93a877;
+  --color-sage-500: #7c9260;
+  --color-sage-600: #66784e;
+  --color-sage-700: #526140;
+  --color-sage-800: #445036;
+  --color-sage-900: #3a442f;
 }
 
 html {
@@ -111,13 +139,13 @@ body {
 }
 
 .glass-btn {
-  background: rgba(37,99,235,0.22);
+  background: rgba(99,135,159,0.28);
   backdrop-filter: blur(18px);
   border: 1px solid rgba(255,255,255,0.10);
   transition: 0.3s ease;
 }
 .glass-btn:hover {
-  background: rgba(37,99,235,0.35);
+  background: rgba(99,135,159,0.42);
 }
 
 .glass-outline {
@@ -147,8 +175,8 @@ body {
 }
 .glass-input:focus {
   outline: none;
-  border-color: rgba(59,130,246,0.6);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.18);
+  border-color: rgba(122,156,179,0.7);
+  box-shadow: 0 0 0 3px rgba(122,156,179,0.2);
 }
 /* Native <select> / date-input popups can't inherit the glass background,
    so force a dark scheme for their painted chrome (dropdown list, calendar). */
@@ -158,10 +186,10 @@ input[type="date"].glass-input {
 }
 
 .glass-active {
-  background: rgba(37,99,235,0.35);
+  background: rgba(99,135,159,0.4);
   backdrop-filter: blur(18px);
-  border: 1px solid rgba(96,165,250,0.4);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 16px rgba(37,99,235,0.25);
+  border: 1px solid rgba(156,183,201,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 16px rgba(99,135,159,0.3);
 }
 
 /* ========== Sidebar link styles ========== */
@@ -172,8 +200,8 @@ input[type="date"].glass-input {
   background: rgba(255,255,255,0.06);
 }
 .sidebar-link.active {
-  background: rgba(59,130,246,0.16);
-  color: #60a5fa;
+  background: rgba(122,156,179,0.18);
+  color: #9cb7c9;
 }
 
 /* ========== Card hover effect ========== */

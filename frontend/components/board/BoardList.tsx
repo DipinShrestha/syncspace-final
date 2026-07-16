@@ -62,7 +62,7 @@ const BoardList: React.FC<BoardListProps> = ({
       <div
         ref={setDroppableRef}
         className={`flex-grow overflow-y-auto space-y-2 min-h-[4rem] rounded transition-colors ${
-          isOver ? 'bg-blue-50 ring-2 ring-blue-300' : ''
+          isOver ? 'bg-sage-50 ring-2 ring-sage-300' : ''
         }`}
       >
         <SortableContext
@@ -91,14 +91,14 @@ const BoardList: React.FC<BoardListProps> = ({
             onChange={(e) => setNewCardTitle(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddCard()}
             placeholder="Enter card title..."
-            className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-dusty-500"
             autoFocus
           />
           {members.length > 0 && (
             <select
               value={selectedAssignee}
               onChange={(e) => setSelectedAssignee(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-dusty-500"
             >
               <option value="">Unassigned</option>
               {members.map((m) => (
@@ -112,7 +112,7 @@ const BoardList: React.FC<BoardListProps> = ({
             <button
               type="button"
               onClick={handleAddCard}
-              className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700"
+              className="bg-dusty-600 text-white px-3 py-1 rounded-md text-sm hover:bg-dusty-700"
             >
               Add
             </button>

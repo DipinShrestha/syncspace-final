@@ -53,10 +53,10 @@ export default function LandingPage() {
               {!user ? (
                 // Public menu
                 <>
-                  <Link href="#features" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">FEATURES</Link>
-                  <Link href="#about" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">ABOUT US</Link>
-                  <Link href="#support" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">SUPPORT</Link>
-                  <Link href="/login" className="text-blue-400 text-sm font-medium transition-colors hover:text-blue-300">LOGIN</Link>
+                  <Link href="#features" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">FEATURES</Link>
+                  <Link href="#about" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">ABOUT US</Link>
+                  <Link href="#support" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">SUPPORT</Link>
+                  <Link href="/login" className="text-dusty-300 text-sm font-medium transition-colors hover:text-dusty-200">LOGIN</Link>
                   <Link href="/register" className="glass-btn px-5 py-2 rounded-xl text-white text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]">
                     SIGN UP
                   </Link>
@@ -64,11 +64,11 @@ export default function LandingPage() {
               ) : (
                 // Authenticated menu
                 <>
-                  <Link href="/dashboard" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">DASHBOARD</Link>
-                  <Link href="#features" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">FEATURES</Link>
-                  <Link href="#about" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">ABOUT</Link>
-                  <Link href="#support" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">SUPPORT</Link>
-                  <Link href="#notifications" className="nav-link text-white text-sm font-medium transition-colors hover:text-blue-400">NOTIFICATION</Link>
+                  <Link href="/dashboard" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">DASHBOARD</Link>
+                  <Link href="#features" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">FEATURES</Link>
+                  <Link href="#about" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">ABOUT</Link>
+                  <Link href="#support" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">SUPPORT</Link>
+                  <Link href="#notifications" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">NOTIFICATION</Link>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={logout}
@@ -76,7 +76,7 @@ export default function LandingPage() {
                     >
                       Logout
                     </button>
-                    <button className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-semibold text-white transition-transform hover:scale-105 active:scale-95">
+                    <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-white transition-transform hover:scale-105 active:scale-95">
                       {user.name?.charAt(0).toUpperCase() || 'U'}
                     </button>
                   </div>
@@ -106,7 +106,7 @@ export default function LandingPage() {
               <Link href="#features" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Features</Link>
               <Link href="#about" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>About</Link>
               <Link href="#support" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Support</Link>
-              <Link href="/login" className="block text-blue-400 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Login</Link>
+              <Link href="/login" className="block text-dusty-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Login</Link>
               <Link href="/register" className="block glass-btn text-center text-white text-sm font-medium px-4 py-2.5 rounded-xl mt-2 transition-all active:scale-95" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
             </>
           ) : (
@@ -118,7 +118,7 @@ export default function LandingPage() {
               <Link href="#notifications" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Notification</Link>
               <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="block w-full text-left text-gray-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10">Logout</button>
               <div className="flex justify-center pt-2">
-                <button className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-semibold text-white">
+                <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-white">
                   {user.name?.charAt(0).toUpperCase() || 'U'}
                 </button>
               </div>
