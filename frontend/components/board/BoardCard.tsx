@@ -81,18 +81,13 @@ const BoardCard: React.FC<BoardCardProps> = ({
           ⋮⋮
         </div>
         {/* Main content area – clickable. Opens the single task detail modal
-            (code editor + file upload + comments), which enforces that only
-            the assigned member can edit — there used to be a second modal
-            (CardCodeModal) reachable from this same click that let anyone
-            edit code/upload files with no permission check. Removed. */}
-        <div
-          className="ml-6 cursor-pointer"
-          onClick={() => setShowEditModal(true)}
-        >
+ (code editor + file upload + comments), which enforces that only
+ the assigned member can edit — there used to be a second modal
+ (CardCodeModal) reachable from this same click that let anyone
+ edit code/upload files with no permission check. Removed. */}
+        <div className="ml-6 cursor-pointer" onClick={() => setShowEditModal(true)}>
           <p className="text-sm font-medium text-gray-800 pr-12">{card.title}</p>
-          {card.assignedTo && (
-            <div className="mt-1 text-xs text-gray-500">👤 Assigned</div>
-          )}
+          {card.assignedTo && <div className="mt-1 text-xs text-gray-500">👤 Assigned</div>}
         </div>
         <div className="absolute top-2 right-2 flex gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
           {nextStage && (

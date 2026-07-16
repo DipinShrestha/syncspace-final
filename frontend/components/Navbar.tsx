@@ -23,7 +23,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-black/95 backdrop-blur-sm border-b border-white/5 text-white h-16 flex items-center justify-between px-4 sm:px-6 md:px-10">
+    <header className="fixed top-0 left-0 w-full z-50 bg-black border-b border-gray-900 text-white h-16 flex items-center justify-between px-4 sm:px-6 md:px-10">
       {/* Logo as image */}
       <Link href="/" className="logo transition-opacity hover:opacity-80">
         <img src="/Gemini_Generated_Image_wf220zwf220zwf22.png" alt="SyncSpace Logo" />
@@ -32,17 +32,57 @@ export default function Navbar() {
       <nav className="hidden md:flex items-center space-x-6 uppercase text-sm font-medium">
         {!user ? (
           <>
-            <Link href="/login" className="nav-link relative transition-colors hover:text-dusty-300">Login</Link>
-            <Link href="/register" className="nav-link relative transition-colors hover:text-dusty-300">Register</Link>
+            <Link
+              href="/login"
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              Register
+            </Link>
           </>
         ) : (
           <>
-            <Link href="/dashboard" className="nav-link relative transition-colors hover:text-dusty-300">Dashboard</Link>
-            <Link href="/#features" className="nav-link relative transition-colors hover:text-dusty-300">Features</Link>
-            <Link href="/#about" className="nav-link relative transition-colors hover:text-dusty-300">About</Link>
-            <Link href="/#support" className="nav-link relative transition-colors hover:text-dusty-300">Support</Link>
-            <Link href="/#notifications" className="nav-link relative transition-colors hover:text-dusty-300">Notification</Link>
-            <button onClick={logout} className="nav-link relative transition-colors hover:text-dusty-300">Logout</button>
+            <Link
+              href="/dashboard"
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/#features"
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              Features
+            </Link>
+            <Link
+              href="/#about"
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              About
+            </Link>
+            <Link
+              href="/#support"
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              Support
+            </Link>
+            <Link
+              href="/#notifications"
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              Notification
+            </Link>
+            <button
+              onClick={logout}
+              className="nav-link relative transition-colors hover:text-dusty-300"
+            >
+              Logout
+            </button>
             {/* Avatar dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
@@ -52,11 +92,11 @@ export default function Navbar() {
                 {user.name?.charAt(0).toUpperCase()}
               </button>
               {showDropdown && (
-                <div className="animate-fade-in-up absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-md shadow-lg py-1 z-50">
+                <div className="animate-fade-in-up absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-md shadow-lg py-1 z-50">
                   {isDashboard && (
                     <Link
                       href="/dashboard/settings"
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
                       onClick={() => setShowDropdown(false)}
                     >
                       Profile / Settings
@@ -67,7 +107,7 @@ export default function Navbar() {
                       setShowDropdown(false);
                       logout();
                     }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
                   >
                     Logout
                   </button>
@@ -83,27 +123,83 @@ export default function Navbar() {
         className="md:hidden flex flex-col justify-center items-center w-8 h-8"
         onClick={() => setMenuOpen(!menuOpen)}
       >
-        <span className={`block w-6 h-0.5 bg-white mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+        <span
+          className={`block w-6 h-0.5 bg-white mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`}
+        />
         <span className={`block w-6 h-0.5 bg-white mb-1 ${menuOpen ? 'opacity-0' : ''}`} />
-        <span className={`block w-6 h-0.5 bg-white transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
+        <span
+          className={`block w-6 h-0.5 bg-white transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}
+        />
       </button>
 
       {/* Mobile menu overlay */}
-      <div className={`fixed top-0 right-0 h-full w-64 bg-black border-l border-white/10 z-40 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden pt-20`}>
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-black border-l border-gray-800 z-40 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden pt-20`}
+      >
         <nav className="flex flex-col items-center space-y-6 uppercase text-sm font-medium">
           {!user ? (
             <>
-              <Link href="/login" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Login</Link>
-              <Link href="/register" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Register</Link>
+              <Link
+                href="/login"
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => setMenuOpen(false)}
+              >
+                Register
+              </Link>
             </>
           ) : (
             <>
-              <Link href="/dashboard" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-              <Link href="/#features" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Features</Link>
-              <Link href="/#about" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>About</Link>
-              <Link href="/#support" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Support</Link>
-              <Link href="/#notifications" className="text-white transition-colors hover:text-dusty-300" onClick={() => setMenuOpen(false)}>Notification</Link>
-              <button className="text-white transition-colors hover:text-dusty-300" onClick={() => { logout(); setMenuOpen(false); }}>Logout</button>
+              <Link
+                href="/dashboard"
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => setMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/#features"
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => setMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link
+                href="/#about"
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => setMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/#support"
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => setMenuOpen(false)}
+              >
+                Support
+              </Link>
+              <Link
+                href="/#notifications"
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => setMenuOpen(false)}
+              >
+                Notification
+              </Link>
+              <button
+                className="text-white transition-colors hover:text-dusty-300"
+                onClick={() => {
+                  logout();
+                  setMenuOpen(false);
+                }}
+              >
+                Logout
+              </button>
             </>
           )}
         </nav>

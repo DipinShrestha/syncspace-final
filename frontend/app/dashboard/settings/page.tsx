@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { getWorkspaces, deleteWorkspace, removeWorkspaceMember, updateProfile, changePassword, deleteAccount } from '@/lib/api';
+import {
+  getWorkspaces,
+  deleteWorkspace,
+  removeWorkspaceMember,
+  updateProfile,
+  changePassword,
+  deleteAccount,
+} from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import toast from 'react-hot-toast';
@@ -54,7 +61,7 @@ export default function SettingsPage() {
     return ws.owner?._id || '';
   };
 
-  const ownedWorkspaces = workspaces.filter(ws => getOwnerId(ws) === user?._id);
+  const ownedWorkspaces = workspaces.filter((ws) => getOwnerId(ws) === user?._id);
 
   // Profile update
   const handleUpdateProfile = async () => {
@@ -106,7 +113,7 @@ export default function SettingsPage() {
     if (!confirm('Delete this workspace? This action cannot be undone.')) return;
     try {
       await deleteWorkspace(workspaceId);
-      setWorkspaces(prev => prev.filter(ws => ws._id !== workspaceId));
+      setWorkspaces((prev) => prev.filter((ws) => ws._id !== workspaceId));
       toast.success('Workspace deleted');
     } catch {
       toast.error('Failed to delete workspace');
@@ -117,14 +124,14 @@ export default function SettingsPage() {
     if (!confirm(`Remove ${memberName} from this workspace?`)) return;
     try {
       await removeWorkspaceMember(workspaceId, memberId);
-      setWorkspaces(prev =>
-        prev.map(ws => {
+      setWorkspaces((prev) =>
+        prev.map((ws) => {
           if (ws._id !== workspaceId) return ws;
           return {
             ...ws,
-            members: ws.members.filter(m => m.user._id !== memberId),
+            members: ws.members.filter((m) => m.user._id !== memberId),
           };
-        })
+        }),
       );
       toast.success(`Removed ${memberName}`);
     } catch {
@@ -163,7 +170,10 @@ export default function SettingsPage() {
                 placeholder="https://example.com/avatar.jpg"
               />
             </div>
-            <button onClick={handleUpdateProfile} className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95">
+            <button
+              onClick={handleUpdateProfile}
+              className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
+            >
               Update Profile
             </button>
           </div>
@@ -174,7 +184,9 @@ export default function SettingsPage() {
           <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Change Password</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Current Password</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Current Password
+              </label>
               <input
                 type="password"
                 value={currentPassword}
@@ -192,7 +204,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Confirm New Password</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Confirm New Password
+              </label>
               <input
                 type="password"
                 value={confirmPassword}
@@ -200,7 +214,10 @@ export default function SettingsPage() {
                 className="w-full glass-input rounded-lg p-2 text-white transition-colors"
               />
             </div>
-            <button onClick={handleChangePassword} className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95">
+            <button
+              onClick={handleChangePassword}
+              className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
+            >
               Change Password
             </button>
           </div>
@@ -213,12 +230,17 @@ export default function SettingsPage() {
             <p className="text-gray-400 text-sm">You don't own any workspaces.</p>
           ) : (
             <div className="space-y-4 sm:space-y-6">
-              {ownedWorkspaces.map(ws => (
-                <div key={ws._id} className="border border-gray-700 rounded-lg p-4 transition-colors hover:border-gray-600">
+              {ownedWorkspaces.map((ws) => (
+                <div
+                  key={ws._id}
+                  className="border border-gray-700 rounded-lg p-4 transition-colors hover:border-gray-600"
+                >
                   <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3 mb-2">
                     <div className="min-w-0">
                       <h3 className="text-lg font-semibold text-white truncate">{ws.name}</h3>
-                      <p className="text-sm text-gray-400 line-clamp-2">{ws.description || 'No description'}</p>
+                      <p className="text-sm text-gray-400 line-clamp-2">
+                        {ws.description || 'No description'}
+                      </p>
                     </div>
                     <button
                       onClick={() => handleDeleteWorkspace(ws._id)}
@@ -230,13 +252,20 @@ export default function SettingsPage() {
                   <div className="mt-4">
                     <h4 className="text-sm font-medium text-gray-300 mb-2">Members</h4>
                     <ul className="space-y-2">
-                      {ws.members.map(member => {
-                        const memberId = typeof member.user === 'string' ? member.user : member.user._id;
-                        const memberName = typeof member.user === 'string' ? memberId : member.user.name;
+                      {ws.members.map((member) => {
+                        const memberId =
+                          typeof member.user === 'string' ? member.user : member.user._id;
+                        const memberName =
+                          typeof member.user === 'string' ? memberId : member.user.name;
                         const isOwner = getOwnerId(ws) === memberId;
                         return (
-                          <li key={memberId} className="flex justify-between items-center bg-gray-800 p-2 rounded gap-2">
-                            <span className="text-sm text-gray-200 truncate">{memberName} {isOwner && '(Owner)'}</span>
+                          <li
+                            key={memberId}
+                            className="flex justify-between items-center bg-gray-800 p-2 rounded gap-2"
+                          >
+                            <span className="text-sm text-gray-200 truncate">
+                              {memberName} {isOwner && '(Owner)'}
+                            </span>
                             {!isOwner && (
                               <button
                                 onClick={() => handleRemoveMember(ws._id, memberId, memberName)}
@@ -256,7 +285,7 @@ export default function SettingsPage() {
           )}
         </div>
         {/* Delete Account */}
-        <div className="glass p-4 sm:p-6 rounded-xl mb-8 border border-red-500/30">
+        <div className="glass p-4 sm:p-6 rounded-xl mb-8 border border-red-800">
           <h2 className="text-lg sm:text-xl font-semibold text-red-200 mb-4">Delete Account</h2>
           {!showDeleteConfirm ? (
             <button

@@ -44,7 +44,9 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
     }
   }, [workspaceId]);
 
-  useEffect(() => { fetchMembers(); }, [fetchMembers]);
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   const handleInvite = async () => {
     if (!email.trim()) return toast.error('Email required');
@@ -74,8 +76,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
 
   // Current user is owner or admin → can manage members
   const canManage =
-    user?._id === owner?._id ||
-    members.some((m) => m.user._id === user?._id && m.role === 'admin');
+    user?._id === owner?._id || members.some((m) => m.user._id === user?._id && m.role === 'admin');
 
   if (loading) return <div className="p-4 text-gray-400">Loading members...</div>;
 
@@ -87,7 +88,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
       {owner && (
         <div className="mb-4">
           <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Owner</p>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-900 border border-gray-800">
             <div className="w-9 h-9 rounded-full bg-dusty-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
               {owner.name.charAt(0).toUpperCase()}
             </div>
@@ -95,7 +96,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               <p className="text-sm font-medium text-white truncate">{owner.name}</p>
               <p className="text-xs text-gray-400 truncate">{owner.email}</p>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-dusty-600/30 text-dusty-200">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-dusty-900 text-dusty-100">
               owner
             </span>
           </div>
@@ -117,7 +118,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               return (
                 <div
                   key={m.user._id}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 transition-colors hover:bg-white/[0.08]"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-900 border border-gray-800 transition-colors hover:bg-white/[0.08]"
                 >
                   <div className="w-9 h-9 rounded-full bg-sage-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {m.user.name.charAt(0).toUpperCase()}
@@ -128,7 +129,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
                     </p>
                     <p className="text-xs text-gray-400 truncate">{m.user.email}</p>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-300 flex-shrink-0">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300 flex-shrink-0">
                     {m.role}
                   </span>
                   {/* Show remove button to admins/owner, but not for the owner row itself */}
@@ -159,7 +160,7 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
             />
             <button
               onClick={handleInvite}

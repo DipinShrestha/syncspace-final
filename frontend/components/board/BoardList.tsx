@@ -1,9 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import BoardCard from './BoardCard';
 import { List } from '@/types/board';
@@ -58,7 +55,7 @@ const BoardList: React.FC<BoardListProps> = ({
       <h3 className="font-semibold text-gray-700 mb-3 px-1 text-sm sm:text-base">{list.title}</h3>
 
       {/* FIX: attach both the sortable context AND the droppable ref to the
-          card container so dropping onto an empty column works correctly. */}
+ card container so dropping onto an empty column works correctly. */}
       <div
         ref={setDroppableRef}
         className={`flex-grow overflow-y-auto space-y-2 min-h-[4rem] rounded transition-colors ${

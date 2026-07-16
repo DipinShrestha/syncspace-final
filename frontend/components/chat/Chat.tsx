@@ -42,7 +42,10 @@ export default function Chat({ workspaceId }: ChatProps) {
       setIsConnected(true);
       newSocket.emit('join-workspace', workspaceId, user._id, (response: { error?: string }) => {
         if (response?.error) toast.error(response.error);
-        else newSocket.emit('load-messages', workspaceId, (msgs: Message[]) => setMessages(msgs || []));
+        else
+          newSocket.emit('load-messages', workspaceId, (msgs: Message[]) =>
+            setMessages(msgs || []),
+          );
       });
     });
 
@@ -61,10 +64,14 @@ export default function Chat({ workspaceId }: ChatProps) {
 
   const sendMessage = () => {
     if (!newMessage.trim() || !socket || !isConnected) return;
-    socket.emit('send-message', { workspaceId, text: newMessage }, (response: { error?: string }) => {
-      if (response?.error) toast.error(response.error);
-      else setNewMessage('');
-    });
+    socket.emit(
+      'send-message',
+      { workspaceId, text: newMessage },
+      (response: { error?: string }) => {
+        if (response?.error) toast.error(response.error);
+        else setNewMessage('');
+      },
+    );
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -79,7 +86,9 @@ export default function Chat({ workspaceId }: ChatProps) {
       <div className="border-b p-3 sm:p-4 bg-gray-50 rounded-t-lg">
         <h2 className="font-semibold text-gray-900 text-sm sm:text-base">Workspace Chat</h2>
         <p className="text-xs text-gray-500 mt-0.5">
-          <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${isConnected ? 'bg-sage-500' : 'bg-red-500'}`} />
+          <span
+            className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${isConnected ? 'bg-sage-500' : 'bg-red-500'}`}
+          />
           {isConnected ? 'Connected' : 'Disconnected'}
         </p>
       </div>
@@ -99,7 +108,9 @@ export default function Chat({ workspaceId }: ChatProps) {
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
-                <div className={`text-xs font-medium mb-1 ${msg.sender._id === user?._id ? 'text-dusty-100' : 'text-gray-500'}`}>
+                <div
+                  className={`text-xs font-medium mb-1 ${msg.sender._id === user?._id ? 'text-dusty-100' : 'text-gray-500'}`}
+                >
                   {msg.sender.name}
                 </div>
                 <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>

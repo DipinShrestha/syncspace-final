@@ -7,8 +7,8 @@ export interface Card {
   dueDate?: string;
   assignedTo?: string;
   position: number;
-  code?: string;          // for Monaco editor code
-  codeFileUrl?: string;   // for uploaded file URL
+  code?: string; // for Monaco editor code
+  codeFileUrl?: string; // for uploaded file URL
 }
 
 export interface List {

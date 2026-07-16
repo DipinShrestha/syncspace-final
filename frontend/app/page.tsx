@@ -53,22 +53,70 @@ export default function LandingPage() {
               {!user ? (
                 // Public menu
                 <>
-                  <Link href="#features" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">FEATURES</Link>
-                  <Link href="#about" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">ABOUT US</Link>
-                  <Link href="#support" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">SUPPORT</Link>
-                  <Link href="/login" className="text-dusty-300 text-sm font-medium transition-colors hover:text-dusty-200">LOGIN</Link>
-                  <Link href="/register" className="glass-btn px-5 py-2 rounded-xl text-white text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]">
+                  <Link
+                    href="#features"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    FEATURES
+                  </Link>
+                  <Link
+                    href="#about"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    ABOUT US
+                  </Link>
+                  <Link
+                    href="#support"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    SUPPORT
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="text-dusty-300 text-sm font-medium transition-colors hover:text-dusty-200"
+                  >
+                    LOGIN
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="glass-btn px-5 py-2 rounded-xl text-white text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]"
+                  >
                     SIGN UP
                   </Link>
                 </>
               ) : (
                 // Authenticated menu
                 <>
-                  <Link href="/dashboard" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">DASHBOARD</Link>
-                  <Link href="#features" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">FEATURES</Link>
-                  <Link href="#about" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">ABOUT</Link>
-                  <Link href="#support" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">SUPPORT</Link>
-                  <Link href="#notifications" className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300">NOTIFICATION</Link>
+                  <Link
+                    href="/dashboard"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    DASHBOARD
+                  </Link>
+                  <Link
+                    href="#features"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    FEATURES
+                  </Link>
+                  <Link
+                    href="#about"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    ABOUT
+                  </Link>
+                  <Link
+                    href="#support"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    SUPPORT
+                  </Link>
+                  <Link
+                    href="#notifications"
+                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                  >
+                    NOTIFICATION
+                  </Link>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={logout}
@@ -98,25 +146,95 @@ export default function LandingPage() {
         {/* Mobile Menu */}
         <div
           className={`md:hidden glass mx-4 mb-4 rounded-2xl p-4 space-y-1 overflow-hidden transition-all duration-300 ease-out ${
-            mobileMenuOpen ? 'max-h-[28rem] opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0 pointer-events-none'
+            mobileMenuOpen
+              ? 'max-h-[28rem] opacity-100 mt-2'
+              : 'max-h-0 opacity-0 mt-0 pointer-events-none'
           }`}
         >
           {!user ? (
             <>
-              <Link href="#features" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Features</Link>
-              <Link href="#about" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>About</Link>
-              <Link href="#support" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Support</Link>
-              <Link href="/login" className="block text-dusty-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Login</Link>
-              <Link href="/register" className="block glass-btn text-center text-white text-sm font-medium px-4 py-2.5 rounded-xl mt-2 transition-all active:scale-95" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
+              <Link
+                href="#features"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link
+                href="#about"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="#support"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Support
+              </Link>
+              <Link
+                href="/login"
+                className="block text-dusty-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="block glass-btn text-center text-white text-sm font-medium px-4 py-2.5 rounded-xl mt-2 transition-all active:scale-95"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Sign Up
+              </Link>
             </>
           ) : (
             <>
-              <Link href="/dashboard" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
-              <Link href="#features" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Features</Link>
-              <Link href="#about" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>About</Link>
-              <Link href="#support" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Support</Link>
-              <Link href="#notifications" className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Notification</Link>
-              <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="block w-full text-left text-gray-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-white/10">Logout</button>
+              <Link
+                href="/dashboard"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="#features"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link
+                href="#about"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="#support"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Support
+              </Link>
+              <Link
+                href="#notifications"
+                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Notification
+              </Link>
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="block w-full text-left text-gray-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+              >
+                Logout
+              </button>
               <div className="flex justify-center pt-2">
                 <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-white">
                   {user.name?.charAt(0).toUpperCase() || 'U'}
@@ -138,7 +256,10 @@ export default function LandingPage() {
             {!user ? (
               // Public CTA buttons
               <>
-                <Link href="/register" className="glass-btn px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-medium transition-all active:scale-95 hover:scale-[1.02]">
+                <Link
+                  href="/register"
+                  className="glass-btn px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-medium transition-all active:scale-95 hover:scale-[1.02]"
+                >
                   Get Started Free
                 </Link>
                 <button
@@ -150,7 +271,10 @@ export default function LandingPage() {
               </>
             ) : (
               // Logged‑in CTA
-              <Link href="/dashboard" className="glass-btn px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-medium transition-all active:scale-95 hover:scale-[1.02]">
+              <Link
+                href="/dashboard"
+                className="glass-btn px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-medium transition-all active:scale-95 hover:scale-[1.02]"
+              >
                 My Dashboard
               </Link>
             )}
@@ -161,29 +285,39 @@ export default function LandingPage() {
       {/* FEATURES SECTION */}
       <section id="features" className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-4xl font-bold text-center text-white mb-10 sm:mb-16 tracking-tight">Everything you need in one place</h2>
+          <h2 className="text-2xl sm:text-4xl font-bold text-center text-white mb-10 sm:mb-16 tracking-tight">
+            Everything you need in one place
+          </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center">
               <div className="text-4xl sm:text-5xl mb-4">📋</div>
               <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">Kanban Boards</h3>
-              <p className="text-gray-300 text-sm sm:text-base">Plan projects with drag-and-drop task boards.</p>
+              <p className="text-gray-300 text-sm sm:text-base">
+                Plan projects with drag-and-drop task boards.
+              </p>
             </div>
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center">
               <div className="text-4xl sm:text-5xl mb-4">📝</div>
-              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">Collaborative Docs</h3>
-              <p className="text-gray-300 text-sm sm:text-base">Create documents together in real-time.</p>
+              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">
+                Collaborative Docs
+              </h3>
+              <p className="text-gray-300 text-sm sm:text-base">
+                Create documents together in real-time.
+              </p>
             </div>
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center sm:col-span-2 md:col-span-1">
               <div className="text-4xl sm:text-5xl mb-4">💬</div>
               <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">Team Chat</h3>
-              <p className="text-gray-300 text-sm sm:text-base">Fast messaging with channels and direct chat.</p>
+              <p className="text-gray-300 text-sm sm:text-base">
+                Fast messaging with channels and direct chat.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="text-center py-8 text-gray-400 border-t border-white/5">
+      <footer className="text-center py-8 text-gray-400 border-t border-gray-900">
         © 2025 SyncSpace
       </footer>
     </>

@@ -67,8 +67,8 @@ export default function DashboardPage() {
     return workspace.owner?._id || '';
   };
 
-  const ownedWorkspaces = workspaces.filter(ws => getOwnerId(ws) === user?._id);
-  const memberWorkspaces = workspaces.filter(ws => getOwnerId(ws) !== user?._id);
+  const ownedWorkspaces = workspaces.filter((ws) => getOwnerId(ws) === user?._id);
+  const memberWorkspaces = workspaces.filter((ws) => getOwnerId(ws) !== user?._id);
 
   return (
     <>
@@ -88,7 +88,9 @@ export default function DashboardPage() {
         <div className="mb-10">
           <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Your Workspaces</h2>
           {ownedWorkspaces.length === 0 ? (
-            <p className="text-gray-400 text-sm sm:text-base">You haven't created any workspaces yet.</p>
+            <p className="text-gray-400 text-sm sm:text-base">
+              You haven't created any workspaces yet.
+            </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {ownedWorkspaces.map((ws, i) => (
@@ -99,12 +101,16 @@ export default function DashboardPage() {
                   className="animate-fade-in-up glass p-4 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.99]"
                 >
                   <h3 className="text-lg font-semibold text-white truncate">{ws.name}</h3>
-                  <p className="text-sm text-gray-400 line-clamp-2">{ws.description || 'No description'}</p>
+                  <p className="text-sm text-gray-400 line-clamp-2">
+                    {ws.description || 'No description'}
+                  </p>
                   <div className="flex justify-between items-center mt-3 text-xs text-gray-400">
                     <span>{new Date(ws.updatedAt).toLocaleDateString()}</span>
                     <span>{ws.members?.length || 1} members</span>
                   </div>
-                  <span className="text-xs text-dusty-300 mt-2 inline-block font-medium">Owner</span>
+                  <span className="text-xs text-dusty-300 mt-2 inline-block font-medium">
+                    Owner
+                  </span>
                 </div>
               ))}
             </div>
@@ -113,9 +119,13 @@ export default function DashboardPage() {
 
         {/* Workspaces You're a Member Of */}
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Workspaces You're a Member Of</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">
+            Workspaces You're a Member Of
+          </h2>
           {memberWorkspaces.length === 0 ? (
-            <p className="text-gray-400 text-sm sm:text-base">You are not a member of any other workspaces.</p>
+            <p className="text-gray-400 text-sm sm:text-base">
+              You are not a member of any other workspaces.
+            </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {memberWorkspaces.map((ws, i) => (
@@ -126,7 +136,9 @@ export default function DashboardPage() {
                   className="animate-fade-in-up glass p-4 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.99]"
                 >
                   <h3 className="text-lg font-semibold text-white truncate">{ws.name}</h3>
-                  <p className="text-sm text-gray-400 line-clamp-2">{ws.description || 'No description'}</p>
+                  <p className="text-sm text-gray-400 line-clamp-2">
+                    {ws.description || 'No description'}
+                  </p>
                   <div className="flex justify-between items-center mt-3 text-xs text-gray-400">
                     <span>{new Date(ws.updatedAt).toLocaleDateString()}</span>
                     <span>{ws.members?.length || 1} members</span>
@@ -138,7 +150,7 @@ export default function DashboardPage() {
         </div>
 
         {showModal && (
-          <div className="modal-overlay fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="modal-overlay fixed inset-0 bg-black flex items-center justify-center p-4 z-50">
             <div className="modal-panel bg-gray-900 rounded-xl p-6 w-full max-w-md">
               <h2 className="text-xl font-bold mb-4 text-white">Create Workspace</h2>
               <input

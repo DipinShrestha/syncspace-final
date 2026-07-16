@@ -105,8 +105,8 @@ export default function WorkspacePage() {
       <div className="pt-16 min-h-screen bg-gray-900">
         <div className="flex flex-col md:flex-row md:h-[calc(100vh-4rem)]">
           {/* Sidebar now carries workspaceId + workspaceName for the Members tab.
-              Stacks above the content as a horizontal tab strip on mobile,
-              sits as a fixed left column from md up. */}
+ Stacks above the content as a horizontal tab strip on mobile,
+ sits as a fixed left column from md up. */}
           <WorkspaceSidebar
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -119,7 +119,9 @@ export default function WorkspacePage() {
               {/* Header — InviteMember removed; it now lives inside the Members tab */}
               <div className="mb-6">
                 <h1 className="text-xl sm:text-2xl font-bold text-white">{workspace.name}</h1>
-                <p className="text-sm sm:text-base text-gray-400">{workspace.description || 'No description'}</p>
+                <p className="text-sm sm:text-base text-gray-400">
+                  {workspace.description || 'No description'}
+                </p>
               </div>
 
               {/* Boards */}
@@ -157,7 +159,7 @@ export default function WorkspacePage() {
               )}
 
               {activeTab === 'analytics' && <Analytics workspaceId={id as string} />}
-              {activeTab === 'code'      && <LiveCodeEditor />}
+              {activeTab === 'code' && <LiveCodeEditor />}
 
               {/* Members — replaces the old InviteMember banner */}
               {activeTab === 'members' && <MembersPanel workspaceId={id as string} />}

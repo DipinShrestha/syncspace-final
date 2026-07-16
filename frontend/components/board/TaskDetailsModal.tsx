@@ -7,7 +7,10 @@ import { updateCard } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
 
-interface Member { _id: string; name: string; }
+interface Member {
+  _id: string;
+  name: string;
+}
 
 interface Comment {
   _id: string;
@@ -44,19 +47,19 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
   const isAssigned = !!user && card.assignedTo === user._id;
 
   // ── editable fields (only used when isAssigned) ───────────────────────────
-  const [title,       setTitle]       = useState(card.title);
+  const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description ?? '');
-  const [dueDate,     setDueDate]     = useState(card.dueDate ?? '');
-  const [labels,      setLabels]      = useState(card.labels?.join(', ') ?? '');
-  const [assignedTo,  setAssignedTo]  = useState(card.assignedTo ?? '');
-  const [code,        setCode]        = useState(card.code ?? '');
-  const [uploading,   setUploading]   = useState(false);
-  const [saving,      setSaving]      = useState(false);
+  const [dueDate, setDueDate] = useState(card.dueDate ?? '');
+  const [labels, setLabels] = useState(card.labels?.join(', ') ?? '');
+  const [assignedTo, setAssignedTo] = useState(card.assignedTo ?? '');
+  const [code, setCode] = useState(card.code ?? '');
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // ── comments (everyone can see + post) ───────────────────────────────────
-  const [comments,     setComments]     = useState<Comment[]>([]);
-  const [commentText,  setCommentText]  = useState('');
-  const [postingComment, setPosting]   = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [postingComment, setPosting] = useState(false);
   const [loadingComments, setLoadingC] = useState(true);
   const commentsEndRef = useRef<HTMLDivElement>(null);
 
@@ -133,7 +136,10 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
         title,
         description,
         dueDate: dueDate || undefined,
-        labels: labels.split(',').map((l) => l.trim()).filter(Boolean),
+        labels: labels
+          .split(',')
+          .map((l) => l.trim())
+          .filter(Boolean),
         assignedTo: assignedTo || undefined,
         code,
       });
@@ -190,7 +196,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
 
   return (
     <div
-      className="modal-overlay fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
+      className="modal-overlay fixed inset-0 bg-black flex items-center justify-center z-50 p-2 sm:p-4"
       onClick={onClose}
     >
       <div
@@ -198,11 +204,12 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 sm:p-6 space-y-4">
-
           {/* Header */}
           <div className="flex justify-between items-start gap-3">
             <div className="min-w-0">
-              <h2 className="text-lg sm:text-xl font-semibold text-white break-words">{card.title}</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-white break-words">
+                {card.title}
+              </h2>
               {assignedMemberName && (
                 <p className="text-sm text-gray-400 mt-0.5">
                   Assigned to <span className="text-dusty-300">{assignedMemberName}</span>
@@ -210,11 +217,11 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
               )}
             </div>
             {isAssigned ? (
-              <span className="flex-shrink-0 text-xs bg-sage-700/30 text-sage-300 px-2 py-1 rounded-full font-medium">
+              <span className="flex-shrink-0 text-xs bg-sage-900 text-sage-100 px-2 py-1 rounded-full font-medium">
                 Editable
               </span>
             ) : (
-              <span className="flex-shrink-0 text-xs bg-white/5 text-gray-400 px-2 py-1 rounded-full font-medium">
+              <span className="flex-shrink-0 text-xs bg-gray-900 text-gray-400 px-2 py-1 rounded-full font-medium">
                 View only
               </span>
             )}
@@ -256,7 +263,9 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                   >
                     <option value="">Unassigned</option>
                     {members.map((m) => (
-                      <option key={m._id} value={m._id}>{m.name}</option>
+                      <option key={m._id} value={m._id}>
+                        {m.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -279,12 +288,16 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                 {card.description && <p>{card.description}</p>}
                 <div className="flex items-center gap-3 flex-wrap">
                   {card.dueDate && (
-                    <span className="text-gray-400 text-xs">Due {new Date(card.dueDate).toLocaleDateString()}</span>
+                    <span className="text-gray-400 text-xs">
+                      Due {new Date(card.dueDate).toLocaleDateString()}
+                    </span>
                   )}
                   {card.labels && card.labels.length > 0 && (
                     <div className="flex gap-1.5 flex-wrap">
                       {card.labels.map((l) => (
-                        <span key={l} className="px-2 py-0.5 bg-white/10 rounded-full text-xs">{l}</span>
+                        <span key={l} className="px-2 py-0.5 bg-gray-800 rounded-full text-xs">
+                          {l}
+                        </span>
                       ))}
                     </div>
                   )}
@@ -294,15 +307,19 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
           )}
 
           {/* ── CODE & ATTACHMENT — collapsed by default to keep simple cards
-               simple; expands automatically if the card already has content. ── */}
+ simple; expands automatically if the card already has content. ── */}
           <div className="border border-gray-800 rounded-lg overflow-hidden">
             <button
               type="button"
               onClick={() => setShowCode((v) => !v)}
-              className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+              className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-gray-900 transition-colors"
             >
               <span className="font-medium">Code &amp; attachment</span>
-              <span className={`text-gray-500 transition-transform ${showCode ? 'rotate-180' : ''}`}>⌄</span>
+              <span
+                className={`text-gray-500 transition-transform ${showCode ? 'rotate-180' : ''}`}
+              >
+                ⌄
+              </span>
             </button>
 
             {showCode && (
@@ -345,8 +362,8 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                         onChange={handleFileUpload}
                         disabled={uploading}
                         className="block w-full text-sm text-gray-300 bg-gray-800 border border-gray-700
-                                   rounded-lg file:mr-3 file:py-1 file:px-3 file:rounded file:border-0
-                                   file:text-sm file:bg-dusty-600 file:text-white hover:file:bg-dusty-700 transition-colors"
+ rounded-lg file:mr-3 file:py-1 file:px-3 file:rounded file:border-0
+ file:text-sm file:bg-dusty-600 file:text-white hover:file:bg-dusty-700 transition-colors"
                       />
                       {uploading && (
                         <p className="text-xs text-gray-400 mt-1 animate-pulse">Uploading…</p>
@@ -361,7 +378,8 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
           {/* ── COMMENTS — everyone can read and post ─────────────────────── */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Comments {comments.length > 0 && <span className="text-gray-500">({comments.length})</span>}
+              Comments{' '}
+              {comments.length > 0 && <span className="text-gray-500">({comments.length})</span>}
             </label>
             <div className="bg-gray-800 rounded-lg p-3 max-h-48 overflow-y-auto space-y-3 mb-3">
               {loadingComments ? (

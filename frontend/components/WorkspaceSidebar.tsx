@@ -19,16 +19,16 @@ export default function WorkspaceSidebar({
   workspaceName,
 }: WorkspaceSidebarProps) {
   const navItems = [
-    { id: 'boards'    as const, label: 'Boards',    icon: '📋' },
+    { id: 'boards' as const, label: 'Boards', icon: '📋' },
     { id: 'documents' as const, label: 'Documents', icon: '📝' },
-    { id: 'chat'      as const, label: 'Chat',       icon: '💬' },
+    { id: 'chat' as const, label: 'Chat', icon: '💬' },
     { id: 'analytics' as const, label: 'Analytics', icon: '📊' },
-    { id: 'code'      as const, label: 'Code',       icon: '</>' },
-    { id: 'members'   as const, label: 'Members',   icon: '👥' },
+    { id: 'code' as const, label: 'Code', icon: '</>' },
+    { id: 'members' as const, label: 'Members', icon: '👥' },
   ];
 
   return (
-    <aside className="w-full md:w-64 bg-black/40 backdrop-blur-sm border-b md:border-b-0 md:border-r border-white/10 p-2 md:p-4 flex-shrink-0 flex flex-col">
+    <aside className="w-full md:w-64 bg-black border-b md:border-b-0 md:border-r border-gray-800 p-2 md:p-4 flex-shrink-0 flex flex-col">
       <div className="hidden md:block mb-8">
         <h2 className="text-lg font-semibold text-white truncate">{workspaceName}</h2>
       </div>
@@ -40,8 +40,8 @@ export default function WorkspaceSidebar({
             onClick={() => setActiveTab(item.id)}
             className={`flex-shrink-0 flex items-center gap-2 md:gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap ${
               activeTab === item.id
-                ? 'bg-dusty-600 text-white shadow-sm shadow-dusty-600/30'
-                : 'text-gray-300 hover:bg-white/10 hover:text-white active:scale-95'
+                ? 'bg-dusty-600 text-white shadow-sm'
+                : 'text-gray-300 hover:bg-gray-800 hover:text-white active:scale-95'
             }`}
           >
             <span aria-hidden>{item.icon}</span>

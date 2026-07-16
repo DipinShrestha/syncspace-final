@@ -11,11 +11,7 @@ export const metadata: Metadata = {
   description: 'Collaboration tool like Notion + Trello + Slack',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>

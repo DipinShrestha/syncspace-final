@@ -19,24 +19,36 @@ export default function DocumentEditor({ document, onUpdate }: DocumentEditorPro
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const editor = useEditor({
-    extensions: [StarterKit, Underline, TextAlign.configure({ types: ['heading', 'paragraph'] }), Placeholder.configure({ placeholder: 'Start writing...' })],
+    extensions: [
+      StarterKit,
+      Underline,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      Placeholder.configure({ placeholder: 'Start writing...' }),
+    ],
     content: document.content ? JSON.parse(document.content) : '<p></p>',
-    editorProps: { attributes: { class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] p-4 text-gray-900' } },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] p-4 text-gray-900',
+      },
+    },
   });
 
- const autoSave = useCallback(async (content: unknown) => {
-  setSaving(true);
-  try {
-    const res = await updateDocument(document._id, { content: JSON.stringify(content) });
-    setLastSaved(new Date());
-    // res.data is the full updated document from the backend
-    onUpdate(res.data);   // ← pass the whole document (includes updatedAt)
-  } catch {
-    toast.error('Failed to save');
-  } finally {
-    setSaving(false);
-  }
-}, [document, onUpdate]);
+  const autoSave = useCallback(
+    async (content: unknown) => {
+      setSaving(true);
+      try {
+        const res = await updateDocument(document._id, { content: JSON.stringify(content) });
+        setLastSaved(new Date());
+        // res.data is the full updated document from the backend
+        onUpdate(res.data); // ← pass the whole document (includes updatedAt)
+      } catch {
+        toast.error('Failed to save');
+      } finally {
+        setSaving(false);
+      }
+    },
+    [document, onUpdate],
+  );
 
   useEffect(() => {
     if (!editor) return;
@@ -45,16 +57,16 @@ export default function DocumentEditor({ document, onUpdate }: DocumentEditorPro
   }, [editor, autoSave]);
 
   const saveTitle = async () => {
-  if (title === document.title) return;
-  try {
-    const res = await updateDocument(document._id, { title });
-    setLastSaved(new Date());
-    onUpdate(res.data);   // ← use the full response
-    toast.success('Title saved');
-  } catch {
-    toast.error('Failed to save title');
-  }
-};
+    if (title === document.title) return;
+    try {
+      const res = await updateDocument(document._id, { title });
+      setLastSaved(new Date());
+      onUpdate(res.data); // ← use the full response
+      toast.success('Title saved');
+    } catch {
+      toast.error('Failed to save title');
+    }
+  };
 
   // Shared toolbar button styling — text color was previously unset, which
   // relied on inherited page color. Now explicit so it stays readable
@@ -66,19 +78,77 @@ export default function DocumentEditor({ document, onUpdate }: DocumentEditorPro
   return (
     <div className="flex-1 flex flex-col bg-white rounded-lg shadow-lg p-3 sm:p-4">
       <div className="border-b pb-3 mb-3">
-        <input type="text" value={title} onChange={e => setTitle(e.target.value)} onBlur={saveTitle} className="text-xl sm:text-2xl font-bold w-full border-none focus:outline-none focus:ring-0 p-0 text-gray-900 bg-transparent" placeholder="Document title" />
-        <div className="text-xs text-gray-400 mt-1">{saving ? 'Saving…' : lastSaved ? `Saved at ${lastSaved.toLocaleTimeString()}` : 'Auto-save enabled'}</div>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={saveTitle}
+          className="text-xl sm:text-2xl font-bold w-full border-none focus:outline-none focus:ring-0 p-0 text-gray-900 bg-transparent"
+          placeholder="Document title"
+        />
+        <div className="text-xs text-gray-400 mt-1">
+          {saving
+            ? 'Saving…'
+            : lastSaved
+              ? `Saved at ${lastSaved.toLocaleTimeString()}`
+              : 'Auto-save enabled'}
+        </div>
       </div>
       <div className="flex flex-wrap gap-1 border-b pb-2 mb-2">
-        <button onClick={() => editor?.chain().focus().toggleBold().run()} className={`${btnBase} ${editor?.isActive('bold') ? btnActive : btnIdle} font-bold`}>Bold</button>
-        <button onClick={() => editor?.chain().focus().toggleItalic().run()} className={`${btnBase} ${editor?.isActive('italic') ? btnActive : btnIdle} italic`}>Italic</button>
-        <button onClick={() => editor?.chain().focus().toggleUnderline().run()} className={`${btnBase} ${editor?.isActive('underline') ? btnActive : btnIdle} underline`}>Underline</button>
-        <button onClick={() => editor?.chain().focus().setTextAlign('left').run()} className={`${btnBase} ${btnIdle}`}>Left</button>
-        <button onClick={() => editor?.chain().focus().setTextAlign('center').run()} className={`${btnBase} ${btnIdle}`}>Center</button>
-        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={`${btnBase} ${editor?.isActive('heading', { level: 1 }) ? btnActive : btnIdle}`}>H1</button>
-        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={`${btnBase} ${editor?.isActive('heading', { level: 2 }) ? btnActive : btnIdle}`}>H2</button>
-        <button onClick={() => editor?.chain().focus().toggleBulletList().run()} className={`${btnBase} ${editor?.isActive('bulletList') ? btnActive : btnIdle}`}>Bullet List</button>
-        <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={`${btnBase} ${editor?.isActive('orderedList') ? btnActive : btnIdle}`}>Numbered List</button>
+        <button
+          onClick={() => editor?.chain().focus().toggleBold().run()}
+          className={`${btnBase} ${editor?.isActive('bold') ? btnActive : btnIdle} font-bold`}
+        >
+          Bold
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().toggleItalic().run()}
+          className={`${btnBase} ${editor?.isActive('italic') ? btnActive : btnIdle} italic`}
+        >
+          Italic
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().toggleUnderline().run()}
+          className={`${btnBase} ${editor?.isActive('underline') ? btnActive : btnIdle} underline`}
+        >
+          Underline
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+          className={`${btnBase} ${btnIdle}`}
+        >
+          Left
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+          className={`${btnBase} ${btnIdle}`}
+        >
+          Center
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+          className={`${btnBase} ${editor?.isActive('heading', { level: 1 }) ? btnActive : btnIdle}`}
+        >
+          H1
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={`${btnBase} ${editor?.isActive('heading', { level: 2 }) ? btnActive : btnIdle}`}
+        >
+          H2
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().toggleBulletList().run()}
+          className={`${btnBase} ${editor?.isActive('bulletList') ? btnActive : btnIdle}`}
+        >
+          Bullet List
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+          className={`${btnBase} ${editor?.isActive('orderedList') ? btnActive : btnIdle}`}
+        >
+          Numbered List
+        </button>
       </div>
       <EditorContent editor={editor} className="flex-1 min-h-[400px]" />
     </div>

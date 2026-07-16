@@ -26,7 +26,9 @@ export default function VideoCall({ roomId, userId }: VideoCallProps) {
     const newSocket = io(socketUrl);
     setSocket(newSocket);
 
-    return () => { newSocket.disconnect(); };
+    return () => {
+      newSocket.disconnect();
+    };
   }, []);
 
   // 2. Setup PeerJS client
@@ -34,7 +36,9 @@ export default function VideoCall({ roomId, userId }: VideoCallProps) {
     const newPeer = new Peer(userId);
     setPeer(newPeer);
 
-    return () => { newPeer.destroy(); };
+    return () => {
+      newPeer.destroy();
+    };
   }, [userId]);
 
   // 3. Get user's camera and microphone access
@@ -88,7 +92,7 @@ export default function VideoCall({ roomId, userId }: VideoCallProps) {
   useEffect(() => {
     return () => {
       if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
+        localStream.getTracks().forEach((track) => track.stop());
       }
     };
   }, [localStream]);
@@ -97,18 +101,25 @@ export default function VideoCall({ roomId, userId }: VideoCallProps) {
   return (
     <div className="flex flex-col items-center gap-4 p-4">
       {!callActive ? (
-        <button onClick={startCall} className="bg-dusty-600 hover:bg-dusty-700 text-white font-bold py-2 px-4 rounded">
+        <button
+          onClick={startCall}
+          className="bg-dusty-600 hover:bg-dusty-700 text-white font-bold py-2 px-4 rounded"
+        >
           Start Video Call
         </button>
       ) : (
         <div className="flex flex-col md:flex-row gap-4 w-full">
           <div className="relative bg-gray-800 rounded-lg overflow-hidden w-full md:w-1/2">
             <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-auto" />
-            <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">You</div>
+            <div className="absolute bottom-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
+              You
+            </div>
           </div>
           <div className="relative bg-gray-800 rounded-lg overflow-hidden w-full md:w-1/2">
             <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-auto" />
-            <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">Remote</div>
+            <div className="absolute bottom-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
+              Remote
+            </div>
           </div>
         </div>
       )}

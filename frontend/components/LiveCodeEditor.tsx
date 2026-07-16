@@ -8,7 +8,7 @@ export default function LiveCodeEditor() {
   const [code, setCode] = useState(`// Write JavaScript code here
 console.log("Hello, SyncSpace!");
 function add(a, b) {
-  return a + b;
+ return a + b;
 }
 console.log(add(5, 3));
 `);
@@ -29,41 +29,41 @@ console.log(add(5, 3));
 
     // Prepare the code to execute
     const script = `
-      try {
-        let output = '';
-        // Override console.log to capture output
-        const originalLog = console.log;
-        console.log = (...args) => {
-          output += args.map(arg => String(arg)).join(' ') + '\\n';
-          originalLog(...args);
-        };
-        // Also capture return value of the last expression? We'll just evaluate.
-        // We'll also capture errors.
-        (function() {
-          ${code}
-        })();
-        // Send output back
-        window.parent.postMessage({ type: 'output', data: output }, '*');
-      } catch (err) {
-        window.parent.postMessage({ type: 'error', data: err.message }, '*');
-      }
-    `;
+ try {
+ let output = '';
+ // Override console.log to capture output
+ const originalLog = console.log;
+ console.log = (...args) => {
+ output += args.map(arg => String(arg)).join(' ') + '\\n';
+ originalLog(...args);
+ };
+ // Also capture return value of the last expression? We'll just evaluate.
+ // We'll also capture errors.
+ (function() {
+ ${code}
+ })();
+ // Send output back
+ window.parent.postMessage({ type: 'output', data: output }, '*');
+ } catch (err) {
+ window.parent.postMessage({ type: 'error', data: err.message }, '*');
+ }
+ `;
 
     // Write to iframe and execute
     const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
     if (iframeDoc) {
       iframeDoc.open();
       iframeDoc.write(`
-        <!DOCTYPE html>
-        <html>
-          <head><title>Code Runner</title></head>
-          <body>
-            <script>
-              ${script}
-            <\/script>
-          </body>
-        </html>
-      `);
+ <!DOCTYPE html>
+ <html>
+ <head><title>Code Runner</title></head>
+ <body>
+ <script>
+ ${script}
+ <\/script>
+ </body>
+ </html>
+ `);
       iframeDoc.close();
     }
 
@@ -113,7 +113,12 @@ console.log(add(5, 3));
         </pre>
       </div>
       {/* Hidden iframe for sandbox execution */}
-      <iframe ref={iframeRef} style={{ display: 'none' }} sandbox="allow-same-origin allow-scripts" title="code-runner" />
+      <iframe
+        ref={iframeRef}
+        style={{ display: 'none' }}
+        sandbox="allow-same-origin allow-scripts"
+        title="code-runner"
+      />
     </div>
   );
 }

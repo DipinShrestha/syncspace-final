@@ -1,52 +1,51 @@
 @import "tailwindcss";
 
 /*
- * BUG FIX: this app is a fixed dark-theme product (black navbars, glass
- * morphism panels, `text-white`/`text-gray-300` used everywhere) but the
- * background/foreground colors used to flip with the OS `prefers-color-scheme`
- * setting. Any page that didn't set its own explicit background (Dashboard,
- * Settings, the landing page hero) fell back to this variable — so on a
- * light-mode OS, "text-white" headings sat on a white body background and
- * were completely invisible. Locking the theme to dark, always, fixes it.
+ * BUG FIX: this app is a fixed dark-theme product (black navbars, panels,
+ * `text-white`/`text-gray-300` used everywhere) but the background/foreground
+ * colors used to flip with the OS `prefers-color-scheme` setting. Any page
+ * that didn't set its own explicit background fell back to this variable —
+ * so on a light-mode OS, "text-white" headings sat on a white background and
+ * were invisible. Locking the theme to solid black/white, always, fixes it.
+ *
+ * Palette: white, black, dusty blue (#82acbf) and sage green (#89a174) —
+ * every surface below uses ONE flat, fully opaque color from this set.
+ * No gradients, no translucent/blurred "glass" overlays, no color blending.
  */
 :root {
-  --background: #0e1211;
-  --foreground: #f2f4f2;
+  --background: #000000;
+  --foreground: #ffffff;
 }
 
-/*
- * Brand palette: dusty blue (primary accent — buttons, links, focus states)
- * + sage green (secondary accent — positive/success states, highlights).
- * Replaces the old generic blue/emerald/purple mix used across the app so
- * every screen pulls from the same two-tone palette.
- */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-dusty-50: #f1f5f8;
-  --color-dusty-100: #dfe8ee;
-  --color-dusty-200: #c1d3de;
-  --color-dusty-300: #9cb7c9;
-  --color-dusty-400: #7a9cb3;
-  --color-dusty-500: #63879f;
-  --color-dusty-600: #517087;
-  --color-dusty-700: #445c6f;
-  --color-dusty-800: #3a4c5b;
-  --color-dusty-900: #32404c;
+  /* Dusty blue — anchored exactly on #82acbf at the 600 shade */
+  --color-dusty-50: #f0f5f7;
+  --color-dusty-100: #e0eaef;
+  --color-dusty-200: #cddee5;
+  --color-dusty-300: #bad1dc;
+  --color-dusty-400: #a8c5d2;
+  --color-dusty-500: #95b8c9;
+  --color-dusty-600: #82acbf;
+  --color-dusty-700: #6e92a2;
+  --color-dusty-800: #5b7886;
+  --color-dusty-900: #485f69;
 
-  --color-sage-50: #f4f6f0;
-  --color-sage-100: #e5eadb;
-  --color-sage-200: #cbd6ba;
-  --color-sage-300: #adbe92;
-  --color-sage-400: #93a877;
-  --color-sage-500: #7c9260;
-  --color-sage-600: #66784e;
-  --color-sage-700: #526140;
-  --color-sage-800: #445036;
-  --color-sage-900: #3a442f;
+  /* Sage green — anchored exactly on #89a174 at the 600 shade */
+  --color-sage-50: #f1f4ee;
+  --color-sage-100: #e2e8dc;
+  --color-sage-200: #d0d9c7;
+  --color-sage-300: #becbb3;
+  --color-sage-400: #acbd9e;
+  --color-sage-500: #9baf89;
+  --color-sage-600: #89a174;
+  --color-sage-700: #748963;
+  --color-sage-800: #607151;
+  --color-sage-900: #4b5940;
 }
 
 html {
@@ -124,61 +123,59 @@ body {
   transform: scaleX(1);
 }
 
-/* ========== Glass morphism classes ========== */
+/*
+ * ========== Surface classes ==========
+ * Previously these were translucent "glass morphism" panels (rgba alpha +
+ * backdrop-filter blur). Per the requested palette, every surface below is
+ * now a single flat, fully opaque color — no blur, no transparency, no
+ * gradients, no blending between layers.
+ */
 .glass {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.35);
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 8px 24px #000000;
 }
 
 .glass-nav {
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: #000000;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .glass-btn {
-  background: rgba(99,135,159,0.28);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255,255,255,0.10);
-  transition: 0.3s ease;
+  background: var(--color-dusty-600);
+  color: #ffffff;
+  border: 1px solid var(--color-dusty-600);
+  transition: 0.2s ease;
 }
 .glass-btn:hover {
-  background: rgba(99,135,159,0.42);
+  background: var(--color-dusty-700);
+  border-color: var(--color-dusty-700);
 }
 
 .glass-outline {
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #000000;
+  border: 1px solid #3a3a3a;
 }
 
 /*
- * BUG FIX: .glass-input and .glass-active were referenced across the
- * Board/Dashboard/Settings screens (filter selects, "add a list" field,
- * the currently-selected board tab, profile/password inputs) but were never
- * defined anywhere in this file. Without them those inputs rendered with
- * zero custom styling — plain unstyled browser form controls sitting on the
- * dark UI, and the "active" board tab had no visual distinction from the
- * others. Adding the missing styles here, matching the existing glass
- * language used by .glass / .glass-btn / .glass-outline.
+ * .glass-input and .glass-active are shared by the filter selects, the
+ * "add a list" field, the currently-selected board tab, and the
+ * profile/password inputs — kept as solid fills instead of translucent
+ * overlays so nothing on top of them visually blends.
  */
 .glass-input {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #f2f2f4;
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  color: #ffffff;
 }
 .glass-input::placeholder {
-  color: rgba(242,242,244,0.45);
+  color: #8a8a8a;
 }
 .glass-input:focus {
   outline: none;
-  border-color: rgba(122,156,179,0.7);
-  box-shadow: 0 0 0 3px rgba(122,156,179,0.2);
+  border-color: var(--color-dusty-600);
 }
-/* Native <select> / date-input popups can't inherit the glass background,
+/* Native <select> / date-input popups can't inherit the custom background,
    so force a dark scheme for their painted chrome (dropdown list, calendar). */
 select.glass-input,
 input[type="date"].glass-input {
@@ -186,31 +183,30 @@ input[type="date"].glass-input {
 }
 
 .glass-active {
-  background: rgba(99,135,159,0.4);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(156,183,201,0.5);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 16px rgba(99,135,159,0.3);
+  background: var(--color-dusty-600);
+  color: #ffffff;
+  border: 1px solid var(--color-dusty-600);
 }
 
 /* ========== Sidebar link styles ========== */
 .sidebar-link {
-  transition: 0.3s ease;
+  transition: 0.2s ease;
 }
 .sidebar-link:hover {
-  background: rgba(255,255,255,0.06);
+  background: #1a1a1a;
 }
 .sidebar-link.active {
-  background: rgba(122,156,179,0.18);
-  color: #9cb7c9;
+  background: var(--color-dusty-600);
+  color: #ffffff;
 }
 
 /* ========== Card hover effect ========== */
 .card-hover {
-  transition: 0.3s ease;
+  transition: 0.2s ease;
 }
 .card-hover:hover {
   transform: translateY(-6px);
-  background: rgba(255,255,255,0.09);
+  background: #1a1a1a;
 }
 
 /* ========== Logo styling ========== */

@@ -31,7 +31,9 @@ export default function RegisterPage() {
     <div className="min-h-[100dvh] flex items-center justify-center bg-black px-4 py-12">
       <div className="max-w-md w-full p-6 sm:p-8 rounded-2xl glass animate-fade-in-up">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Create account</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Create account
+          </h2>
           <p className="text-gray-400 mt-2 text-sm sm:text-base">Join SyncSpace for free</p>
         </div>
 
@@ -43,7 +45,7 @@ export default function RegisterPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500/30"
+              className="w-full px-4 py-2.5 rounded-lg bg-gray-900 border border-gray-700 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500"
             />
           </div>
           <div>
@@ -53,7 +55,7 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500/30"
+              className="w-full px-4 py-2.5 rounded-lg bg-gray-900 border border-gray-700 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500"
             />
           </div>
           <div>
@@ -63,7 +65,7 @@ export default function RegisterPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500/30"
+              className="w-full px-4 py-2.5 rounded-lg bg-gray-900 border border-gray-700 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500"
             />
           </div>
           <div>
@@ -73,7 +75,7 @@ export default function RegisterPage() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500/30"
+              className="w-full px-4 py-2.5 rounded-lg bg-gray-900 border border-gray-700 text-white transition-colors focus:outline-none focus:border-dusty-500 focus:ring-2 focus:ring-dusty-500"
             />
           </div>
           <button
@@ -87,7 +89,10 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-gray-400 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-dusty-300 hover:text-dusty-200 hover:underline transition-colors">
+          <Link
+            href="/login"
+            className="text-dusty-300 hover:text-dusty-200 hover:underline transition-colors"
+          >
             Login
           </Link>
         </p>

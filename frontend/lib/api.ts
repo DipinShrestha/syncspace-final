@@ -43,8 +43,7 @@ export const createWorkspace = (data: { name: string; description?: string }) =>
   api.post('/workspaces', data);
 export const inviteMember = (workspaceId: string, email: string) =>
   api.post(`/workspaces/${workspaceId}/members`, { email });
-export const getWorkspaceById = (id: string) =>
-  api.get(`/workspaces/${id}`);
+export const getWorkspaceById = (id: string) => api.get(`/workspaces/${id}`);
 export const deleteWorkspace = (id: string) => api.delete(`/workspaces/${id}`);
 export const removeWorkspaceMember = (workspaceId: string, userId: string) =>
   api.delete(`/workspaces/${workspaceId}/members/${userId}`);
@@ -58,11 +57,12 @@ export const addList = (boardId: string, title: string) =>
   api.post(`/boards/${boardId}/lists`, { title });
 export const addCard = (boardId: string, listIndex: number, data: CardData) =>
   api.post(`/boards/${boardId}/lists/${listIndex}/cards`, data);
-export const updateCard = (cardId: string, data: CardData) =>
-  api.put(`/cards/${cardId}`, data);
-export const moveCard = (cardId: string, data: { targetBoardId: string; targetListIndex: number; newPosition: number }) =>
-  api.patch(`/cards/${cardId}/move`, data);
-export const deleteCard = (cardId: string) => api.delete(`/cards/${cardId}`);   // ✅ only one!
+export const updateCard = (cardId: string, data: CardData) => api.put(`/cards/${cardId}`, data);
+export const moveCard = (
+  cardId: string,
+  data: { targetBoardId: string; targetListIndex: number; newPosition: number },
+) => api.patch(`/cards/${cardId}/move`, data);
+export const deleteCard = (cardId: string) => api.delete(`/cards/${cardId}`); // ✅ only one!
 
 // ========== Document endpoints ==========
 export const getDocumentsByWorkspace = (workspaceId: string) =>
@@ -92,4 +92,3 @@ export const deleteAccount = () => api.delete('/auth/account');
 // and let axios/fetch set Content-Type automatically — never set it by hand).
 
 export default api;
-

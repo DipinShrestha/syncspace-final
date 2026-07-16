@@ -86,7 +86,7 @@ export default function Analytics({ workspaceId }: { workspaceId: string }) {
               </tr>
             </thead>
             <tbody>
-              {data.members.map(member => (
+              {data.members.map((member) => (
                 <tr key={member.userId} className="border-b border-gray-700">
                   <td className="px-4 py-2 font-medium">{member.name}</td>
                   <td className="px-4 py-2">{member.tasksAssigned}</td>
