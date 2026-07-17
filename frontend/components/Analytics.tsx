@@ -45,37 +45,37 @@ export default function Analytics({ workspaceId }: { workspaceId: string }) {
     if (workspaceId) fetchAnalytics();
   }, [workspaceId]);
 
-  if (loading) return <div className="p-8 text-white">Loading analytics...</div>;
-  if (!data) return <div className="p-8 text-white">No data available</div>;
+  if (loading) return <div className="p-8 text-black">Loading analytics...</div>;
+  if (!data) return <div className="p-8 text-black">No data available</div>;
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in-up">
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
-          <h3 className="text-xs sm:text-sm text-gray-400">Total Tasks</h3>
-          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.totalTasks}</p>
+          <h3 className="text-xs sm:text-sm text-gray-500">Total Tasks</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.totalTasks}</p>
         </div>
         <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
-          <h3 className="text-xs sm:text-sm text-gray-400">Completed Tasks</h3>
-          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.completedTasks}</p>
+          <h3 className="text-xs sm:text-sm text-gray-500">Completed Tasks</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.completedTasks}</p>
         </div>
         <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
-          <h3 className="text-xs sm:text-sm text-gray-400">Completion Rate</h3>
-          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.completionRate}%</p>
+          <h3 className="text-xs sm:text-sm text-gray-500">Completion Rate</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.completionRate}%</p>
         </div>
         <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
-          <h3 className="text-xs sm:text-sm text-gray-400">Total Messages</h3>
-          <p className="text-xl sm:text-2xl font-bold text-white">{data.summary.totalMessages}</p>
+          <h3 className="text-xs sm:text-sm text-gray-500">Total Messages</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.totalMessages}</p>
         </div>
       </div>
 
       {/* Member table */}
       <div className="glass p-4 rounded-xl">
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Member Contributions</h2>
+        <h2 className="text-lg sm:text-xl font-semibold text-black mb-4">Member Contributions</h2>
         <div className="overflow-x-auto scrollbar-none">
-          <table className="w-full text-sm text-left text-gray-300">
-            <thead className="text-xs uppercase bg-gray-800">
+          <table className="w-full text-sm text-left text-black">
+            <thead className="text-xs uppercase bg-gray-100">
               <tr>
                 <th className="px-4 py-2">Member</th>
                 <th className="px-4 py-2">Tasks Assigned</th>
@@ -87,7 +87,7 @@ export default function Analytics({ workspaceId }: { workspaceId: string }) {
             </thead>
             <tbody>
               {data.members.map((member) => (
-                <tr key={member.userId} className="border-b border-gray-700">
+                <tr key={member.userId} className="border-b border-gray-200">
                   <td className="px-4 py-2 font-medium">{member.name}</td>
                   <td className="px-4 py-2">{member.tasksAssigned}</td>
                   <td className="px-4 py-2">{member.tasksCompleted}</td>

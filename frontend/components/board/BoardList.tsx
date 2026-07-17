@@ -109,7 +109,7 @@ const BoardList: React.FC<BoardListProps> = ({
             <button
               type="button"
               onClick={handleAddCard}
-              className="bg-dusty-600 text-white px-3 py-1 rounded-md text-sm hover:bg-dusty-700"
+              className="bg-dusty-600 text-black px-3 py-1 rounded-md text-sm hover:bg-dusty-700"
             >
               Add
             </button>

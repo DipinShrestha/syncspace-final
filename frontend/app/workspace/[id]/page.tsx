@@ -96,13 +96,13 @@ export default function WorkspacePage() {
     }
   };
 
-  if (authLoading || loading) return <div className="p-8 text-white">Loading workspace…</div>;
+  if (authLoading || loading) return <div className="p-8 text-black">Loading workspace…</div>;
   if (!workspace) return null;
 
   return (
     <>
       <Navbar />
-      <div className="pt-16 min-h-screen bg-gray-900">
+      <div className="pt-16 min-h-screen bg-white">
         <div className="flex flex-col md:flex-row md:h-[calc(100vh-4rem)]">
           {/* Sidebar now carries workspaceId + workspaceName for the Members tab.
  Stacks above the content as a horizontal tab strip on mobile,
@@ -118,8 +118,8 @@ export default function WorkspacePage() {
             <div className="p-4 sm:p-6">
               {/* Header — InviteMember removed; it now lives inside the Members tab */}
               <div className="mb-6">
-                <h1 className="text-xl sm:text-2xl font-bold text-white">{workspace.name}</h1>
-                <p className="text-sm sm:text-base text-gray-400">
+                <h1 className="text-xl sm:text-2xl font-bold text-black">{workspace.name}</h1>
+                <p className="text-sm sm:text-base text-gray-500">
                   {workspace.description || 'No description'}
                 </p>
               </div>
@@ -131,7 +131,7 @@ export default function WorkspacePage() {
               {activeTab === 'documents' && (
                 <div className="h-[75vh]">
                   {docLoading ? (
-                    <div className="flex items-center justify-center h-full text-gray-400">
+                    <div className="flex items-center justify-center h-full text-gray-500">
                       Loading document…
                     </div>
                   ) : workspaceDoc ? (
@@ -140,7 +140,7 @@ export default function WorkspacePage() {
                       onUpdate={(updated) => setWorkspaceDoc(updated)}
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
+                    <div className="flex items-center justify-center h-full text-gray-500">
                       Failed to load document.
                     </div>
                   )}
@@ -151,8 +151,8 @@ export default function WorkspacePage() {
               {activeTab === 'chat' && (
                 <div className="space-y-6">
                   <Chat workspaceId={id as string} />
-                  <div className="border-t border-gray-700 pt-6">
-                    <h3 className="text-lg font-semibold text-white mb-3">Video Call</h3>
+                  <div className="border-t border-gray-200 pt-6">
+                    <h3 className="text-lg font-semibold text-black mb-3">Video Call</h3>
                     <VideoCall roomId={id as string} userId={user?._id as string} />
                   </div>
                 </div>

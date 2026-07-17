@@ -78,27 +78,25 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
   const canManage =
     user?._id === owner?._id || members.some((m) => m.user._id === user?._id && m.role === 'admin');
 
-  if (loading) return <div className="p-4 text-gray-400">Loading members...</div>;
+  if (loading) return <div className="p-4 text-gray-500">Loading members...</div>;
 
   return (
     <div className="max-w-lg animate-fade-in-up">
-      <h2 className="text-lg sm:text-xl font-bold text-white mb-6">Members</h2>
+      <h2 className="text-lg sm:text-xl font-bold text-black mb-6">Members</h2>
 
       {/* Owner row */}
       {owner && (
         <div className="mb-4">
           <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Owner</p>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-900 border border-gray-800">
-            <div className="w-9 h-9 rounded-full bg-dusty-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-200">
+            <div className="w-9 h-9 rounded-full bg-dusty-600 flex items-center justify-center text-black font-bold text-sm flex-shrink-0">
               {owner.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{owner.name}</p>
-              <p className="text-xs text-gray-400 truncate">{owner.email}</p>
+              <p className="text-sm font-medium text-black truncate">{owner.name}</p>
+              <p className="text-xs text-gray-500 truncate">{owner.email}</p>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-dusty-900 text-dusty-100">
-              owner
-            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-dusty-600 text-black">owner</span>
           </div>
         </div>
       )}
@@ -118,25 +116,25 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               return (
                 <div
                   key={m.user._id}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-900 border border-gray-800 transition-colors hover:bg-white/[0.08]"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-200 transition-colors hover:bg-gray-50"
                 >
-                  <div className="w-9 h-9 rounded-full bg-sage-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-sage-600 flex items-center justify-center text-black font-bold text-sm flex-shrink-0">
                     {m.user.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
-                      {m.user.name} {isSelf && <span className="text-xs text-gray-400">(you)</span>}
+                    <p className="text-sm font-medium text-black truncate">
+                      {m.user.name} {isSelf && <span className="text-xs text-gray-500">(you)</span>}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">{m.user.email}</p>
+                    <p className="text-xs text-gray-500 truncate">{m.user.email}</p>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300 flex-shrink-0">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black flex-shrink-0">
                     {m.role}
                   </span>
                   {/* Show remove button to admins/owner, but not for the owner row itself */}
                   {canManage && !isOwnerRow && (
                     <button
                       onClick={() => handleRemove(m.user._id, m.user.name)}
-                      className="ml-1 text-gray-500 hover:text-red-400 text-xs transition-colors flex-shrink-0 p-1"
+                      className="ml-1 text-gray-400 hover:text-red-600 text-xs transition-colors flex-shrink-0 p-1"
                       title={`Remove ${m.user.name}`}
                     >
                       ✕
@@ -160,12 +158,12 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+              className="flex-1 glass-input rounded-lg px-3 py-2 text-sm transition-colors"
             />
             <button
               onClick={handleInvite}
               disabled={inviting}
-              className="bg-dusty-600 hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
+              className="bg-dusty-600 hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 text-black px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
             >
               {inviting ? 'Sending…' : 'Invite'}
             </button>

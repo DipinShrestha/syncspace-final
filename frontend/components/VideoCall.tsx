@@ -103,7 +103,7 @@ export default function VideoCall({ roomId, userId }: VideoCallProps) {
       {!callActive ? (
         <button
           onClick={startCall}
-          className="bg-dusty-600 hover:bg-dusty-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-dusty-600 hover:bg-dusty-700 text-black font-bold py-2 px-4 rounded"
         >
           Start Video Call
         </button>

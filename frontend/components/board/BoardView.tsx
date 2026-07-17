@@ -391,12 +391,12 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
 
   // ─── render ──────────────────────────────────────────────────────────────────
 
-  if (loading) return <div className="p-8 text-center text-white">Loading boards...</div>;
+  if (loading) return <div className="p-8 text-center text-black">Loading boards...</div>;
 
   if (!currentBoard) {
     return (
       <div>
-        <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-4">
+        <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
           <button
             onClick={() => setShowNewBoardModal(true)}
             className="px-3 py-1 glass-btn rounded-lg text-sm"
@@ -405,15 +405,15 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
           </button>
         </div>
         {showNewBoardModal && (
-          <div className="modal-overlay fixed inset-0 bg-black flex items-center justify-center z-50 p-4">
+          <div className="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="modal-panel glass rounded-lg p-6 w-full max-w-96">
-              <h2 className="text-xl mb-4 text-white font-semibold">Create New Board</h2>
+              <h2 className="text-xl mb-4 text-black font-semibold">Create New Board</h2>
               <input
                 type="text"
                 placeholder="Board title"
                 value={newBoardTitle}
                 onChange={(e) => setNewBoardTitle(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mb-4 text-white placeholder-gray-400"
+                className="w-full glass-input rounded-lg p-2 mb-4 transition-colors"
                 autoFocus
               />
               <div className="flex justify-end gap-2">
@@ -444,7 +444,7 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
         <select
           value={filterAssignee}
           onChange={(e) => setFilterAssignee(e.target.value)}
-          className="glass-input rounded px-2 py-1.5 text-white text-sm transition-colors"
+          className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
         >
           <option value="">All Assignees</option>
           {members.map((m) => (
@@ -456,7 +456,7 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
         <select
           value={filterLabel}
           onChange={(e) => setFilterLabel(e.target.value)}
-          className="glass-input rounded px-2 py-1.5 text-white text-sm transition-colors"
+          className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
         >
           <option value="">All Labels</option>
           <option value="bug">Bug</option>
@@ -467,7 +467,7 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
           type="date"
           value={filterDueDate}
           onChange={(e) => setFilterDueDate(e.target.value)}
-          className="glass-input rounded px-2 py-1.5 text-white text-sm transition-colors"
+          className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
         />
         <button
           onClick={() => {
@@ -482,7 +482,7 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
       </div>
 
       {/* Board tabs + Add List */}
-      <div className="flex flex-col sm:flex-row flex-wrap justify-between sm:items-center gap-3 mb-4 border-b border-gray-700 pb-4">
+      <div className="flex flex-col sm:flex-row flex-wrap justify-between sm:items-center gap-3 mb-4 border-b border-gray-200 pb-4">
         <div className="flex flex-wrap gap-2 overflow-x-auto scrollbar-none">
           {boards.map((board) => (
             <button
@@ -490,8 +490,8 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
               onClick={() => setCurrentBoard(board)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 currentBoard._id === board._id
-                  ? 'glass-active text-white'
-                  : 'glass text-gray-300 hover:bg-gray-800 active:scale-95'
+                  ? 'glass-active text-black'
+                  : 'glass text-black hover:bg-gray-100 active:scale-95'
               }`}
             >
               {board.title}
@@ -584,15 +584,15 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
 
       {/* New board modal */}
       {showNewBoardModal && (
-        <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="glass rounded-lg p-6 w-96">
-            <h2 className="text-xl mb-4 text-white">Create New Board</h2>
+            <h2 className="text-xl mb-4 text-black">Create New Board</h2>
             <input
               type="text"
               placeholder="Board title"
               value={newBoardTitle}
               onChange={(e) => setNewBoardTitle(e.target.value)}
-              className="w-full glass-input rounded-lg p-2 mb-4 text-white"
+              className="w-full glass-input rounded-lg p-2 mb-4"
               autoFocus
             />
             <div className="flex justify-end gap-2">

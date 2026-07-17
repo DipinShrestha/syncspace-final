@@ -28,9 +28,9 @@ export default function WorkspaceSidebar({
   ];
 
   return (
-    <aside className="w-full md:w-64 bg-black border-b md:border-b-0 md:border-r border-gray-800 p-2 md:p-4 flex-shrink-0 flex flex-col">
+    <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-gray-200 p-2 md:p-4 flex-shrink-0 flex flex-col">
       <div className="hidden md:block mb-8">
-        <h2 className="text-lg font-semibold text-white truncate">{workspaceName}</h2>
+        <h2 className="text-lg font-semibold text-black truncate">{workspaceName}</h2>
       </div>
       {/* Horizontal scrollable tab strip on mobile, vertical stack from md up */}
       <nav className="flex md:flex-col gap-1.5 md:gap-2 overflow-x-auto md:overflow-visible pb-1 md:pb-0 -mx-2 px-2 md:mx-0 md:px-0 scrollbar-none">
@@ -40,8 +40,8 @@ export default function WorkspaceSidebar({
             onClick={() => setActiveTab(item.id)}
             className={`flex-shrink-0 flex items-center gap-2 md:gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap ${
               activeTab === item.id
-                ? 'bg-dusty-600 text-white shadow-sm'
-                : 'text-gray-300 hover:bg-gray-800 hover:text-white active:scale-95'
+                ? 'bg-dusty-600 text-black shadow-sm'
+                : 'text-black hover:bg-gray-100 active:scale-95'
             }`}
           >
             <span aria-hidden>{item.icon}</span>

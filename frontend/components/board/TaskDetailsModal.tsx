@@ -196,32 +196,35 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
 
   return (
     <div
-      className="modal-overlay fixed inset-0 bg-black flex items-center justify-center z-50 p-2 sm:p-4"
+      className="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="modal-panel bg-gray-900 rounded-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+        className="modal-panel bg-white border border-gray-200 rounded-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 sm:p-6 space-y-4">
           {/* Header */}
           <div className="flex justify-between items-start gap-3">
             <div className="min-w-0">
-              <h2 className="text-lg sm:text-xl font-semibold text-white break-words">
+              <h2 className="text-lg sm:text-xl font-semibold text-black break-words">
                 {card.title}
               </h2>
               {assignedMemberName && (
-                <p className="text-sm text-gray-400 mt-0.5">
-                  Assigned to <span className="text-dusty-300">{assignedMemberName}</span>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Assigned to{' '}
+                  <span className="text-xs text-black bg-dusty-600 px-2 py-0.5 rounded-full font-medium">
+                    {assignedMemberName}
+                  </span>
                 </p>
               )}
             </div>
             {isAssigned ? (
-              <span className="flex-shrink-0 text-xs bg-sage-900 text-sage-100 px-2 py-1 rounded-full font-medium">
+              <span className="flex-shrink-0 text-xs bg-sage-600 text-black px-2 py-1 rounded-full font-medium">
                 Editable
               </span>
             ) : (
-              <span className="flex-shrink-0 text-xs bg-gray-900 text-gray-400 px-2 py-1 rounded-full font-medium">
+              <span className="flex-shrink-0 text-xs bg-gray-100 text-black px-2 py-1 rounded-full font-medium">
                 View only
               </span>
             )}
@@ -234,7 +237,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                className="w-full glass-input rounded-lg p-2.5 transition-colors"
                 placeholder="Title"
               />
               <textarea
@@ -242,7 +245,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 placeholder="Add a description…"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                className="w-full glass-input rounded-lg p-2.5 text-sm transition-colors"
               />
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1">
@@ -251,7 +254,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm text-white transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                    className="w-full glass-input rounded-lg p-2 text-sm transition-colors"
                   />
                 </div>
                 <div className="flex-1">
@@ -259,7 +262,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                   <select
                     value={assignedTo}
                     onChange={(e) => setAssignedTo(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm text-white transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                    className="w-full glass-input rounded-lg p-2 text-sm transition-colors"
                   >
                     <option value="">Unassigned</option>
                     {members.map((m) => (
@@ -277,25 +280,28 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                   value={labels}
                   onChange={(e) => setLabels(e.target.value)}
                   placeholder="bug, feature, urgent"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm text-white transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                  className="w-full glass-input rounded-lg p-2 text-sm transition-colors"
                 />
               </div>
             </div>
           ) : (
             /* READ-ONLY view of description / labels / due date */
             (card.description || card.dueDate || (card.labels && card.labels.length > 0)) && (
-              <div className="space-y-2 text-sm text-gray-300">
+              <div className="space-y-2 text-sm text-gray-700">
                 {card.description && <p>{card.description}</p>}
                 <div className="flex items-center gap-3 flex-wrap">
                   {card.dueDate && (
-                    <span className="text-gray-400 text-xs">
+                    <span className="text-gray-500 text-xs">
                       Due {new Date(card.dueDate).toLocaleDateString()}
                     </span>
                   )}
                   {card.labels && card.labels.length > 0 && (
                     <div className="flex gap-1.5 flex-wrap">
                       {card.labels.map((l) => (
-                        <span key={l} className="px-2 py-0.5 bg-gray-800 rounded-full text-xs">
+                        <span
+                          key={l}
+                          className="px-2 py-0.5 bg-gray-100 text-black rounded-full text-xs"
+                        >
                           {l}
                         </span>
                       ))}
@@ -308,11 +314,11 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
 
           {/* ── CODE & ATTACHMENT — collapsed by default to keep simple cards
  simple; expands automatically if the card already has content. ── */}
-          <div className="border border-gray-800 rounded-lg overflow-hidden">
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
             <button
               type="button"
               onClick={() => setShowCode((v) => !v)}
-              className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-gray-900 transition-colors"
+              className="w-full flex items-center justify-between px-3 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
             >
               <span className="font-medium">Code &amp; attachment</span>
               <span
@@ -323,7 +329,10 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
             </button>
 
             {showCode && (
-              <div className="p-3 pt-0 space-y-3 animate-fade-in-up border-t border-gray-800">
+              <div className="p-3 pt-0 space-y-3 animate-fade-in-up border-t border-gray-200">
+                {/* Monaco editor is intentionally kept dark (vs-dark theme) as an
+                    accepted convention for code editors, independent of the
+                    site's light theme — matching GitHub/VS Code docs. */}
                 <div className="border border-gray-700 rounded-lg overflow-hidden mt-3">
                   <Editor
                     height="200px"
@@ -346,7 +355,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                       href={card.codeFileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-dusty-300 hover:underline text-sm break-all"
+                      className="text-black font-medium hover:underline text-sm break-all"
                     >
                       📎 {card.codeFileUrl.split('/').pop()}
                     </a>
@@ -361,12 +370,12 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                         accept=".js,.ts,.py,.java,.cpp,.c,.cs,.go,.rb,.php,.html,.css,.json,.txt,.md,.zip,.pdf"
                         onChange={handleFileUpload}
                         disabled={uploading}
-                        className="block w-full text-sm text-gray-300 bg-gray-800 border border-gray-700
+                        className="block w-full text-sm text-black bg-white border border-gray-300
  rounded-lg file:mr-3 file:py-1 file:px-3 file:rounded file:border-0
- file:text-sm file:bg-dusty-600 file:text-white hover:file:bg-dusty-700 transition-colors"
+ file:text-sm file:bg-dusty-600 file:text-black hover:file:bg-dusty-700 transition-colors"
                       />
                       {uploading && (
-                        <p className="text-xs text-gray-400 mt-1 animate-pulse">Uploading…</p>
+                        <p className="text-xs text-gray-500 mt-1 animate-pulse">Uploading…</p>
                       )}
                     </div>
                   )}
@@ -377,11 +386,11 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
 
           {/* ── COMMENTS — everyone can read and post ─────────────────────── */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Comments{' '}
               {comments.length > 0 && <span className="text-gray-500">({comments.length})</span>}
             </label>
-            <div className="bg-gray-800 rounded-lg p-3 max-h-48 overflow-y-auto space-y-3 mb-3">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 max-h-48 overflow-y-auto space-y-3 mb-3">
               {loadingComments ? (
                 <p className="text-gray-500 text-sm">Loading comments…</p>
               ) : comments.length === 0 ? (
@@ -389,25 +398,25 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
               ) : (
                 comments.map((c) => (
                   <div key={c._id} className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-sage-700 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
+                    <div className="w-7 h-7 rounded-full bg-sage-600 flex-shrink-0 flex items-center justify-center text-black text-xs font-bold">
                       {c.author.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-xs font-medium text-white">{c.author.name}</span>
+                        <span className="text-xs font-medium text-black">{c.author.name}</span>
                         <span className="text-xs text-gray-500">
                           {new Date(c.createdAt).toLocaleString()}
                         </span>
                         {user && c.author._id === user._id && (
                           <button
                             onClick={() => handleDeleteComment(c._id)}
-                            className="text-gray-600 hover:text-red-400 text-xs ml-auto"
+                            className="text-gray-400 hover:text-red-600 text-xs ml-auto"
                           >
                             ✕
                           </button>
                         )}
                       </div>
-                      <p className="text-sm text-gray-300 mt-0.5">{c.text}</p>
+                      <p className="text-sm text-gray-700 mt-0.5">{c.text}</p>
                     </div>
                   </div>
                 ))
@@ -423,12 +432,12 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
                 onChange={(e) => setCommentText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handlePostComment()}
                 placeholder="Write a comment…"
-                className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                className="flex-1 glass-input rounded-lg px-3 py-2 text-sm"
               />
               <button
                 onClick={handlePostComment}
                 disabled={postingComment || !commentText.trim()}
-                className="bg-dusty-600 hover:bg-dusty-700 active:scale-95 disabled:opacity-40 disabled:active:scale-100 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                className="bg-dusty-600 hover:bg-dusty-700 active:scale-95 disabled:opacity-40 disabled:active:scale-100 text-black px-4 py-2 rounded-lg text-sm font-medium transition-all"
               >
                 {postingComment ? '…' : 'Post'}
               </button>
@@ -436,10 +445,10 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
           </div>
 
           {/* ── ACTION BUTTONS ────────────────────────────────────────────── */}
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2 border-t border-gray-700">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2 border-t border-gray-200">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 active:scale-95 transition-all text-sm font-medium"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-black hover:bg-gray-100 active:scale-95 transition-all text-sm font-medium"
             >
               Close
             </button>
@@ -447,7 +456,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-4 py-2 bg-dusty-600 hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 rounded-lg text-white text-sm font-medium transition-all"
+                className="px-4 py-2 bg-dusty-600 hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100 rounded-lg text-black text-sm font-medium transition-all"
               >
                 {saving ? 'Saving…' : 'Save Changes'}
               </button>

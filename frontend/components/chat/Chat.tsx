@@ -104,12 +104,12 @@ export default function Chat({ workspaceId }: ChatProps) {
               <div
                 className={`max-w-[85%] sm:max-w-[70%] rounded-lg px-4 py-2 ${
                   msg.sender._id === user?._id
-                    ? 'bg-dusty-600 text-white'
+                    ? 'bg-dusty-600 text-black'
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
                 <div
-                  className={`text-xs font-medium mb-1 ${msg.sender._id === user?._id ? 'text-dusty-100' : 'text-gray-500'}`}
+                  className={`text-xs font-medium mb-1 ${msg.sender._id === user?._id ? 'text-black' : 'text-gray-500'}`}
                 >
                   {msg.sender.name}
                 </div>
@@ -134,7 +134,7 @@ export default function Chat({ workspaceId }: ChatProps) {
           <button
             onClick={sendMessage}
             disabled={!isConnected || !newMessage.trim()}
-            className="bg-dusty-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-all hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+            className="bg-dusty-600 text-black px-4 py-2 rounded-md text-sm font-medium transition-all hover:bg-dusty-700 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
           >
             Send
           </button>

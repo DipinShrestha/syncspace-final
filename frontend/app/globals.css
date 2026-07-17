@@ -1,20 +1,14 @@
 @import "tailwindcss";
 
 /*
- * BUG FIX: this app is a fixed dark-theme product (black navbars, panels,
- * `text-white`/`text-gray-300` used everywhere) but the background/foreground
- * colors used to flip with the OS `prefers-color-scheme` setting. Any page
- * that didn't set its own explicit background fell back to this variable —
- * so on a light-mode OS, "text-white" headings sat on a white background and
- * were invisible. Locking the theme to solid black/white, always, fixes it.
- *
- * Palette: white, black, dusty blue (#82acbf) and sage green (#89a174) —
- * every surface below uses ONE flat, fully opaque color from this set.
- * No gradients, no translucent/blurred "glass" overlays, no color blending.
+ * Palette: white background, black text, dusty blue (#82acbf) and sage green
+ * (#89a174) used only for buttons/badges/active states/borders — never as a
+ * page or panel background. Every surface below is ONE flat, fully opaque
+ * color. No gradients, no translucent "glass" overlays, no color blending.
  */
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -49,7 +43,7 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -115,7 +109,7 @@ body {
   left: 0;
   width: 100%;
   height: 1px;
-  background: white;
+  background: black;
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
@@ -125,25 +119,25 @@ body {
 
 /*
  * ========== Surface classes ==========
- * Previously these were translucent "glass morphism" panels (rgba alpha +
- * backdrop-filter blur). Per the requested palette, every surface below is
- * now a single flat, fully opaque color — no blur, no transparency, no
- * gradients, no blending between layers.
+ * White background, black text, everywhere. #82acbf / #89a174 only ever
+ * appear as solid fills on interactive elements (buttons, active tab,
+ * badges) — never as a page or panel background. One flat opaque color per
+ * surface: no gradients, no transparency, no blending between layers.
  */
 .glass {
-  background: #111111;
-  border: 1px solid #2a2a2a;
-  box-shadow: 0 8px 24px #000000;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .glass-nav {
-  background: #000000;
-  border-bottom: 1px solid #2a2a2a;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .glass-btn {
   background: var(--color-dusty-600);
-  color: #ffffff;
+  color: #000000;
   border: 1px solid var(--color-dusty-600);
   transition: 0.2s ease;
 }
@@ -153,8 +147,9 @@ body {
 }
 
 .glass-outline {
-  background: #000000;
-  border: 1px solid #3a3a3a;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  color: #000000;
 }
 
 /*
@@ -164,27 +159,21 @@ body {
  * overlays so nothing on top of them visually blends.
  */
 .glass-input {
-  background: #111111;
-  border: 1px solid #2a2a2a;
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  color: #000000;
 }
 .glass-input::placeholder {
-  color: #8a8a8a;
+  color: #737373;
 }
 .glass-input:focus {
   outline: none;
   border-color: var(--color-dusty-600);
 }
-/* Native <select> / date-input popups can't inherit the custom background,
-   so force a dark scheme for their painted chrome (dropdown list, calendar). */
-select.glass-input,
-input[type="date"].glass-input {
-  color-scheme: dark;
-}
 
 .glass-active {
   background: var(--color-dusty-600);
-  color: #ffffff;
+  color: #000000;
   border: 1px solid var(--color-dusty-600);
 }
 
@@ -193,11 +182,11 @@ input[type="date"].glass-input {
   transition: 0.2s ease;
 }
 .sidebar-link:hover {
-  background: #1a1a1a;
+  background: #f2f2f2;
 }
 .sidebar-link.active {
   background: var(--color-dusty-600);
-  color: #ffffff;
+  color: #000000;
 }
 
 /* ========== Card hover effect ========== */
@@ -206,7 +195,7 @@ input[type="date"].glass-input {
 }
 .card-hover:hover {
   transform: translateY(-6px);
-  background: #1a1a1a;
+  background: #f7f7f7;
 }
 
 /* ========== Logo styling ========== */

@@ -18,7 +18,7 @@ export default function LandingPage() {
           height: 1px;
           left: 0;
           bottom: -4px;
-          background: white;
+          background: black;
           transform: scaleX(0);
           transition: transform 0.3s ease;
         }
@@ -55,31 +55,31 @@ export default function LandingPage() {
                 <>
                   <Link
                     href="#features"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     FEATURES
                   </Link>
                   <Link
                     href="#about"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     ABOUT US
                   </Link>
                   <Link
                     href="#support"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     SUPPORT
                   </Link>
                   <Link
                     href="/login"
-                    className="text-dusty-300 text-sm font-medium transition-colors hover:text-dusty-200"
+                    className="text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     LOGIN
                   </Link>
                   <Link
                     href="/register"
-                    className="glass-btn px-5 py-2 rounded-xl text-white text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]"
+                    className="glass-btn px-5 py-2 rounded-xl text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]"
                   >
                     SIGN UP
                   </Link>
@@ -89,42 +89,42 @@ export default function LandingPage() {
                 <>
                   <Link
                     href="/dashboard"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     DASHBOARD
                   </Link>
                   <Link
                     href="#features"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     FEATURES
                   </Link>
                   <Link
                     href="#about"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     ABOUT
                   </Link>
                   <Link
                     href="#support"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     SUPPORT
                   </Link>
                   <Link
                     href="#notifications"
-                    className="nav-link text-white text-sm font-medium transition-colors hover:text-dusty-300"
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
                   >
                     NOTIFICATION
                   </Link>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={logout}
-                      className="text-sm text-gray-300 hover:text-white transition-colors"
+                      className="text-sm text-black transition-opacity hover:opacity-60"
                     >
                       Logout
                     </button>
-                    <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-white transition-transform hover:scale-105 active:scale-95">
+                    <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black transition-transform hover:scale-105 active:scale-95">
                       {user.name?.charAt(0).toUpperCase() || 'U'}
                     </button>
                   </div>
@@ -134,7 +134,7 @@ export default function LandingPage() {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden text-white text-2xl w-9 h-9 flex items-center justify-center focus:outline-none transition-transform active:scale-90"
+              className="md:hidden text-black text-2xl w-9 h-9 flex items-center justify-center focus:outline-none transition-transform active:scale-90"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -155,35 +155,35 @@ export default function LandingPage() {
             <>
               <Link
                 href="#features"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 href="#about"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 About
               </Link>
               <Link
                 href="#support"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Support
               </Link>
               <Link
                 href="/login"
-                className="block text-dusty-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Login
               </Link>
               <Link
                 href="/register"
-                className="block glass-btn text-center text-white text-sm font-medium px-4 py-2.5 rounded-xl mt-2 transition-all active:scale-95"
+                className="block glass-btn text-center text-sm font-medium px-4 py-2.5 rounded-xl mt-2 transition-all active:scale-95"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign Up
@@ -193,35 +193,35 @@ export default function LandingPage() {
             <>
               <Link
                 href="/dashboard"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Dashboard
               </Link>
               <Link
                 href="#features"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 href="#about"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 About
               </Link>
               <Link
                 href="#support"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Support
               </Link>
               <Link
                 href="#notifications"
-                className="block text-white text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Notification
@@ -231,12 +231,12 @@ export default function LandingPage() {
                   logout();
                   setMobileMenuOpen(false);
                 }}
-                className="block w-full text-left text-gray-300 text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-800"
+                className="block w-full text-left text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
               >
                 Logout
               </button>
               <div className="flex justify-center pt-2">
-                <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-white">
+                <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black">
                   {user.name?.charAt(0).toUpperCase() || 'U'}
                 </button>
               </div>
@@ -248,8 +248,8 @@ export default function LandingPage() {
       {/* HERO SECTION */}
       <section className="min-h-[100dvh] flex items-center justify-center px-4 sm:px-6 text-center pt-16">
         <div className="max-w-5xl mx-auto animate-fade-in-up">
-          <h1 className="hero-title text-white mb-6 sm:mb-8">All-in-one collaboration platform</h1>
-          <p className="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
+          <h1 className="hero-title text-black mb-6 sm:mb-8">All-in-one collaboration platform</h1>
+          <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
             Chat, boards, docs, and teamwork, all connected in one workspace.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
@@ -285,30 +285,30 @@ export default function LandingPage() {
       {/* FEATURES SECTION */}
       <section id="features" className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-4xl font-bold text-center text-white mb-10 sm:mb-16 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-bold text-center text-black mb-10 sm:mb-16 tracking-tight">
             Everything you need in one place
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center">
               <div className="text-4xl sm:text-5xl mb-4">📋</div>
-              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">Kanban Boards</h3>
-              <p className="text-gray-300 text-sm sm:text-base">
+              <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3">Kanban Boards</h3>
+              <p className="text-gray-600 text-sm sm:text-base">
                 Plan projects with drag-and-drop task boards.
               </p>
             </div>
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center">
               <div className="text-4xl sm:text-5xl mb-4">📝</div>
-              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">
+              <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3">
                 Collaborative Docs
               </h3>
-              <p className="text-gray-300 text-sm sm:text-base">
+              <p className="text-gray-600 text-sm sm:text-base">
                 Create documents together in real-time.
               </p>
             </div>
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center sm:col-span-2 md:col-span-1">
               <div className="text-4xl sm:text-5xl mb-4">💬</div>
-              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">Team Chat</h3>
-              <p className="text-gray-300 text-sm sm:text-base">
+              <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3">Team Chat</h3>
+              <p className="text-gray-600 text-sm sm:text-base">
                 Fast messaging with channels and direct chat.
               </p>
             </div>
@@ -317,7 +317,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="text-center py-8 text-gray-400 border-t border-gray-900">
+      <footer className="text-center py-8 text-gray-600 border-t border-gray-200">
         © 2025 SyncSpace
       </footer>
     </>
