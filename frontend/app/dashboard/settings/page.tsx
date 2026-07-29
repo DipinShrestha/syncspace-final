@@ -7,8 +7,8 @@ import {
   deleteWorkspace,
   removeWorkspaceMember,
   updateProfile,
-  changePassword,
   deleteAccount,
+  uploadAvatar,
 } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
@@ -30,10 +30,7 @@ export default function SettingsPage() {
   // Profile update
   const [name, setName] = useState(user?.name || '');
   const [avatar, setAvatar] = useState(user?.avatar || '');
-  // Password change
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   // Delete account
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -75,24 +72,26 @@ export default function SettingsPage() {
     }
   };
 
-  // Password change
-  const handleChangePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      toast.error('New password and confirmation do not match');
+  // Avatar photo upload — uploads to Cloudinary immediately, then just
+  // stages the returned URL in state until "Update Profile" is clicked
+  // (keeps a single save action instead of two separate network calls).
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose an image file');
       return;
     }
-    if (newPassword.length < 6) {
-      toast.error('New password must be at least 6 characters');
-      return;
-    }
+    setUploadingAvatar(true);
     try {
-      await changePassword({ currentPassword, newPassword });
-      toast.success('Password changed');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      const { url } = await uploadAvatar(file);
+      setAvatar(url);
+      toast.success('Photo uploaded — click Update Profile to save');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to change password');
+      toast.error(err.message || 'Upload failed');
+    } finally {
+      setUploadingAvatar(false);
+      e.target.value = '';
     }
   };
 
@@ -152,6 +151,32 @@ export default function SettingsPage() {
           <h2 className="text-lg sm:text-xl font-semibold text-black mb-4">Profile Information</h2>
           <div className="space-y-4">
             <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Photo</label>
+              <div className="flex items-center gap-4">
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt="Profile"
+                    className="w-16 h-16 rounded-full object-cover border border-gray-200 flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-dusty-600 flex items-center justify-center text-black font-semibold text-xl flex-shrink-0">
+                    {name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                )}
+                <label className="glass-outline px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95 cursor-pointer">
+                  {uploadingAvatar ? 'Uploading…' : 'Change Photo'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarFile}
+                    disabled={uploadingAvatar}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Name</label>
               <input
                 type="text"
@@ -160,65 +185,11 @@ export default function SettingsPage() {
                 className="w-full glass-input rounded-lg p-2 text-black transition-colors"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Avatar URL</label>
-              <input
-                type="text"
-                value={avatar}
-                onChange={(e) => setAvatar(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 text-black transition-colors"
-                placeholder="https://example.com/avatar.jpg"
-              />
-            </div>
             <button
               onClick={handleUpdateProfile}
               className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
             >
               Update Profile
-            </button>
-          </div>
-        </div>
-
-        {/* Change Password */}
-        <div className="glass p-4 sm:p-6 rounded-xl mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold text-black mb-4">Change Password</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Current Password
-              </label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 text-black transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 text-black transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Confirm New Password
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 text-black transition-colors"
-              />
-            </div>
-            <button
-              onClick={handleChangePassword}
-              className="glass-btn px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95"
-            >
-              Change Password
             </button>
           </div>
         </div>

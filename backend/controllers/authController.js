@@ -1,52 +1,56 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const { OAuth2Client } = require('google-auth-library');
 
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// @desc    Sign in (or sign up, on first use) with a Google ID token.
+//          The frontend gets this token from Google Identity Services —
+//          the same button is used for both "Login" and "Register"; which
+//          one happens is decided here, not by the button the user clicked.
+// @route   POST /api/auth/google
 // @access  Public
-const registerUser = async (req, res) => {
+const googleAuth = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please provide name, email and password' });
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ message: 'Missing Google credential' });
+    }
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(500).json({ message: 'Google sign-in is not configured on the server' });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const user = await User.create({ name, email, password });
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      token: generateToken(user._id),
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
-    }
+    let user = await User.findOne({ googleId });
+    let isNewUser = false;
 
-    const user = await User.findOne({ email }).select('+password');
-    if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    if (!user) {
+      // Not linked yet — but an account with this email may already exist
+      // (e.g. from before the Google-only switch). Link it instead of
+      // creating a duplicate.
+      user = await User.findOne({ email });
+      if (user) {
+        user.googleId = googleId;
+        if (!user.avatar || user.avatar.includes('placeholder')) user.avatar = picture;
+        await user.save();
+      } else {
+        user = await User.create({
+          name,
+          email,
+          googleId,
+          avatar: picture || undefined,
+        });
+        isNewUser = true;
+      }
     }
 
     res.json({
@@ -55,9 +59,10 @@ const loginUser = async (req, res) => {
       email: user.email,
       avatar: user.avatar,
       token: generateToken(user._id),
+      isNewUser,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(401).json({ message: 'Google sign-in failed: ' + error.message });
   }
 };
 
@@ -104,32 +109,6 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// @desc    Change password
-// @route   PUT /api/auth/password
-// @access  Private
-const changePassword = async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: 'Current password and new password are required' });
-    }
-
-    const user = await User.findById(req.user.id).select('+password');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    const isMatch = await user.matchPassword(currentPassword);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Current password is incorrect' });
-    }
-
-    user.password = newPassword;
-    await user.save();
-    res.json({ message: 'Password changed successfully' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 // @desc    Delete user account
 // @route   DELETE /api/auth/account
 // @access  Private
@@ -147,10 +126,8 @@ const deleteAccount = async (req, res) => {
 };
 
 module.exports = {
-  registerUser,
-  loginUser,
+  googleAuth,
   getMe,
   updateProfile,
-  changePassword,
   deleteAccount,
 };

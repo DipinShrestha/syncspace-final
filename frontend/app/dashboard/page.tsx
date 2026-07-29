@@ -7,6 +7,7 @@ import { getWorkspaces, createWorkspace } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Navbar from '@/components/Navbar';
+import { IconLayers, IconCrown, IconUsers, IconFolderOpen, IconInbox } from '@/components/icons';
 
 interface Workspace {
   _id: string;
@@ -15,6 +16,89 @@ interface Workspace {
   updatedAt: string;
   members: { user: { _id: string } }[];
   owner: string | { _id: string; name: string; email: string }; // can be string or populated object
+}
+
+function StatCard({
+  icon,
+  value,
+  label,
+  tint,
+}: {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+  tint: 'dusty' | 'sage';
+}) {
+  return (
+    <div className="glass p-4 rounded-xl flex items-center gap-3">
+      <div
+        className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${
+          tint === 'dusty' ? 'bg-dusty-50 text-dusty-700' : 'bg-sage-50 text-sage-700'
+        }`}
+      >
+        {icon}
+      </div>
+      <div>
+        <p className="text-2xl font-bold text-black leading-tight">{value}</p>
+        <p className="text-xs text-gray-500">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="glass rounded-xl py-10 px-6 flex flex-col items-center text-center">
+      <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-3">
+        {icon}
+      </div>
+      <p className="text-black font-medium text-sm sm:text-base">{title}</p>
+      <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <>
+      <Navbar />
+      <div className="pt-16 px-4 sm:px-6 pb-8 max-w-6xl mx-auto animate-pulse">
+        <div className="flex justify-between items-center mb-8 pt-4">
+          <div className="h-8 w-40 bg-gray-200 rounded-lg" />
+          <div className="h-10 w-36 bg-gray-200 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="glass p-4 rounded-xl flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-gray-200 flex-shrink-0" />
+              <div className="flex-1">
+                <div className="h-6 w-10 bg-gray-200 rounded mb-2" />
+                <div className="h-3 w-20 bg-gray-200 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="h-6 w-40 bg-gray-200 rounded mb-4" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="glass p-4 rounded-xl">
+              <div className="h-5 w-2/3 bg-gray-200 rounded mb-3" />
+              <div className="h-3 w-full bg-gray-200 rounded mb-2" />
+              <div className="h-3 w-1/2 bg-gray-200 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default function DashboardPage() {
@@ -59,7 +143,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (authLoading || loading) return <div className="p-8">Loading...</div>;
+  if (authLoading || loading) return <DashboardSkeleton />;
 
   // Helper to get owner ID regardless of whether owner is a string or object
   const getOwnerId = (workspace: Workspace): string => {
@@ -84,13 +168,37 @@ export default function DashboardPage() {
           </button>
         </div>
 
+        {/* Stat cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          <StatCard
+            icon={<IconLayers className="w-5 h-5" />}
+            value={workspaces.length}
+            label="Total Workspaces"
+            tint="dusty"
+          />
+          <StatCard
+            icon={<IconCrown className="w-5 h-5" />}
+            value={ownedWorkspaces.length}
+            label="Owned by You"
+            tint="sage"
+          />
+          <StatCard
+            icon={<IconUsers className="w-5 h-5" />}
+            value={memberWorkspaces.length}
+            label="Shared with You"
+            tint="dusty"
+          />
+        </div>
+
         {/* Your Workspaces (owned) */}
         <div className="mb-10">
           <h2 className="text-lg sm:text-xl font-semibold text-black mb-4">Your Workspaces</h2>
           {ownedWorkspaces.length === 0 ? (
-            <p className="text-gray-500 text-sm sm:text-base">
-              You haven't created any workspaces yet.
-            </p>
+            <EmptyState
+              icon={<IconFolderOpen className="w-6 h-6" />}
+              title="You haven't created any workspaces yet"
+              subtitle="Click “+ New Workspace” above to start your first one."
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {ownedWorkspaces.map((ws, i) => (
@@ -123,9 +231,11 @@ export default function DashboardPage() {
             Workspaces You're a Member Of
           </h2>
           {memberWorkspaces.length === 0 ? (
-            <p className="text-gray-500 text-sm sm:text-base">
-              You are not a member of any other workspaces.
-            </p>
+            <EmptyState
+              icon={<IconInbox className="w-6 h-6" />}
+              title="You are not a member of any other workspaces"
+              subtitle="Workspaces you're invited to will show up here."
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {memberWorkspaces.map((ws, i) => (

@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { login as loginApi, register as registerApi, getMe } from '@/lib/api';
+import { googleAuth, getMe } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
@@ -15,8 +15,11 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  // Sign-in is Google-only. Returns `isNewUser` so the caller (login/register
+  // page) can decide whether to send the person to the onboarding step —
+  // that decision is made from the server's answer, not from which button
+  // ("Login" vs "Register") they clicked.
+  loginWithGoogle: (credential: string) => Promise<{ isNewUser: boolean }>;
   logout: () => void;
 }
 
@@ -42,30 +45,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const loginWithGoogle = async (credential: string) => {
     try {
-      const res = await loginApi(email, password);
+      const res = await googleAuth(credential);
       localStorage.setItem('token', res.data.token);
       setUser(res.data);
-      toast.success('Logged in successfully');
-      // after successful login/register
-      router.push('/'); // instead of '/dashboard'
+      toast.success(res.data.isNewUser ? 'Welcome to SyncSpace!' : 'Logged in successfully');
+      return { isNewUser: res.data.isNewUser };
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
-      throw err;
-    }
-  };
-
-  const register = async (name: string, email: string, password: string) => {
-    try {
-      const res = await registerApi(name, email, password);
-      localStorage.setItem('token', res.data.token);
-      setUser(res.data);
-      toast.success('Registered successfully');
-      // after successful login/register
-      router.push('/'); // instead of '/dashboard'
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Registration failed');
+      toast.error(err.response?.data?.message || 'Google sign-in failed');
       throw err;
     }
   };
@@ -78,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );

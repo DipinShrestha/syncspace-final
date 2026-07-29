@@ -1,5 +1,16 @@
 const Workspace = require('../models/Workspace');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
+const { getIO } = require('../socketInstance');
+
+// Push a notification to a user — persists it and, if they're currently
+// connected, delivers it live to their personal socket room.
+const notify = async ({ recipient, type, message, workspace, card }) => {
+  const notification = await Notification.create({ recipient, type, message, workspace, card });
+  const io = getIO();
+  if (io) io.to(`user-${recipient}`).emit('notification', notification);
+  return notification;
+};
 // @desc    Create a new workspace
 // @route   POST /api/workspaces
 // @access  Private
@@ -48,7 +59,8 @@ const getWorkspaceById = async (req, res) => {
   try {
     const workspace = await Workspace.findById(req.params.id)
       .populate('owner', 'name email')
-      .populate('members.user', 'name email');
+      .populate('members.user', 'name email avatar')
+      .populate('pendingInvites.user', 'name email avatar');
     if (!workspace) {
       return res.status(404).json({ message: 'Workspace not found' });
     }
@@ -106,7 +118,8 @@ const deleteWorkspace = async (req, res) => {
   }
 };
 
-// @desc    Add a member to workspace by email
+// @desc    Invite a member to workspace by email — they must accept before
+//          they become a real member (see acceptInvite/declineInvite below).
 // @route   POST /api/workspaces/:id/members
 // @access  Private (admin or owner)
 const addMember = async (req, res) => {
@@ -126,14 +139,122 @@ const addMember = async (req, res) => {
     const userToAdd = await User.findOne({ email });
     if (!userToAdd) return res.status(404).json({ message: 'User not found with that email' });
 
+    if (userToAdd._id.toString() === workspace.owner.toString()) {
+      return res.status(400).json({ message: 'User already owns this workspace' });
+    }
     const alreadyMember = workspace.members.some(m => m.user.toString() === userToAdd._id.toString());
     if (alreadyMember) return res.status(400).json({ message: 'User already in workspace' });
 
-    workspace.members.push({ user: userToAdd._id, role: role || 'member' });
-    await workspace.save();
-    await workspace.populate('members.user', 'name email avatar');
+    const alreadyInvited = workspace.pendingInvites.some(
+      (p) => p.user.toString() === userToAdd._id.toString()
+    );
+    if (alreadyInvited) return res.status(400).json({ message: 'User already invited' });
 
-    res.json({ message: 'Member added successfully', workspace });
+    workspace.pendingInvites.push({ user: userToAdd._id, role: role || 'member', invitedBy: req.user.id });
+    await workspace.save();
+    await workspace.populate('pendingInvites.user', 'name email avatar');
+
+    await notify({
+      recipient: userToAdd._id,
+      type: 'workspace_invite',
+      message: `You've been invited to join "${workspace.name}"`,
+      workspace: workspace._id,
+    });
+
+    res.json({ message: 'Invitation sent', workspace });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Accept a pending workspace invite (the logged-in user accepts
+//          their own invite — no separate ID needed).
+// @route   POST /api/workspaces/:id/accept-invite
+// @access  Private
+const acceptInvite = async (req, res) => {
+  try {
+    const workspace = await Workspace.findById(req.params.id);
+    if (!workspace) return res.status(404).json({ message: 'Workspace not found' });
+
+    const inviteIndex = workspace.pendingInvites.findIndex(
+      (p) => p.user.toString() === req.user.id
+    );
+    if (inviteIndex === -1) return res.status(404).json({ message: 'No pending invite found' });
+
+    const { role, invitedBy } = workspace.pendingInvites[inviteIndex];
+    workspace.pendingInvites.splice(inviteIndex, 1);
+    workspace.members.push({ user: req.user.id, role });
+    await workspace.save();
+
+    if (invitedBy) {
+      await notify({
+        recipient: invitedBy,
+        type: 'invite_accepted',
+        message: `${req.user.name} accepted your invite to "${workspace.name}"`,
+        workspace: workspace._id,
+      });
+    }
+
+    res.json({ message: 'Invite accepted', workspace });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Decline a pending workspace invite
+// @route   POST /api/workspaces/:id/decline-invite
+// @access  Private
+const declineInvite = async (req, res) => {
+  try {
+    const workspace = await Workspace.findById(req.params.id);
+    if (!workspace) return res.status(404).json({ message: 'Workspace not found' });
+
+    const inviteIndex = workspace.pendingInvites.findIndex(
+      (p) => p.user.toString() === req.user.id
+    );
+    if (inviteIndex === -1) return res.status(404).json({ message: 'No pending invite found' });
+
+    const { invitedBy } = workspace.pendingInvites[inviteIndex];
+    workspace.pendingInvites.splice(inviteIndex, 1);
+    await workspace.save();
+
+    if (invitedBy) {
+      await notify({
+        recipient: invitedBy,
+        type: 'invite_declined',
+        message: `${req.user.name} declined your invite to "${workspace.name}"`,
+        workspace: workspace._id,
+      });
+    }
+
+    res.json({ message: 'Invite declined' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Cancel a pending invite (owner/admin revokes it before it's accepted)
+// @route   DELETE /api/workspaces/:id/invites/:userId
+// @access  Private (admin or owner)
+const cancelInvite = async (req, res) => {
+  try {
+    const workspace = await Workspace.findById(req.params.id);
+    if (!workspace) return res.status(404).json({ message: 'Workspace not found' });
+
+    const isOwner = workspace.owner.toString() === req.user.id;
+    const isAdmin = workspace.members.some(m => m.user.toString() === req.user.id && m.role === 'admin');
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    const inviteIndex = workspace.pendingInvites.findIndex(
+      (p) => p.user.toString() === req.params.userId
+    );
+    if (inviteIndex === -1) return res.status(404).json({ message: 'Invite not found' });
+
+    workspace.pendingInvites.splice(inviteIndex, 1);
+    await workspace.save();
+    res.json({ message: 'Invite cancelled' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -168,4 +289,7 @@ module.exports = {
   deleteWorkspace,
   addMember,
   removeMember,
+  acceptInvite,
+  declineInvite,
+  cancelInvite,
 };

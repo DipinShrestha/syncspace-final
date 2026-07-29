@@ -52,7 +52,12 @@ const BoardList: React.FC<BoardListProps> = ({
 
   return (
     <div className="bg-gray-100 rounded-md p-3 w-[82vw] sm:w-80 flex-shrink-0 flex flex-col max-h-full transition-shadow">
-      <h3 className="font-semibold text-gray-700 mb-3 px-1 text-sm sm:text-base">{list.title}</h3>
+      <div className="flex items-center gap-2 mb-3 px-1">
+        <h3 className="font-semibold text-gray-700 text-sm sm:text-base">{list.title}</h3>
+        <span className="text-xs font-medium text-gray-500 bg-gray-200 rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">
+          {list.cards.length}
+        </span>
+      </div>
 
       {/* FIX: attach both the sortable context AND the droppable ref to the
  card container so dropping onto an empty column works correctly. */}
@@ -62,6 +67,11 @@ const BoardList: React.FC<BoardListProps> = ({
           isOver ? 'bg-sage-50 ring-2 ring-sage-300' : ''
         }`}
       >
+        {list.cards.length === 0 && (
+          <div className="h-full min-h-[4rem] flex items-center justify-center text-xs text-gray-400 border-2 border-dashed border-gray-200 rounded-md">
+            Drop a card here
+          </div>
+        )}
         <SortableContext
           items={list.cards.map((card) => `card-${card._id}`)}
           strategy={verticalListSortingStrategy}

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import toast from 'react-hot-toast';
+import { IconPlay, IconCode } from '@/components/icons';
 
 export default function LiveCodeEditor() {
   const [code, setCode] = useState(`// Write JavaScript code here
@@ -14,10 +15,12 @@ console.log(add(5, 3));
 `);
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const [isError, setIsError] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const runCode = () => {
     setIsRunning(true);
+    setIsError(false);
     setOutput('Running...');
 
     // Create a sandboxed iframe
@@ -70,9 +73,10 @@ console.log(add(5, 3));
     // Listen for messages from iframe
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'output') {
-        setOutput(event.data.data);
+        setOutput(event.data.data || '(no output)');
         setIsRunning(false);
       } else if (event.data.type === 'error') {
+        setIsError(true);
         setOutput(`Error: ${event.data.data}`);
         setIsRunning(false);
       }
@@ -88,13 +92,22 @@ console.log(add(5, 3));
     <div className="flex flex-col h-full gap-4">
       <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
         <div className="bg-gray-800 px-3 sm:px-4 py-2 text-sm font-medium text-white flex justify-between items-center gap-2">
-          <span className="truncate">JavaScript Editor</span>
+          <span className="flex items-center gap-1.5 truncate">
+            <IconCode className="w-4 h-4 flex-shrink-0" />
+            JavaScript Editor
+          </span>
           <button
             onClick={runCode}
             disabled={isRunning}
-            className="bg-green-600 hover:bg-green-700 active:scale-95 px-3 py-1 rounded text-sm font-medium transition-all disabled:opacity-50 disabled:active:scale-100 whitespace-nowrap flex-shrink-0"
+            className="flex items-center gap-1.5 bg-sage-600 hover:bg-sage-700 active:scale-95 px-3 py-1 rounded text-sm font-medium text-black transition-all disabled:opacity-50 disabled:active:scale-100 whitespace-nowrap flex-shrink-0"
           >
-            {isRunning ? 'Running…' : 'Run Code'}
+            {isRunning ? (
+              'Running…'
+            ) : (
+              <>
+                <IconPlay className="w-3.5 h-3.5" /> Run Code
+              </>
+            )}
           </button>
         </div>
         <Editor
@@ -107,8 +120,17 @@ console.log(add(5, 3));
         />
       </div>
       <div className="bg-gray-900 rounded-lg border border-gray-700">
-        <div className="bg-gray-800 px-3 sm:px-4 py-2 text-sm font-medium text-white">Output</div>
-        <pre className="p-3 sm:p-4 text-sm text-gray-300 font-mono whitespace-pre-wrap break-words overflow-auto max-h-64">
+        <div className="bg-gray-800 px-3 sm:px-4 py-2 text-sm font-medium text-white flex items-center justify-between">
+          <span>Output</span>
+          {output && !isRunning && (
+            <span className={`w-1.5 h-1.5 rounded-full ${isError ? 'bg-red-500' : 'bg-sage-500'}`} />
+          )}
+        </div>
+        <pre
+          className={`p-3 sm:p-4 text-sm font-mono whitespace-pre-wrap break-words overflow-auto max-h-64 ${
+            isError ? 'text-red-400' : 'text-gray-300'
+          }`}
+        >
           {output || 'Click "Run Code" to see output here.'}
         </pre>
       </div>

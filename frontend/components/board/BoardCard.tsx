@@ -7,6 +7,15 @@ import { Card } from '@/types/board';
 import { deleteCard } from '@/lib/api';
 import toast from 'react-hot-toast';
 import TaskDetailsModal from './TaskDetailsModal';
+import { IconUsers, IconClock, IconX } from '@/components/icons';
+
+// A due date reads as "overdue" once its calendar day has passed.
+const isOverdue = (dueDate?: string) => {
+  if (!dueDate) return false;
+  const due = new Date(dueDate);
+  due.setHours(23, 59, 59, 999);
+  return due.getTime() < Date.now();
+};
 
 interface BoardCardProps {
   card: Card;
@@ -87,7 +96,35 @@ const BoardCard: React.FC<BoardCardProps> = ({
  edit code/upload files with no permission check. Removed. */}
         <div className="ml-6 cursor-pointer" onClick={() => setShowEditModal(true)}>
           <p className="text-sm font-medium text-gray-800 pr-12">{card.title}</p>
-          {card.assignedTo && <div className="mt-1 text-xs text-gray-500">👤 Assigned</div>}
+          {(card.labels && card.labels.length > 0) || card.dueDate || card.assignedTo ? (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              {card.labels?.slice(0, 3).map((l) => (
+                <span
+                  key={l}
+                  className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-sage-50 text-sage-900 border border-sage-200"
+                >
+                  {l}
+                </span>
+              ))}
+              {card.dueDate && (
+                <span
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
+                    isOverdue(card.dueDate)
+                      ? 'bg-red-50 text-red-700 border border-red-200'
+                      : 'bg-dusty-50 text-dusty-900 border border-dusty-200'
+                  }`}
+                >
+                  <IconClock className="w-2.5 h-2.5" />
+                  {new Date(card.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                </span>
+              )}
+              {card.assignedTo && (
+                <span className="inline-flex items-center gap-1 text-[10px] text-gray-500">
+                  <IconUsers className="w-3 h-3" />
+                </span>
+              )}
+            </div>
+          ) : null}
         </div>
         <div className="absolute top-2 right-2 flex gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
           {nextStage && (
@@ -101,10 +138,10 @@ const BoardCard: React.FC<BoardCardProps> = ({
           )}
           <button
             onClick={handleDelete}
-            className="text-gray-400 hover:text-red-500 text-xs transition-colors p-1"
+            className="text-gray-400 hover:text-red-500 transition-colors p-1"
             title="Delete card"
           >
-            ✕
+            <IconX className="w-3 h-3" />
           </button>
         </div>
       </div>

@@ -94,60 +94,72 @@ export default function DocumentEditor({ document, onUpdate }: DocumentEditorPro
               : 'Auto-save enabled'}
         </div>
       </div>
-      <div className="flex flex-wrap gap-1 border-b pb-2 mb-2">
+      <div className="flex flex-wrap items-center gap-1 border-b pb-2 mb-2">
         <button
           onClick={() => editor?.chain().focus().toggleBold().run()}
           className={`${btnBase} ${editor?.isActive('bold') ? btnActive : btnIdle} font-bold`}
+          title="Bold"
         >
-          Bold
+          B
         </button>
         <button
           onClick={() => editor?.chain().focus().toggleItalic().run()}
           className={`${btnBase} ${editor?.isActive('italic') ? btnActive : btnIdle} italic`}
+          title="Italic"
         >
-          Italic
+          I
         </button>
         <button
           onClick={() => editor?.chain().focus().toggleUnderline().run()}
           className={`${btnBase} ${editor?.isActive('underline') ? btnActive : btnIdle} underline`}
+          title="Underline"
         >
-          Underline
+          U
         </button>
-        <button
-          onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-          className={`${btnBase} ${btnIdle}`}
-        >
-          Left
-        </button>
-        <button
-          onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-          className={`${btnBase} ${btnIdle}`}
-        >
-          Center
-        </button>
+        <span className="w-px h-5 bg-gray-200 mx-1" />
         <button
           onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
           className={`${btnBase} ${editor?.isActive('heading', { level: 1 }) ? btnActive : btnIdle}`}
+          title="Heading 1"
         >
           H1
         </button>
         <button
           onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
           className={`${btnBase} ${editor?.isActive('heading', { level: 2 }) ? btnActive : btnIdle}`}
+          title="Heading 2"
         >
           H2
         </button>
+        <span className="w-px h-5 bg-gray-200 mx-1" />
+        <button
+          onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+          className={`${btnBase} ${btnIdle}`}
+          title="Align left"
+        >
+          Left
+        </button>
+        <button
+          onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+          className={`${btnBase} ${btnIdle}`}
+          title="Align center"
+        >
+          Center
+        </button>
+        <span className="w-px h-5 bg-gray-200 mx-1" />
         <button
           onClick={() => editor?.chain().focus().toggleBulletList().run()}
           className={`${btnBase} ${editor?.isActive('bulletList') ? btnActive : btnIdle}`}
+          title="Bullet list"
         >
-          Bullet List
+          • List
         </button>
         <button
           onClick={() => editor?.chain().focus().toggleOrderedList().run()}
           className={`${btnBase} ${editor?.isActive('orderedList') ? btnActive : btnIdle}`}
+          title="Numbered list"
         >
-          Numbered List
+          1. List
         </button>
       </div>
       <EditorContent editor={editor} className="flex-1 min-h-[400px]" />

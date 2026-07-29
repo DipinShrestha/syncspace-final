@@ -14,6 +14,7 @@ import VideoCall from '@/components/VideoCall';
 import Analytics from '@/components/Analytics';
 import LiveCodeEditor from '@/components/LiveCodeEditor';
 import MembersPanel from '@/components/MembersPanel';
+import { IconFileText } from '@/components/icons';
 
 type Tab = 'boards' | 'documents' | 'chat' | 'analytics' | 'code' | 'members';
 
@@ -96,7 +97,31 @@ export default function WorkspacePage() {
     }
   };
 
-  if (authLoading || loading) return <div className="p-8 text-black">Loading workspace…</div>;
+  if (authLoading || loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="pt-16 min-h-screen bg-white">
+          <div className="flex flex-col md:flex-row md:h-[calc(100vh-4rem)] animate-pulse">
+            <div className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-gray-200 p-4 space-y-2 flex-shrink-0">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="h-9 bg-gray-100 rounded-lg" />
+              ))}
+            </div>
+            <div className="flex-1 p-4 sm:p-6">
+              <div className="h-7 w-56 bg-gray-100 rounded mb-2" />
+              <div className="h-4 w-80 bg-gray-100 rounded mb-6" />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-32 bg-gray-100 rounded-xl" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
   if (!workspace) return null;
 
   return (
@@ -131,8 +156,18 @@ export default function WorkspacePage() {
               {activeTab === 'documents' && (
                 <div className="h-[75vh]">
                   {docLoading ? (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                      Loading document…
+                    <div className="flex-1 flex flex-col bg-white rounded-lg shadow-lg p-4 h-full animate-pulse">
+                      <div className="h-7 w-1/3 bg-gray-200 rounded mb-3" />
+                      <div className="flex gap-1 border-b pb-2 mb-3">
+                        {[0, 1, 2, 3].map((i) => (
+                          <div key={i} className="h-7 w-12 bg-gray-100 rounded" />
+                        ))}
+                      </div>
+                      <div className="space-y-2 flex-1">
+                        <div className="h-4 bg-gray-100 rounded w-full" />
+                        <div className="h-4 bg-gray-100 rounded w-5/6" />
+                        <div className="h-4 bg-gray-100 rounded w-2/3" />
+                      </div>
                     </div>
                   ) : workspaceDoc ? (
                     <DocumentEditor
@@ -140,8 +175,11 @@ export default function WorkspacePage() {
                       onUpdate={(updated) => setWorkspaceDoc(updated)}
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                      Failed to load document.
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-3">
+                        <IconFileText className="w-6 h-6" />
+                      </div>
+                      <p className="text-sm text-gray-500">Couldn't load the document. Try refreshing.</p>
                     </div>
                   )}
                 </div>

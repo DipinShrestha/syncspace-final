@@ -2,10 +2,18 @@
 const Message = require('../models/Message');
 const Workspace = require('../models/Workspace');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 module.exports = (io) => {
   io.on('connection', (socket) => {
     console.log('🟢 New client connected:', socket.id);
+
+    // Personal room — kept separate from workspace rooms (and never left on
+    // workspace switch) so a user can be pushed a notification no matter
+    // which workspace/screen they currently have open.
+    socket.on('join-user', (userId) => {
+      socket.join(`user-${userId}`);
+    });
 
     // Join a workspace room
     socket.on('join-workspace', async (workspaceId, userId, callback) => {
@@ -16,10 +24,10 @@ module.exports = (io) => {
         const isOwner = workspace.owner.toString() === userId;
         if (!isMember && !isOwner) return callback({ error: 'Not authorized' });
 
-        // Leave previous rooms (except own socket id)
+        // Leave previous workspace rooms (but keep the personal user-* room)
         const rooms = Array.from(socket.rooms);
         rooms.forEach(room => {
-          if (room !== socket.id) socket.leave(room);
+          if (room !== socket.id && !room.startsWith('user-')) socket.leave(room);
         });
         socket.join(workspaceId);
         socket.workspaceId = workspaceId;
@@ -66,13 +74,23 @@ module.exports = (io) => {
 
     // BUG FIX: was registered twice (once outside this connection handler).
     // Now correctly registered once, scoped to the connected socket.
+    // ALSO FIXED: this used to broadcast to the entire workspace room, so
+    // every member saw "You have been assigned" even when it wasn't them.
+    // Now it's persisted for, and pushed only to, the assigned user.
     // data = { assignedTo, cardTitle, workspaceId, cardId }
-    socket.on('task-assigned', (data) => {
-      io.to(data.workspaceId).emit('notification', {
-        message: `You have been assigned to task: ${data.cardTitle}`,
-        type: 'task',
-        cardId: data.cardId,
-      });
+    socket.on('task-assigned', async (data) => {
+      try {
+        const notification = await Notification.create({
+          recipient: data.assignedTo,
+          type: 'task_assigned',
+          message: `You were assigned to "${data.cardTitle}"`,
+          workspace: data.workspaceId,
+          card: data.cardId,
+        });
+        io.to(`user-${data.assignedTo}`).emit('notification', notification);
+      } catch (err) {
+        console.error('Failed to create task-assigned notification:', err.message);
+      }
     });
 
     // ── Video call (WebRTC) signaling ─────────────────────────────────────

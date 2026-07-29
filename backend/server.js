@@ -13,6 +13,7 @@ const boardRoutes     = require('./routes/boardRoutes');
 const cardRoutes      = require('./routes/cardRoutes');
 const documentRoutes  = require('./routes/documentRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const uploadRoute     = require('./routes/uploadRoute');   // NEW
 const chatSocket      = require('./sockets/chatSocket');
 const { setIO }       = require('./socketInstance');
@@ -41,6 +42,7 @@ app.use('/api/boards',     boardRoutes);
 app.use('/api/cards',      cardRoutes);
 app.use('/api/documents',  documentRoutes);
 app.use('/api/analytics',  analyticsRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/upload',     uploadRoute);   // NEW  →  POST /api/upload
 
 app.get('/', (_req, res) => res.send('SyncSpace API running'));

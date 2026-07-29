@@ -2,15 +2,13 @@
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,34 +54,33 @@ export default function Navbar() {
             <Link href="/#support" className="nav-link relative transition-opacity hover:opacity-60">
               Support
             </Link>
-            <Link
-              href="/#notifications"
-              className="nav-link relative transition-opacity hover:opacity-60"
-            >
-              Notification
-            </Link>
             <button onClick={logout} className="nav-link relative transition-opacity hover:opacity-60">
               Logout
             </button>
+            <div className="normal-case">
+              <NotificationBell />
+            </div>
             {/* Avatar dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="w-8 h-8 rounded-full bg-dusty-600 flex items-center justify-center text-sm font-semibold text-black transition-transform hover:scale-105 active:scale-95 focus:outline-none"
+                className="w-8 h-8 rounded-full bg-dusty-600 flex items-center justify-center text-sm font-semibold text-black transition-transform hover:scale-105 active:scale-95 focus:outline-none overflow-hidden"
               >
-                {user.name?.charAt(0).toUpperCase()}
+                {user.avatar && !user.avatar.includes('placeholder') ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  user.name?.charAt(0).toUpperCase()
+                )}
               </button>
               {showDropdown && (
                 <div className="animate-fade-in-up absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
-                  {isDashboard && (
-                    <Link
-                      href="/dashboard/settings"
-                      className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
-                      onClick={() => setShowDropdown(false)}
-                    >
-                      Profile / Settings
-                    </Link>
-                  )}
+                  <Link
+                    href="/dashboard/settings"
+                    className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    Profile / Settings
+                  </Link>
                   <button
                     onClick={() => {
                       setShowDropdown(false);
@@ -100,19 +97,22 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Mobile menu button */}
-      <button
-        className="md:hidden flex flex-col justify-center items-center w-8 h-8"
-        onClick={() => setMenuOpen(!menuOpen)}
-      >
-        <span
-          className={`block w-6 h-0.5 bg-black mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`}
-        />
-        <span className={`block w-6 h-0.5 bg-black mb-1 ${menuOpen ? 'opacity-0' : ''}`} />
-        <span
-          className={`block w-6 h-0.5 bg-black transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}
-        />
-      </button>
+      {/* Mobile: bell always visible, hamburger opens the rest of the menu */}
+      <div className="md:hidden flex items-center gap-1">
+        {user && <NotificationBell />}
+        <button
+          className="flex flex-col justify-center items-center w-8 h-8"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span
+            className={`block w-6 h-0.5 bg-black mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`}
+          />
+          <span className={`block w-6 h-0.5 bg-black mb-1 ${menuOpen ? 'opacity-0' : ''}`} />
+          <span
+            className={`block w-6 h-0.5 bg-black transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}
+          />
+        </button>
+      </div>
 
       {/* Mobile menu overlay */}
       <div
@@ -167,11 +167,11 @@ export default function Navbar() {
                 Support
               </Link>
               <Link
-                href="/#notifications"
+                href="/dashboard/settings"
                 className="text-black transition-opacity hover:opacity-60"
                 onClick={() => setMenuOpen(false)}
               >
-                Notification
+                Profile / Settings
               </Link>
               <button
                 className="text-black transition-opacity hover:opacity-60"

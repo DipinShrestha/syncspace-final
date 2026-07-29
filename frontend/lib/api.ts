@@ -29,11 +29,19 @@ interface CardData {
 }
 
 // ========== Auth endpoints ==========
-export const register = (name: string, email: string, password: string) =>
-  api.post('/auth/register', { name, email, password });
-
-export const login = (email: string, password: string) =>
-  api.post('/auth/login', { email, password });
+// Sign-in is Google-only — one call handles both first-time sign-up and
+// returning login. `credential` is the ID token string Google Identity
+// Services hands back to the button's callback.
+export interface GoogleAuthResponse {
+  _id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  token: string;
+  isNewUser: boolean;
+}
+export const googleAuth = (credential: string) =>
+  api.post<GoogleAuthResponse>('/auth/google', { credential });
 
 export const getMe = () => api.get('/auth/me');
 
@@ -47,6 +55,12 @@ export const getWorkspaceById = (id: string) => api.get(`/workspaces/${id}`);
 export const deleteWorkspace = (id: string) => api.delete(`/workspaces/${id}`);
 export const removeWorkspaceMember = (workspaceId: string, userId: string) =>
   api.delete(`/workspaces/${workspaceId}/members/${userId}`);
+export const acceptWorkspaceInvite = (workspaceId: string) =>
+  api.post(`/workspaces/${workspaceId}/accept-invite`);
+export const declineWorkspaceInvite = (workspaceId: string) =>
+  api.post(`/workspaces/${workspaceId}/decline-invite`);
+export const cancelWorkspaceInvite = (workspaceId: string, userId: string) =>
+  api.delete(`/workspaces/${workspaceId}/invites/${userId}`);
 
 // ========== Board endpoints ==========
 export const getBoardsByWorkspace = (workspaceId: string) =>
@@ -77,18 +91,38 @@ export const deleteDocument = (id: string) => api.delete(`/documents/${id}`);
 export const updateProfile = (data: { name?: string; avatar?: string }) =>
   api.put('/auth/profile', data);
 
-export const changePassword = (data: { currentPassword: string; newPassword: string }) =>
-  api.put('/auth/password', data);
-
 export const deleteAccount = () => api.delete('/auth/account');
 
-// NOTE: avatar upload used to go through /upload/avatar via a manually-set
-// 'Content-Type: multipart/form-data' header, which breaks multipart parsing
-// because axios never gets the chance to attach the required boundary. The
-// route was also never mounted on the backend, and the Settings page uses a
-// plain avatar URL field instead — so the dead, broken function was removed
-// rather than fixed. If avatar file upload is added back, use the same
-// pattern as the working /upload endpoint (lib/api.ts callers pass FormData
-// and let axios/fetch set Content-Type automatically — never set it by hand).
+// ========== Notification endpoints ==========
+export interface NotificationItem {
+  _id: string;
+  type: 'task_assigned' | 'workspace_invite' | 'invite_accepted' | 'invite_declined' | 'generic';
+  message: string;
+  workspace?: { _id: string; name: string } | string;
+  card?: string;
+  read: boolean;
+  createdAt: string;
+}
+export const getNotifications = () => api.get<NotificationItem[]>('/notifications');
+export const markNotificationRead = (id: string) => api.patch(`/notifications/${id}/read`);
+export const markAllNotificationsRead = () => api.patch('/notifications/read-all');
+
+// Avatar upload — this `api` axios instance sets a default
+// 'Content-Type: application/json' header on every request, which can fight
+// with FormData's required multipart boundary. Rather than rely on axios to
+// strip that default, use plain fetch() here — the same pattern already
+// proven to work for card file uploads in TaskDetailsModal — and let the
+// browser set Content-Type itself.
+export const uploadAvatar = async (file: File): Promise<{ url: string }> => {
+  const formData = new FormData();
+  formData.append('avatar', file);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/avatar`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    body: formData,
+  });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || 'Upload failed');
+  return res.json();
+};
 
 export default api;

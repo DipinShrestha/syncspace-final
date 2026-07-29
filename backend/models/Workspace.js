@@ -22,6 +22,16 @@ const workspaceSchema = new mongoose.Schema(
         role: { type: String, enum: ['admin', 'member'], default: 'member' },
       },
     ],
+    // Invited but not yet accepted — kept separate from `members` so an
+    // invitee has no workspace access until they explicitly accept.
+    pendingInvites: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        role: { type: String, enum: ['admin', 'member'], default: 'member' },
+        invitedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        invitedAt: { type: Date, default: Date.now },
+      },
+    ],
     boards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Board' }],
     documents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],
   },

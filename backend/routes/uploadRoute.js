@@ -45,4 +45,29 @@ router.post('/', protect, upload.single('file'), (req, res) => {
   res.json({ url: req.file.path, filename: req.file.originalname });
 });
 
+// ── Avatar upload — separate storage config: images only, cropped square ──
+const avatarStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'syncspace/avatars',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+    transformation: [{ width: 200, height: 200, crop: 'fill', gravity: 'face' }],
+  },
+});
+
+const uploadAvatar = multer({
+  storage: avatarStorage,
+  limits: { fileSize: 4 * 1024 * 1024 }, // 4 MB
+  fileFilter: (_req, file, cb) => {
+    if (/^image\/(jpe?g|png|gif|webp)$/i.test(file.mimetype)) return cb(null, true);
+    cb(new Error('Only image files are allowed'));
+  },
+});
+
+// POST /api/upload/avatar
+router.post('/avatar', protect, uploadAvatar.single('avatar'), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+  res.json({ url: req.file.path });
+});
+
 module.exports = router;

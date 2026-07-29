@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import NotificationBell from '@/components/NotificationBell';
+import { IconLayers, IconFileText, IconChat } from '@/components/icons';
 
 export default function LandingPage() {
   const { user, logout } = useAuth();
@@ -111,12 +113,6 @@ export default function LandingPage() {
                   >
                     SUPPORT
                   </Link>
-                  <Link
-                    href="#notifications"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    NOTIFICATION
-                  </Link>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={logout}
@@ -124,22 +120,30 @@ export default function LandingPage() {
                     >
                       Logout
                     </button>
-                    <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black transition-transform hover:scale-105 active:scale-95">
-                      {user.name?.charAt(0).toUpperCase() || 'U'}
+                    <NotificationBell />
+                    <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black transition-transform hover:scale-105 active:scale-95 overflow-hidden">
+                      {user.avatar && !user.avatar.includes('placeholder') ? (
+                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        user.name?.charAt(0).toUpperCase() || 'U'
+                      )}
                     </button>
                   </div>
                 </>
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <button
-              className="md:hidden text-black text-2xl w-9 h-9 flex items-center justify-center focus:outline-none transition-transform active:scale-90"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? '✕' : '☰'}
-            </button>
+            {/* Mobile: bell always visible, hamburger opens the rest of the menu */}
+            <div className="md:hidden flex items-center gap-1">
+              {user && <NotificationBell />}
+              <button
+                className="text-black text-2xl w-9 h-9 flex items-center justify-center focus:outline-none transition-transform active:scale-90"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? '✕' : '☰'}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -219,13 +223,6 @@ export default function LandingPage() {
               >
                 Support
               </Link>
-              <Link
-                href="#notifications"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Notification
-              </Link>
               <button
                 onClick={() => {
                   logout();
@@ -262,12 +259,12 @@ export default function LandingPage() {
                 >
                   Get Started Free
                 </Link>
-                <button
-                  onClick={() => window.open('#', '_blank')}
+                <Link
+                  href="#features"
                   className="glass-outline px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-medium transition-all active:scale-95 hover:scale-[1.02]"
                 >
-                  Watch Demo
-                </button>
+                  See Features
+                </Link>
               </>
             ) : (
               // Logged‑in CTA
@@ -290,14 +287,18 @@ export default function LandingPage() {
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center">
-              <div className="text-4xl sm:text-5xl mb-4">📋</div>
+              <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-dusty-50 text-dusty-700 flex items-center justify-center">
+                <IconLayers className="w-7 h-7" />
+              </div>
               <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3">Kanban Boards</h3>
               <p className="text-gray-600 text-sm sm:text-base">
                 Plan projects with drag-and-drop task boards.
               </p>
             </div>
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center">
-              <div className="text-4xl sm:text-5xl mb-4">📝</div>
+              <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-sage-50 text-sage-700 flex items-center justify-center">
+                <IconFileText className="w-7 h-7" />
+              </div>
               <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3">
                 Collaborative Docs
               </h3>
@@ -306,7 +307,9 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="glass feature-card rounded-3xl p-6 sm:p-8 text-center sm:col-span-2 md:col-span-1">
-              <div className="text-4xl sm:text-5xl mb-4">💬</div>
+              <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-dusty-50 text-dusty-700 flex items-center justify-center">
+                <IconChat className="w-7 h-7" />
+              </div>
               <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3">Team Chat</h3>
               <p className="text-gray-600 text-sm sm:text-base">
                 Fast messaging with channels and direct chat.
@@ -316,9 +319,40 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ABOUT SECTION */}
+      <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 border-t border-gray-100">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-4xl font-bold text-black mb-6 tracking-tight">
+            About SyncSpace
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-lg leading-relaxed">
+            SyncSpace is a free, all-in-one workspace built for students and small teams who are
+            tired of juggling separate apps for chat, tasks, documents, and calls. Everything your
+            team needs to plan, discuss, and ship work together lives in one place.
+          </p>
+        </div>
+      </section>
+
+      {/* SUPPORT SECTION */}
+      <section id="support" className="py-16 sm:py-24 px-4 sm:px-6 border-t border-gray-100">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-4xl font-bold text-black mb-6 tracking-tight">Support</h2>
+          <p className="text-gray-600 text-sm sm:text-lg leading-relaxed mb-6">
+            Have a question, found a bug, or want to suggest a feature? Reach out and we'll get
+            back to you.
+          </p>
+          <a
+            href="mailto:bipinshrestha266@gmail.com"
+            className="inline-block glass-btn px-6 py-3 rounded-xl text-sm sm:text-base font-medium transition-all active:scale-95 hover:scale-[1.02]"
+          >
+            Contact Us
+          </a>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer className="text-center py-8 text-gray-600 border-t border-gray-200">
-        © 2025 SyncSpace
+        © {new Date().getFullYear()} SyncSpace
       </footer>
     </>
   );

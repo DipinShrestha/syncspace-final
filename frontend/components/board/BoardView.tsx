@@ -36,6 +36,7 @@ import { Card, List, Board } from '@/types/board';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
 import { useSocket } from '@/hooks/useSocket';
+import { IconLayers } from '@/components/icons';
 
 interface Member {
   _id: string;
@@ -391,17 +392,40 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
 
   // ─── render ──────────────────────────────────────────────────────────────────
 
-  if (loading) return <div className="p-8 text-center text-black">Loading boards...</div>;
+  if (loading) {
+    return (
+      <div className="animate-pulse">
+        <div className="flex gap-2 mb-4 border-b border-gray-200 pb-4">
+          <div className="h-8 w-24 bg-gray-200 rounded-lg" />
+          <div className="h-8 w-24 bg-gray-200 rounded-lg" />
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-gray-100 rounded-md p-3 w-80 flex-shrink-0 space-y-2">
+              <div className="h-4 w-20 bg-gray-200 rounded mb-2" />
+              <div className="h-16 bg-gray-200 rounded" />
+              <div className="h-16 bg-gray-200 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (!currentBoard) {
     return (
       <div>
-        <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
+        <div className="flex flex-col items-center justify-center text-center py-16">
+          <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-4">
+            <IconLayers className="w-7 h-7" />
+          </div>
+          <p className="text-black font-medium mb-1">No boards yet</p>
+          <p className="text-sm text-gray-500 mb-4">Create a board to start organizing tasks.</p>
           <button
             onClick={() => setShowNewBoardModal(true)}
-            className="px-3 py-1 glass-btn rounded-lg text-sm"
+            className="px-4 py-2 glass-btn rounded-lg text-sm font-medium transition-all active:scale-95"
           >
-            + New Board
+            + Create your first board
           </button>
         </div>
         {showNewBoardModal && (
