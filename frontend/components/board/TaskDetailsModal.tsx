@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Editor from '@monaco-editor/react';
 import { updateCard } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
@@ -42,6 +43,18 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export default function TaskDetailsModal({ isOpen, onClose, card, members, onCardUpdated }: Props) {
   const { user } = useAuth();
+
+  // Rendered via a portal straight into document.body (see the return
+  // statement below) instead of in place inside the board column. Board
+  // columns now use backdrop-blur for the glass look, and any ancestor
+  // with backdrop-filter/transform/filter creates a new CSS containing
+  // block — which silently turns this modal's `position: fixed` into
+  // something scoped to that small column instead of the viewport. That's
+  // exactly the "opens in a tiny fixed box" bug. Portaling out of the DOM
+  // tree entirely sidesteps it. `mounted` just avoids touching
+  // `document` during server rendering.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // ── permission: only the assigned member can edit/write code/upload ──────
   const isAssigned = !!user && card.assignedTo === user._id;
@@ -192,9 +205,9 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
 
   const assignedMemberName = members.find((m) => m._id === card.assignedTo)?.name;
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       className="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4"
       onClick={onClose}
@@ -464,6 +477,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
