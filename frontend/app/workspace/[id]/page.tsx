@@ -1,7 +1,7 @@
 // app/workspace/[id]/page.tsx
 'use client';
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getWorkspaceById, getDocumentsByWorkspace, createDocument } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -32,13 +32,28 @@ interface Document {
 }
 
 export default function WorkspacePage() {
+  return (
+    <Suspense fallback={null}>
+      <WorkspacePageInner />
+    </Suspense>
+  );
+}
+
+function WorkspacePageInner() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
 
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<Tab>('boards');
+  // Notifications (chat/call) deep-link here via ?tab=chat — read it once
+  // on mount so clicking one lands directly on the right tab.
+  const validTabs: Tab[] = ['boards', 'documents', 'chat', 'analytics', 'code', 'members'];
+  const tabParam = searchParams.get('tab') as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(
+    tabParam && validTabs.includes(tabParam) ? tabParam : 'boards',
+  );
 
   // Single workspace document — named after the workspace
   const [workspaceDoc, setWorkspaceDoc] = useState<Document | null>(null);
@@ -191,7 +206,11 @@ export default function WorkspacePage() {
                   <Chat workspaceId={id as string} />
                   <div className="border-t border-gray-200 pt-6">
                     <h3 className="text-lg font-semibold text-black mb-3">Video Call</h3>
-                    <VideoCall roomId={id as string} userId={user?._id as string} />
+                    <VideoCall
+                      roomId={id as string}
+                      userId={user?._id as string}
+                      callerName={user?.name}
+                    />
                   </div>
                 </div>
               )}

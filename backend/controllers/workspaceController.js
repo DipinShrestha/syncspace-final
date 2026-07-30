@@ -136,32 +136,51 @@ const addMember = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
+    // The invited email may not have a SyncSpace account yet — that's fine.
+    // We still record the invite (by email); it gets linked to their user
+    // record automatically the moment they sign up with a matching Google
+    // account (see googleAuth in authController.js), and they'll see it in
+    // their notifications as soon as they do.
     const userToAdd = await User.findOne({ email });
-    if (!userToAdd) return res.status(404).json({ message: 'User not found with that email' });
 
-    if (userToAdd._id.toString() === workspace.owner.toString()) {
-      return res.status(400).json({ message: 'User already owns this workspace' });
+    if (userToAdd) {
+      if (userToAdd._id.toString() === workspace.owner.toString()) {
+        return res.status(400).json({ message: 'User already owns this workspace' });
+      }
+      const alreadyMember = workspace.members.some(
+        (m) => m.user.toString() === userToAdd._id.toString()
+      );
+      if (alreadyMember) return res.status(400).json({ message: 'User already in workspace' });
     }
-    const alreadyMember = workspace.members.some(m => m.user.toString() === userToAdd._id.toString());
-    if (alreadyMember) return res.status(400).json({ message: 'User already in workspace' });
 
-    const alreadyInvited = workspace.pendingInvites.some(
-      (p) => p.user.toString() === userToAdd._id.toString()
+    const alreadyInvited = workspace.pendingInvites.some((p) =>
+      userToAdd ? p.user?.toString() === userToAdd._id.toString() : p.email === email.toLowerCase()
     );
-    if (alreadyInvited) return res.status(400).json({ message: 'User already invited' });
+    if (alreadyInvited) return res.status(400).json({ message: 'Already invited' });
 
-    workspace.pendingInvites.push({ user: userToAdd._id, role: role || 'member', invitedBy: req.user.id });
+    workspace.pendingInvites.push({
+      user: userToAdd?._id,
+      email: userToAdd ? undefined : email.toLowerCase(),
+      role: role || 'member',
+      invitedBy: req.user.id,
+    });
     await workspace.save();
     await workspace.populate('pendingInvites.user', 'name email avatar');
 
-    await notify({
-      recipient: userToAdd._id,
-      type: 'workspace_invite',
-      message: `You've been invited to join "${workspace.name}"`,
-      workspace: workspace._id,
-    });
-
-    res.json({ message: 'Invitation sent', workspace });
+    if (userToAdd) {
+      await notify({
+        recipient: userToAdd._id,
+        type: 'workspace_invite',
+        message: `You've been invited to join "${workspace.name}"`,
+        workspace: workspace._id,
+      });
+      res.json({ message: 'Invitation sent', workspace });
+    } else {
+      res.json({
+        message: "Invitation sent — they'll see it as soon as they sign up with this email",
+        workspace,
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -233,7 +252,10 @@ const declineInvite = async (req, res) => {
   }
 };
 
-// @desc    Cancel a pending invite (owner/admin revokes it before it's accepted)
+// @desc    Cancel a pending invite (owner/admin revokes it before it's
+//          accepted). :userId is either a real user id (invite linked to an
+//          existing account) or the invited email address (invite still
+//          only has an email, no account yet) — matched against both.
 // @route   DELETE /api/workspaces/:id/invites/:userId
 // @access  Private (admin or owner)
 const cancelInvite = async (req, res) => {
@@ -247,8 +269,9 @@ const cancelInvite = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
+    const identifier = decodeURIComponent(req.params.userId).toLowerCase();
     const inviteIndex = workspace.pendingInvites.findIndex(
-      (p) => p.user.toString() === req.params.userId
+      (p) => p.user?.toString() === req.params.userId || p.email === identifier
     );
     if (inviteIndex === -1) return res.status(404).json({ message: 'Invite not found' });
 
@@ -266,7 +289,17 @@ const removeMember = async (req, res) => {
 
     const isOwner = workspace.owner.toString() === req.user.id;
     const isAdmin = workspace.members.some(m => m.user.toString() === req.user.id && m.role === 'admin');
-    if (!isOwner && !isAdmin) {
+    // Anyone can remove themselves ("Leave workspace") — that used to
+    // require admin/owner, which meant a plain member had no way to leave
+    // a workspace on their own. The owner still can't leave their own
+    // workspace this way (delete it, or transfer ownership, instead).
+    const isSelfLeaving = req.params.userId === req.user.id;
+    if (isSelfLeaving && isOwner) {
+      return res.status(400).json({
+        message: 'Workspace owners can\'t leave — delete the workspace instead',
+      });
+    }
+    if (!isOwner && !isAdmin && !isSelfLeaving) {
       return res.status(403).json({ message: 'Not authorized' });
     }
 

@@ -21,7 +21,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 text-black h-16 flex items-center justify-between px-4 sm:px-6 md:px-10">
+    <header className="glass-nav fixed top-0 left-0 w-full z-50 text-black h-16 flex items-center justify-between px-4 sm:px-6 md:px-10">
       {/* Logo as image */}
       <Link href="/" className="logo transition-opacity hover:opacity-80">
         <img src="/Gemini_Generated_Image_wf220zwf220zwf22.png" alt="SyncSpace Logo" />
@@ -73,7 +73,7 @@ export default function Navbar() {
                 )}
               </button>
               {showDropdown && (
-                <div className="animate-fade-in-up absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
+                <div className="animate-fade-in-up glass absolute right-0 mt-2 w-48 rounded-2xl shadow-lg py-1 z-50">
                   <Link
                     href="/dashboard/settings"
                     className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
@@ -116,7 +116,7 @@ export default function Navbar() {
 
       {/* Mobile menu overlay */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white border-l border-gray-200 z-40 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden pt-20`}
+        className={`glass fixed top-0 right-0 h-full w-64 rounded-l-3xl z-40 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden pt-20`}
       >
         <nav className="flex flex-col items-center space-y-6 uppercase text-sm font-medium">
           {!user ? (

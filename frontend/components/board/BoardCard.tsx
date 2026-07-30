@@ -79,7 +79,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
       <div
         ref={setNodeRef}
         style={style}
-        className="group bg-white p-3 rounded-md shadow-sm border border-gray-200 transition-all duration-150 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 relative"
+        className="group bg-white/85 backdrop-blur-sm p-3 rounded-lg shadow-sm border border-white/80 transition-all duration-150 hover:shadow-md hover:-translate-y-0.5 relative"
       >
         {/* Drag handle – small area on the left */}
         <div

@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 /*
- * Palette: white background, black text, dusty blue (#82acbf) and sage green
- * (#89a174) used only for buttons/badges/active states/borders — never as a
- * page or panel background. Every surface below is ONE flat, fully opaque
- * color. No gradients, no translucent "glass" overlays, no color blending.
+ * Palette: white page background, black text, dusty blue (#82acbf) and sage
+ * green (#89a174) used for accents/CTAs/badges. Panels use real frosted
+ * "iOS glass": translucent white + backdrop-blur, so they need soft blurred
+ * color washes underneath (see .ambient-bg) to actually read as glass —
+ * a blur over pure flat white is invisible. Text stays black throughout.
  */
 :root {
   --background: #ffffff;
@@ -51,6 +52,42 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/*
+ * ========== Ambient background ==========
+ * Fixed, blurred dusty/sage color washes behind everything. Page background
+ * is still white — these are soft, low-opacity blobs pinned to the
+ * viewport corners, purely so glass panels have something translucent to
+ * reveal through their blur. Pointer-events disabled, sits behind content.
+ */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ambient-bg::before,
+.ambient-bg::after {
+  content: '';
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.35;
+}
+.ambient-bg::before {
+  top: -20vmax;
+  left: -15vmax;
+  background: var(--color-dusty-300);
+}
+.ambient-bg::after {
+  bottom: -25vmax;
+  right: -15vmax;
+  background: var(--color-sage-300);
 }
 
 /* ========== Motion & accessibility ========== */
@@ -118,49 +155,65 @@ body {
 }
 
 /*
- * ========== Surface classes ==========
- * White background, black text, everywhere. #82acbf / #89a174 only ever
- * appear as solid fills on interactive elements (buttons, active tab,
- * badges) — never as a page or panel background. One flat opaque color per
- * surface: no gradients, no transparency, no blending between layers.
+ * ========== Surface classes: iOS-style liquid glass ==========
+ * Translucent white + backdrop-blur + a soft inner highlight, layered over
+ * the ambient color washes above. Text stays black; #82acbf / #89a174 show
+ * up as solid, saturated fills only on primary CTAs/active states — never
+ * as a panel background. Corner radius is intentionally NOT baked in here
+ * (components mix big rounded-2xl/3xl "sheet" corners with sharp
+ * rounded-md/none utility corners via Tailwind classes) — this file only
+ * owns translucency, blur and depth.
  */
 .glass {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 8px 32px rgba(31, 41, 55, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .glass-nav {
-  background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 20px rgba(31, 41, 55, 0.05);
 }
 
 .glass-btn {
-  background: var(--color-dusty-600);
+  background: linear-gradient(180deg, var(--color-dusty-500), var(--color-dusty-600));
   color: #000000;
-  border: 1px solid var(--color-dusty-600);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 4px 14px rgba(130, 172, 191, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transition: 0.2s ease;
 }
 .glass-btn:hover {
-  background: var(--color-dusty-700);
-  border-color: var(--color-dusty-700);
+  background: linear-gradient(180deg, var(--color-dusty-600), var(--color-dusty-700));
 }
 
 .glass-outline {
-  background: #ffffff;
-  border: 1px solid #d4d4d4;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   color: #000000;
 }
 
 /*
  * .glass-input and .glass-active are shared by the filter selects, the
- * "add a list" field, the currently-selected board tab, and the
- * profile/password inputs — kept as solid fills instead of translucent
- * overlays so nothing on top of them visually blends.
+ * "add a list" field, the currently-selected board tab, and the profile
+ * inputs — translucent frosted fills consistent with the rest of the
+ * surface system.
  */
 .glass-input {
-  background: #ffffff;
-  border: 1px solid #d4d4d4;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   color: #000000;
 }
 .glass-input::placeholder {
@@ -169,12 +222,14 @@ body {
 .glass-input:focus {
   outline: none;
   border-color: var(--color-dusty-600);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .glass-active {
-  background: var(--color-dusty-600);
+  background: linear-gradient(180deg, var(--color-dusty-500), var(--color-dusty-600));
   color: #000000;
-  border: 1px solid var(--color-dusty-600);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* ========== Sidebar link styles ========== */
@@ -182,10 +237,10 @@ body {
   transition: 0.2s ease;
 }
 .sidebar-link:hover {
-  background: #f2f2f2;
+  background: rgba(0, 0, 0, 0.05);
 }
 .sidebar-link.active {
-  background: var(--color-dusty-600);
+  background: linear-gradient(180deg, var(--color-dusty-500), var(--color-dusty-600));
   color: #000000;
 }
 
@@ -195,7 +250,7 @@ body {
 }
 .card-hover:hover {
   transform: translateY(-6px);
-  background: #f7f7f7;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 /* ========== Logo styling ========== */

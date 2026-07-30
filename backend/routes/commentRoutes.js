@@ -2,6 +2,9 @@
 const express  = require('express');
 const Comment  = require('../models/Comment');
 const Card     = require('../models/Card');
+const Board    = require('../models/Board');
+const Notification = require('../models/Notification');
+const { getIO } = require('../socketInstance');
 const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router({ mergeParams: true }); // gives us req.params.cardId
@@ -30,6 +33,26 @@ router.post('/', protect, async (req, res) => {
     });
     const populated = await Comment.findById(comment._id).populate('author', 'name email');
     res.status(201).json(populated);
+
+    // Notify the assignee (if there is one, and it isn't the commenter
+    // themselves) that a new comment landed on their card.
+    try {
+      const card = await Card.findById(req.params.cardId);
+      if (card?.assignedTo && card.assignedTo.toString() !== req.user.id) {
+        const board = await Board.findById(card.board);
+        const notification = await Notification.create({
+          recipient: card.assignedTo,
+          type: 'new_comment',
+          message: `${populated.author.name} commented on "${card.title}"`,
+          workspace: board?.workspace,
+          card: card._id,
+        });
+        const io = getIO();
+        if (io) io.to(`user-${card.assignedTo}`).emit('notification', notification);
+      }
+    } catch (notifyErr) {
+      console.error('Failed to send new-comment notification:', notifyErr.message);
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

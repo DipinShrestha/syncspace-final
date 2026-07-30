@@ -59,8 +59,10 @@ export const acceptWorkspaceInvite = (workspaceId: string) =>
   api.post(`/workspaces/${workspaceId}/accept-invite`);
 export const declineWorkspaceInvite = (workspaceId: string) =>
   api.post(`/workspaces/${workspaceId}/decline-invite`);
-export const cancelWorkspaceInvite = (workspaceId: string, userId: string) =>
-  api.delete(`/workspaces/${workspaceId}/invites/${userId}`);
+// `identifier` may be a user id or a raw invited email (see MembersPanel) —
+// encode it since emails contain characters like '@'.
+export const cancelWorkspaceInvite = (workspaceId: string, identifier: string) =>
+  api.delete(`/workspaces/${workspaceId}/invites/${encodeURIComponent(identifier)}`);
 
 // ========== Board endpoints ==========
 export const getBoardsByWorkspace = (workspaceId: string) =>
@@ -96,7 +98,15 @@ export const deleteAccount = () => api.delete('/auth/account');
 // ========== Notification endpoints ==========
 export interface NotificationItem {
   _id: string;
-  type: 'task_assigned' | 'workspace_invite' | 'invite_accepted' | 'invite_declined' | 'generic';
+  type:
+    | 'task_assigned'
+    | 'workspace_invite'
+    | 'invite_accepted'
+    | 'invite_declined'
+    | 'new_message'
+    | 'new_comment'
+    | 'incoming_call'
+    | 'generic';
   message: string;
   workspace?: { _id: string; name: string } | string;
   card?: string;

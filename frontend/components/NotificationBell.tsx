@@ -80,7 +80,12 @@ export default function NotificationBell() {
     const workspaceId = typeof n.workspace === 'string' ? n.workspace : n.workspace?._id;
     if (workspaceId) {
       setOpen(false);
-      router.push(`/workspace/${workspaceId}`);
+      // Deep-link straight to the relevant tab rather than always landing
+      // on Boards — chat/call notifications go to Chat, everything else
+      // (including comments, since there's no per-card deep link yet)
+      // lands on Boards where the card lives.
+      const tab = n.type === 'new_message' || n.type === 'incoming_call' ? 'chat' : 'boards';
+      router.push(`/workspace/${workspaceId}?tab=${tab}`);
     }
   };
 

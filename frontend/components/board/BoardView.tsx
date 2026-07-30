@@ -423,14 +423,14 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
           <p className="text-sm text-gray-500 mb-4">Create a board to start organizing tasks.</p>
           <button
             onClick={() => setShowNewBoardModal(true)}
-            className="px-4 py-2 glass-btn rounded-lg text-sm font-medium transition-all active:scale-95"
+            className="px-4 py-2 glass-btn rounded-full text-sm font-medium transition-all active:scale-95"
           >
             + Create your first board
           </button>
         </div>
         {showNewBoardModal && (
-          <div className="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="modal-panel glass rounded-lg p-6 w-full max-w-96">
+          <div className="modal-overlay fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="modal-panel glass rounded-3xl p-6 w-full max-w-96">
               <h2 className="text-xl mb-4 text-black font-semibold">Create New Board</h2>
               <input
                 type="text"
@@ -443,13 +443,13 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowNewBoardModal(false)}
-                  className="px-4 py-2 glass-outline rounded-lg transition-all active:scale-95 text-sm font-medium"
+                  className="px-4 py-2 glass-outline rounded-full transition-all active:scale-95 text-sm font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateBoard}
-                  className="px-4 py-2 glass-btn rounded-lg transition-all active:scale-95 text-sm font-medium"
+                  className="px-4 py-2 glass-btn rounded-full transition-all active:scale-95 text-sm font-medium"
                 >
                   Create
                 </button>
@@ -608,8 +608,8 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
 
       {/* New board modal */}
       {showNewBoardModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="glass rounded-lg p-6 w-96">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass rounded-3xl p-6 w-96">
             <h2 className="text-xl mb-4 text-black">Create New Board</h2>
             <input
               type="text"
@@ -622,11 +622,11 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowNewBoardModal(false)}
-                className="px-4 py-2 glass-outline rounded-lg"
+                className="px-4 py-2 glass-outline rounded-full"
               >
                 Cancel
               </button>
-              <button onClick={handleCreateBoard} className="px-4 py-2 glass-btn rounded-lg">
+              <button onClick={handleCreateBoard} className="px-4 py-2 glass-btn rounded-full">
                 Create
               </button>
             </div>

@@ -6,7 +6,16 @@ const notificationSchema = new mongoose.Schema(
     recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     type: {
       type: String,
-      enum: ['task_assigned', 'workspace_invite', 'invite_accepted', 'invite_declined', 'generic'],
+      enum: [
+        'task_assigned',
+        'workspace_invite',
+        'invite_accepted',
+        'invite_declined',
+        'new_message',
+        'new_comment',
+        'incoming_call',
+        'generic',
+      ],
       default: 'generic',
     },
     message: { type: String, required: true },

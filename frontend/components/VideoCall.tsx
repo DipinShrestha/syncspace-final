@@ -9,9 +9,12 @@ import { IconMic, IconMicOff, IconVideoCam, IconVideoOff, IconPhoneOff } from '@
 interface VideoCallProps {
   roomId: string;
   userId: string;
+  // Workspace room id is also the display name fallback used in the
+  // "X started a video call" notification sent to the rest of the workspace.
+  callerName?: string;
 }
 
-export default function VideoCall({ roomId, userId }: VideoCallProps) {
+export default function VideoCall({ roomId, userId, callerName }: VideoCallProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [peer, setPeer] = useState<Peer | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -53,6 +56,13 @@ export default function VideoCall({ roomId, userId }: VideoCallProps) {
       setLocalStream(stream);
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       setCallActive(true);
+      // Let the rest of the workspace know a call started, so they get a
+      // live/persisted notification even if they're not on the chat tab.
+      socket?.emit('call-started', {
+        workspaceId: roomId,
+        callerId: userId,
+        callerName: callerName || 'Someone',
+      });
     } catch (error) {
       console.error('Error accessing camera/mic:', error);
     }

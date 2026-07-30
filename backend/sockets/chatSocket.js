@@ -67,6 +67,38 @@ module.exports = (io) => {
         const populated = await Message.findById(message._id).populate('sender', 'name email avatar');
         io.to(workspaceId).emit('new-message', populated);
         callback({ success: true, message: populated });
+
+        // Notify workspace members who are NOT currently looking at this
+        // chat (i.e. not connected to this workspace's socket room right
+        // now) — avoids spamming a notification at people already watching
+        // the message arrive live.
+        const room = io.sockets.adapter.rooms.get(workspaceId);
+        const activeUserIds = new Set();
+        if (room) {
+          for (const socketId of room) {
+            const s = io.sockets.sockets.get(socketId);
+            if (s?.userId) activeUserIds.add(s.userId);
+          }
+        }
+        const workspace = await Workspace.findById(workspaceId);
+        if (workspace) {
+          const memberIds = [
+            workspace.owner.toString(),
+            ...workspace.members.map((m) => m.user.toString()),
+          ];
+          const recipients = [...new Set(memberIds)].filter(
+            (id) => id !== socket.userId && !activeUserIds.has(id),
+          );
+          for (const recipientId of recipients) {
+            const notification = await Notification.create({
+              recipient: recipientId,
+              type: 'new_message',
+              message: `${populated.sender.name}: ${text.slice(0, 80)}`,
+              workspace: workspaceId,
+            });
+            io.to(`user-${recipientId}`).emit('notification', notification);
+          }
+        }
       } catch (err) {
         callback({ error: err.message });
       }
@@ -101,6 +133,34 @@ module.exports = (io) => {
     // never connected — video calling was completely non-functional.
     // Moved here (the socket server that's actually running) and the dead
     // signalingServer.js file has been removed.
+
+    // Someone clicked "Start Video Call" — let the rest of the workspace
+    // know so they get a live/persisted "incoming call" notification
+    // instead of only finding out if they happen to already be on the
+    // chat tab. data = { workspaceId, callerId, callerName }
+    socket.on('call-started', async (data) => {
+      try {
+        const { workspaceId, callerId, callerName } = data;
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) return;
+        const memberIds = [
+          workspace.owner.toString(),
+          ...workspace.members.map((m) => m.user.toString()),
+        ];
+        const recipients = [...new Set(memberIds)].filter((id) => id !== callerId);
+        for (const recipientId of recipients) {
+          const notification = await Notification.create({
+            recipient: recipientId,
+            type: 'incoming_call',
+            message: `${callerName} started a video call in "${workspace.name}"`,
+            workspace: workspaceId,
+          });
+          io.to(`user-${recipientId}`).emit('notification', notification);
+        }
+      } catch (err) {
+        console.error('Failed to send call-started notifications:', err.message);
+      }
+    });
 
     // Join a video-call room (separate from the chat workspace room so
     // joining a call doesn't disturb the chat 'join-workspace' room state).

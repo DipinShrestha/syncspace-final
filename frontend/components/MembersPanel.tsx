@@ -5,6 +5,7 @@
 // and has the invite-by-email form at the bottom.
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   getWorkspaceById,
   inviteMember,
@@ -20,7 +21,11 @@ interface Member {
 }
 
 interface PendingInvite {
-  user: { _id: string; name: string; email: string };
+  // `user` is null when the invite was sent to an email that doesn't have
+  // a SyncSpace account yet — `email` is set instead in that case. It gets
+  // linked automatically once they sign up (see authController.googleAuth).
+  user: { _id: string; name: string; email: string } | null;
+  email?: string;
   role: 'admin' | 'member';
   invitedAt: string;
 }
@@ -37,6 +42,7 @@ interface MembersPanelProps {
 
 export default function MembersPanel({ workspaceId }: MembersPanelProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const [members, setMembers] = useState<Member[]>([]);
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [owner, setOwner] = useState<Owner | null>(null);
@@ -76,20 +82,33 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
     }
   };
 
-  const handleCancelInvite = async (userId: string, name: string) => {
+  // `identifier` is the invited user's id if they already have an account,
+  // or the raw invited email if they don't yet — the backend matches either.
+  const handleCancelInvite = async (identifier: string, name: string) => {
     try {
-      await cancelWorkspaceInvite(workspaceId, userId);
+      await cancelWorkspaceInvite(workspaceId, identifier);
       toast.success(`Invite to ${name} cancelled`);
-      setPendingInvites((prev) => prev.filter((p) => p.user._id !== userId));
+      setPendingInvites((prev) =>
+        prev.filter((p) => (p.user?._id || p.email) !== identifier),
+      );
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to cancel invite');
     }
   };
 
   const handleRemove = async (userId: string, name: string) => {
-    if (!confirm(`Remove ${name} from this workspace?`)) return;
+    const isSelf = userId === user?._id;
+    const prompt = isSelf
+      ? 'Leave this workspace? You\'ll need a new invite to rejoin.'
+      : `Remove ${name} from this workspace?`;
+    if (!confirm(prompt)) return;
     try {
       await removeWorkspaceMember(workspaceId, userId);
+      if (isSelf) {
+        toast.success('You left the workspace');
+        router.push('/dashboard');
+        return;
+      }
       toast.success(`${name} removed`);
       setMembers((prev) => prev.filter((m) => m.user._id !== userId));
     } catch (err: any) {
@@ -153,14 +172,16 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black flex-shrink-0">
                     {m.role}
                   </span>
-                  {/* Show remove button to admins/owner, but not for the owner row itself */}
-                  {canManage && !isOwnerRow && (
+                  {/* Admins/owner can remove anyone (but not the owner row);
+                      a plain member can always remove themselves — i.e.
+                      leave the workspace on their own, no admin needed. */}
+                  {!isOwnerRow && (canManage || isSelf) && (
                     <button
                       onClick={() => handleRemove(m.user._id, m.user.name)}
                       className="ml-1 text-gray-400 hover:text-red-600 text-xs transition-colors flex-shrink-0 p-1"
-                      title={`Remove ${m.user.name}`}
+                      title={isSelf ? 'Leave workspace' : `Remove ${m.user.name}`}
                     >
-                      ✕
+                      {isSelf ? 'Leave' : '✕'}
                     </button>
                   )}
                 </div>
@@ -177,30 +198,37 @@ export default function MembersPanel({ workspaceId }: MembersPanelProps) {
             Pending Invites ({pendingInvites.length})
           </p>
           <div className="space-y-2">
-            {pendingInvites.map((p) => (
-              <div
-                key={p.user._id}
-                className="flex items-center gap-3 p-3 rounded-lg bg-white border border-dashed border-gray-300"
-              >
-                <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-sm flex-shrink-0">
-                  {p.user.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-black truncate">{p.user.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{p.user.email}</p>
-                </div>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 flex-shrink-0">
-                  pending
-                </span>
-                <button
-                  onClick={() => handleCancelInvite(p.user._id, p.user.name)}
-                  className="ml-1 text-gray-400 hover:text-red-600 text-xs transition-colors flex-shrink-0 p-1"
-                  title={`Cancel invite to ${p.user.name}`}
+            {pendingInvites.map((p) => {
+              const identifier = p.user?._id || p.email || '';
+              const displayName = p.user?.name || p.email || 'Unknown';
+              const displaySub = p.user
+                ? p.user.email
+                : "Not signed up yet — they'll see this invite once they do";
+              return (
+                <div
+                  key={identifier}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-white border border-dashed border-gray-300"
                 >
-                  ✕
-                </button>
-              </div>
-            ))}
+                  <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-sm flex-shrink-0">
+                    {displayName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-black truncate">{displayName}</p>
+                    <p className="text-xs text-gray-500 truncate">{displaySub}</p>
+                  </div>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 flex-shrink-0">
+                    pending
+                  </span>
+                  <button
+                    onClick={() => handleCancelInvite(identifier, displayName)}
+                    className="ml-1 text-gray-400 hover:text-red-600 text-xs transition-colors flex-shrink-0 p-1"
+                    title={`Cancel invite to ${displayName}`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

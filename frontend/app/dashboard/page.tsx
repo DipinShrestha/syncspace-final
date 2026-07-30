@@ -50,19 +50,27 @@ function EmptyState({
   icon,
   title,
   subtitle,
+  onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   subtitle: string;
+  onClick?: () => void;
 }) {
+  const Tag = onClick ? 'button' : 'div';
   return (
-    <div className="glass rounded-xl py-10 px-6 flex flex-col items-center text-center">
-      <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-3">
+    <Tag
+      onClick={onClick}
+      className={`glass rounded-2xl py-10 px-6 flex flex-col items-center text-center w-full ${
+        onClick ? 'cursor-pointer transition-all hover:scale-[1.01] hover:shadow-lg active:scale-[0.99]' : ''
+      }`}
+    >
+      <div className="w-14 h-14 rounded-full bg-dusty-50 text-dusty-700 flex items-center justify-center mb-3">
         {icon}
       </div>
       <p className="text-black font-medium text-sm sm:text-base">{title}</p>
       <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
-    </div>
+    </Tag>
   );
 }
 
@@ -197,7 +205,8 @@ export default function DashboardPage() {
             <EmptyState
               icon={<IconFolderOpen className="w-6 h-6" />}
               title="You haven't created any workspaces yet"
-              subtitle="Click “+ New Workspace” above to start your first one."
+              subtitle="Click here to start your first one."
+              onClick={() => setShowModal(true)}
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -260,34 +269,34 @@ export default function DashboardPage() {
         </div>
 
         {showModal && (
-          <div className="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="modal-panel bg-white border border-gray-200 rounded-xl p-6 w-full max-w-md">
+          <div className="modal-overlay fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="modal-panel glass rounded-3xl p-6 w-full max-w-md">
               <h2 className="text-xl font-bold mb-4 text-black">Create Workspace</h2>
               <input
                 type="text"
                 placeholder="Name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="w-full border border-gray-300 bg-white rounded-lg p-2 mb-3 text-black placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                className="w-full glass-input rounded-lg p-2 mb-3 transition-colors"
                 autoFocus
               />
               <textarea
                 placeholder="Description (optional)"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
-                className="w-full border border-gray-300 bg-white rounded-lg p-2 mb-4 text-black placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-dusty-500"
+                className="w-full glass-input rounded-lg p-2 mb-4 transition-colors"
                 rows={2}
               />
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-black hover:bg-gray-100 transition-all active:scale-95 text-sm font-medium"
+                  className="px-4 py-2 glass-outline rounded-full text-black transition-all active:scale-95 text-sm font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreate}
-                  className="px-4 py-2 bg-dusty-600 hover:bg-dusty-700 rounded-lg text-black transition-all active:scale-95 text-sm font-medium"
+                  className="px-4 py-2 glass-btn rounded-full text-black transition-all active:scale-95 text-sm font-medium"
                 >
                   Create
                 </button>

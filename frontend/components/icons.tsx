@@ -218,6 +218,26 @@ export function IconClock(props: IconProps) {
   );
 }
 
+export function IconChart(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 3v18h18" />
+      <path d="M18 12v5M13 8v9M8 14v3" />
+    </svg>
+  );
+}
+
+export function IconGrid(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  );
+}
+
 export function IconTag(props: IconProps) {
   return (
     <svg {...base} {...props}>

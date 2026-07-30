@@ -1,4 +1,7 @@
 const User = require('../models/User');
+const Workspace = require('../models/Workspace');
+const Notification = require('../models/Notification');
+const { getIO } = require('../socketInstance');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 
@@ -50,6 +53,39 @@ const googleAuth = async (req, res) => {
           avatar: picture || undefined,
         });
         isNewUser = true;
+      }
+
+      // Link up any workspace invites that were sent to this email before
+      // this person had a SyncSpace account at all (see addMember in
+      // workspaceController.js — it stores `email` instead of `user` when
+      // the invitee doesn't exist yet). Now that they do, attach their real
+      // user id and notify them so it shows up right away.
+      try {
+        const workspacesWithInvite = await Workspace.find({
+          'pendingInvites.email': email.toLowerCase(),
+        });
+        const io = getIO();
+        for (const ws of workspacesWithInvite) {
+          let changed = false;
+          for (const invite of ws.pendingInvites) {
+            if (!invite.user && invite.email === email.toLowerCase()) {
+              invite.user = user._id;
+              changed = true;
+            }
+          }
+          if (changed) {
+            await ws.save();
+            const notification = await Notification.create({
+              recipient: user._id,
+              type: 'workspace_invite',
+              message: `You've been invited to join "${ws.name}"`,
+              workspace: ws._id,
+            });
+            if (io) io.to(`user-${user._id}`).emit('notification', notification);
+          }
+        }
+      } catch (linkErr) {
+        console.error('Failed to link pending email invites:', linkErr.message);
       }
     }
 
