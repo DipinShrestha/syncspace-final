@@ -31,7 +31,10 @@ export default function VideoCall({ roomId, userId, callerName }: VideoCallProps
   // 1. Setup Socket.io connection to signaling server
   useEffect(() => {
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5500';
-    const newSocket = io(socketUrl);
+    // Backend verifies this token on connection (see chatSocket.js) and
+    // uses it, not client-supplied ids, to know who's actually calling.
+    const token = localStorage.getItem('token');
+    const newSocket = io(socketUrl, { auth: { token } });
     setSocket(newSocket);
 
     return () => {

@@ -1,23 +1,51 @@
 // backend/sockets/chatSocket.js
+const jwt = require('jsonwebtoken');
 const Message = require('../models/Message');
 const Workspace = require('../models/Workspace');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 
 module.exports = (io) => {
+  // ── Connection-time auth ──────────────────────────────────────────────
+  // Every event below used to trust whatever userId the client passed in
+  // (e.g. `socket.emit('join-workspace', workspaceId, someUserId)`), with
+  // no proof it was actually that user. That meant anyone could impersonate
+  // any other user id — join their personal notification room and read
+  // their live notifications, or join a workspace's chat room by simply
+  // claiming to be one of its members. This middleware verifies the same
+  // JWT issued at login (sent via the socket handshake) once per
+  // connection, and every handler below now trusts socket.userId — set
+  // here from the verified token — instead of a client-supplied argument.
+  io.use((socket, next) => {
+    try {
+      const token = socket.handshake.auth?.token;
+      if (!token) return next(new Error('Authentication required'));
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      socket.userId = decoded.id;
+      next();
+    } catch (err) {
+      next(new Error('Authentication failed'));
+    }
+  });
+
   io.on('connection', (socket) => {
     console.log('🟢 New client connected:', socket.id);
 
     // Personal room — kept separate from workspace rooms (and never left on
     // workspace switch) so a user can be pushed a notification no matter
-    // which workspace/screen they currently have open.
-    socket.on('join-user', (userId) => {
-      socket.join(`user-${userId}`);
+    // which workspace/screen they currently have open. Uses the verified
+    // socket.userId, not a client-supplied id, so nobody can join someone
+    // else's notification room.
+    socket.on('join-user', () => {
+      socket.join(`user-${socket.userId}`);
     });
 
-    // Join a workspace room
-    socket.on('join-workspace', async (workspaceId, userId, callback) => {
+    // Join a workspace room. The second argument used to be a
+    // client-supplied userId that was trusted for the membership check —
+    // now it's ignored in favor of the verified socket.userId.
+    socket.on('join-workspace', async (workspaceId, _clientSuppliedUserId, callback) => {
       try {
+        const userId = socket.userId;
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) return callback({ error: 'Workspace not found' });
         const isMember = workspace.members.some(m => m.user.toString() === userId);
@@ -31,7 +59,6 @@ module.exports = (io) => {
         });
         socket.join(workspaceId);
         socket.workspaceId = workspaceId;
-        socket.userId = userId;
         console.log(`User ${userId} joined workspace ${workspaceId}`);
         callback({ success: true });
       } catch (err) {
@@ -140,7 +167,12 @@ module.exports = (io) => {
     // chat tab. data = { workspaceId, callerId, callerName }
     socket.on('call-started', async (data) => {
       try {
-        const { workspaceId, callerId, callerName } = data;
+        // `callerId` is no longer trusted from the client — using the
+        // verified socket.userId means nobody can send a fake "X started a
+        // call" notification while excluding themselves as an arbitrary
+        // other user. `callerName` is just display text, so it's fine as-is.
+        const { workspaceId, callerName } = data;
+        const callerId = socket.userId;
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) return;
         const memberIds = [

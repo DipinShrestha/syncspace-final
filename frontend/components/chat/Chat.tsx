@@ -40,7 +40,10 @@ export default function Chat({ workspaceId }: ChatProps) {
     if (!user) return;
 
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5500';
-    const newSocket = io(socketUrl, { transports: ['websocket'] });
+    // Backend verifies this token on connection and derives the real user
+    // id from it — join-workspace no longer trusts a client-supplied userId.
+    const token = localStorage.getItem('token');
+    const newSocket = io(socketUrl, { transports: ['websocket'], auth: { token } });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
