@@ -1,7 +1,7 @@
 // app/page.tsx
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import NotificationBell from '@/components/NotificationBell';
 import {
@@ -251,7 +251,7 @@ interface Feature {
   title: string;
   description: string;
   how: string;
-  Mockup: () => JSX.Element;
+  Mockup: () => ReactElement;
 }
 
 const features: Feature[] = [
