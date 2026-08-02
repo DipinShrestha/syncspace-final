@@ -24,6 +24,7 @@ interface Card {
   _id: string;
   title: string;
   description?: string;
+  startDate?: string;
   dueDate?: string;
   labels?: string[];
   assignedTo?: string;
@@ -62,6 +63,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
   // ── editable fields (only used when isAssigned) ───────────────────────────
   const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description ?? '');
+  const [startDate, setStartDate] = useState(card.startDate ?? '');
   const [dueDate, setDueDate] = useState(card.dueDate ?? '');
   const [labels, setLabels] = useState(card.labels?.join(', ') ?? '');
   const [assignedTo, setAssignedTo] = useState(card.assignedTo ?? '');
@@ -90,6 +92,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
   useEffect(() => {
     setTitle(card.title);
     setDescription(card.description ?? '');
+    setStartDate(card.startDate ?? '');
     setDueDate(card.dueDate ?? '');
     setLabels(card.labels?.join(', ') ?? '');
     setAssignedTo(card.assignedTo ?? '');
@@ -148,6 +151,7 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
       await updateCard(card._id, {
         title,
         description,
+        startDate: startDate || undefined,
         dueDate: dueDate || undefined,
         labels: labels
           .split(',')
@@ -262,6 +266,15 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
               />
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1">
+                  <label className="block text-xs text-gray-500 mb-1">Start date</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full glass-input rounded-lg p-2 text-sm transition-colors"
+                  />
+                </div>
+                <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Due date</label>
                   <input
                     type="date"
@@ -299,10 +312,15 @@ export default function TaskDetailsModal({ isOpen, onClose, card, members, onCar
             </div>
           ) : (
             /* READ-ONLY view of description / labels / due date */
-            (card.description || card.dueDate || (card.labels && card.labels.length > 0)) && (
+            (card.description || card.startDate || card.dueDate || (card.labels && card.labels.length > 0)) && (
               <div className="space-y-2 text-sm text-gray-700">
                 {card.description && <p>{card.description}</p>}
                 <div className="flex items-center gap-3 flex-wrap">
+                  {card.startDate && (
+                    <span className="text-gray-500 text-xs">
+                      Starts {new Date(card.startDate).toLocaleDateString()}
+                    </span>
+                  )}
                   {card.dueDate && (
                     <span className="text-gray-500 text-xs">
                       Due {new Date(card.dueDate).toLocaleDateString()}

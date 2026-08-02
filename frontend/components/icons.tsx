@@ -127,6 +127,22 @@ export function IconX(props: IconProps) {
   );
 }
 
+export function IconPhone(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M22 16.92v2.58a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 3.18 2 2 0 0 1 4.11 1h2.58a2 2 0 0 1 2 1.72c.13.98.36 1.94.7 2.86a2 2 0 0 1-.45 2.11L7.6 9.03a16 16 0 0 0 6.36 6.36l1.34-1.34a2 2 0 0 1 2.11-.45c.92.34 1.88.57 2.86.7a2 2 0 0 1 1.73 2.02Z" />
+    </svg>
+  );
+}
+
+export function IconChevronDown(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 export function IconPhoneOff(props: IconProps) {
   return (
     <svg {...base} {...props}>

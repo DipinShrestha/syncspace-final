@@ -59,6 +59,10 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
   const [newListTitle, setNewListTitle] = useState('');
   const [activeCard, setActiveCard] = useState<Card | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  // Card creation is owner-only (product decision) — track whether the
+  // current user is the workspace owner so BoardList can hide/show the
+  // "+ Add a card" control accordingly.
+  const [isOwner, setIsOwner] = useState(false);
   const [filterAssignee, setFilterAssignee] = useState<string>('');
   const [filterLabel, setFilterLabel] = useState<string>('');
   const [filterDueDate, setFilterDueDate] = useState<string>('');
@@ -114,6 +118,8 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
       const res = await getWorkspaceById(workspaceId);
       const workspaceMembers = res.data.members.map((m: any) => m.user);
       setMembers(workspaceMembers);
+      const ownerId = res.data.owner?._id || res.data.owner;
+      setIsOwner(!!ownerId && ownerId === user?._id);
     } catch (err) {
       console.error(err);
     }
@@ -171,12 +177,17 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
     listIndex: number,
     cardTitle: string,
     assigneeId?: string,
+    description?: string,
+    startDate?: string,
+    dueDate?: string,
   ) => {
     const tempCardId = `temp-${Date.now()}`;
     const tempCard: Card = {
       _id: tempCardId,
       title: cardTitle,
-      description: '',
+      description: description || '',
+      startDate,
+      dueDate,
       labels: [],
       assignedTo: assigneeId,
       position: 0,
@@ -202,6 +213,9 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
       const res = await addCard(boardId, listIndex, {
         title: cardTitle,
         assignedTo: assigneeId,
+        description,
+        startDate,
+        dueDate,
       });
 
       const replaceTemp = (boards: Board[]) =>
@@ -581,10 +595,19 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
                   key={list._id || listIndex}
                   list={{ ...list, cards: filteredCards }}
                   listIndex={listIndex}
-                  onAddCard={(title, assigneeId) =>
-                    handleAddCard(currentBoard._id, listIndex, title, assigneeId)
+                  onAddCard={(title, assigneeId, description, startDate, dueDate) =>
+                    handleAddCard(
+                      currentBoard._id,
+                      listIndex,
+                      title,
+                      assigneeId,
+                      description,
+                      startDate,
+                      dueDate,
+                    )
                   }
                   members={members}
+                  canAddCard={isOwner}
                   // FIX: these props were declared but never passed — cards had
                   // no delete, edit, or move-stage buttons working
                   onCardUpdated={fetchBoards}

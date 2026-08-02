@@ -12,23 +12,29 @@ const User = require('../models/User');
 const getWorkspaceAnalytics = async (req, res) => {
   try {
     const { workspaceId } = req.params;
-    const workspace = await Workspace.findById(workspaceId);
+    const workspace = await Workspace.findById(workspaceId).lean();
     if (!workspace) return res.status(404).json({ message: 'Workspace not found' });
     const isMember = workspace.members.some(m => m.user.toString() === req.user.id);
     if (!isMember && workspace.owner.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    // Get all boards in this workspace
-    const boards = await Board.find({ workspace: workspaceId });
+    // PERF FIX: boards, messages, documents, and the member lookup are all
+    // independent reads (only `cards` depends on knowing the board ids
+    // first) — this used to run all six queries back-to-back in sequence,
+    // paying full network round-trip latency six times over on every
+    // analytics load. Running the independent ones together cuts that to
+    // two round trips. .lean() everywhere too — this whole response is
+    // read-only, nothing here gets saved back.
+    const memberIds = workspace.members.map(m => m.user);
+    const [boards, messages, documents, users] = await Promise.all([
+      Board.find({ workspace: workspaceId }).lean(),
+      Message.find({ workspace: workspaceId }).lean(),
+      Document.find({ workspace: workspaceId }).lean(),
+      User.find({ _id: { $in: memberIds } }).select('name email').lean(),
+    ]);
     const boardIds = boards.map(b => b._id);
-    const cards = await Card.find({ board: { $in: boardIds } });
-
-    // Get messages
-    const messages = await Message.find({ workspace: workspaceId });
-
-    // Get documents
-    const documents = await Document.find({ workspace: workspaceId });
+    const cards = await Card.find({ board: { $in: boardIds } }).lean();
 
     // BUG FIX: card.list was compared to the hardcoded string 'done', but boards
     // store list titles like 'Done' (capital D). Normalise to lowercase for a
@@ -73,9 +79,7 @@ const getWorkspaceAnalytics = async (req, res) => {
       }
     });
 
-    // Fetch member names
-    const memberIds = workspace.members.map(m => m.user);
-    const users = await User.find({ _id: { $in: memberIds } }).select('name email');
+    // `users` and `memberIds` were already fetched in the parallel batch above.
     const userMap = {};
     users.forEach(u => { userMap[u._id.toString()] = u.name; });
 

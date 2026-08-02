@@ -9,7 +9,8 @@ const getNotifications = async (req, res) => {
     const notifications = await Notification.find({ recipient: req.user.id })
       .sort({ createdAt: -1 })
       .limit(50)
-      .populate('workspace', 'name');
+      .populate('workspace', 'name')
+      .lean();
     res.json(notifications);
   } catch (error) {
     res.status(500).json({ message: error.message });

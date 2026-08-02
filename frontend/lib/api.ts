@@ -16,6 +16,7 @@ api.interceptors.request.use((config) => {
 interface CardData {
   title?: string;
   description?: string;
+  startDate?: string;
   dueDate?: string;
   labels?: string[];
   assignedTo?: string;

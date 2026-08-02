@@ -15,6 +15,7 @@ const workspaceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      index: true,
     },
     members: [
       {
@@ -42,5 +43,12 @@ const workspaceSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// The dashboard's "get my workspaces" query does
+// `Workspace.find({ $or: [{ owner }, { 'members.user': userId }] })` on
+// every single dashboard load — without this, every load was a full
+// collection scan. `owner` has a field-level index above; this covers the
+// array side of that $or.
+workspaceSchema.index({ 'members.user': 1 });
 
 module.exports = mongoose.model('Workspace', workspaceSchema);

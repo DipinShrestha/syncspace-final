@@ -1,11 +1,12 @@
 // backend/server.js
-const express    = require('express');
-const dotenv     = require('dotenv');
-const mongoose   = require('mongoose');
-const cors       = require('cors');
-const http       = require('http');
-const path       = require('path');
-const { Server } = require('socket.io');
+const express     = require('express');
+const dotenv      = require('dotenv');
+const mongoose    = require('mongoose');
+const cors        = require('cors');
+const compression = require('compression');
+const http        = require('http');
+const path        = require('path');
+const { Server }  = require('socket.io');
 
 const authRoutes      = require('./routes/authRoutes');
 const workspaceRoutes = require('./routes/workspaceRoutes');
@@ -38,6 +39,9 @@ const corsOptions = { origin: allowedOrigins || '*' };
 
 app.use(express.json());
 app.use(cors(corsOptions));
+// Gzip every JSON response — board/card lists and chat history are the
+// biggest payloads in this app and compress very well as text.
+app.use(compression());
 
 // Serve uploaded files as static assets  →  GET /uploads/<filename>
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

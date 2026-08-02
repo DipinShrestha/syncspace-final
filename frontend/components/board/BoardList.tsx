@@ -15,8 +15,17 @@ interface Member {
 interface BoardListProps {
   list: List;
   listIndex: number;
-  onAddCard: (title: string, assigneeId?: string) => void;
+  onAddCard: (
+    title: string,
+    assigneeId?: string,
+    description?: string,
+    startDate?: string,
+    dueDate?: string,
+  ) => void;
   members?: Member[];
+  // Only the workspace owner can add cards (product decision). When false,
+  // the "+ Add a card" control is hidden entirely for this list.
+  canAddCard?: boolean;
   // FIX: added missing props so they can be forwarded to BoardCard
   onCardUpdated?: () => void;
   onMoveStage?: (cardId: string, currentList: string) => void;
@@ -27,10 +36,14 @@ const BoardList: React.FC<BoardListProps> = ({
   listIndex,
   onAddCard,
   members = [],
+  canAddCard = false,
   onCardUpdated,
   onMoveStage,
 }) => {
   const [newCardTitle, setNewCardTitle] = useState('');
+  const [newCardDescription, setNewCardDescription] = useState('');
+  const [newCardStartDate, setNewCardStartDate] = useState('');
+  const [newCardDueDate, setNewCardDueDate] = useState('');
   const [selectedAssignee, setSelectedAssignee] = useState<string>('');
   const [isAddingCard, setIsAddingCard] = useState(false);
 
@@ -43,8 +56,17 @@ const BoardList: React.FC<BoardListProps> = ({
 
   const handleAddCard = () => {
     if (newCardTitle.trim()) {
-      onAddCard(newCardTitle, selectedAssignee || undefined);
+      onAddCard(
+        newCardTitle,
+        selectedAssignee || undefined,
+        newCardDescription.trim() || undefined,
+        newCardStartDate || undefined,
+        newCardDueDate || undefined,
+      );
       setNewCardTitle('');
+      setNewCardDescription('');
+      setNewCardStartDate('');
+      setNewCardDueDate('');
       setSelectedAssignee('');
       setIsAddingCard(false);
     }
@@ -90,22 +112,51 @@ const BoardList: React.FC<BoardListProps> = ({
         </SortableContext>
       </div>
 
-      {isAddingCard ? (
-        <div className="mt-3">
+      {/* Card creation is owner-only — non-owners see neither the form nor
+          the "+ Add a card" trigger for this list. */}
+      {canAddCard && (isAddingCard ? (
+        <div className="mt-3 space-y-2">
           <input
             type="text"
             value={newCardTitle}
             onChange={(e) => setNewCardTitle(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddCard()}
             placeholder="Enter card title..."
-            className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-dusty-500"
+            className="w-full p-2 border border-gray-300 rounded-md text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-dusty-500"
             autoFocus
           />
+          <textarea
+            value={newCardDescription}
+            onChange={(e) => setNewCardDescription(e.target.value)}
+            placeholder="Description (optional)..."
+            rows={2}
+            className="w-full p-2 border border-gray-300 rounded-md text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-dusty-500 resize-none"
+          />
+          <div className="flex gap-2">
+            <label className="flex-1 text-xs text-gray-500">
+              Start date
+              <input
+                type="date"
+                value={newCardStartDate}
+                onChange={(e) => setNewCardStartDate(e.target.value)}
+                className="w-full mt-0.5 p-1.5 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-dusty-500"
+              />
+            </label>
+            <label className="flex-1 text-xs text-gray-500">
+              Due date
+              <input
+                type="date"
+                value={newCardDueDate}
+                onChange={(e) => setNewCardDueDate(e.target.value)}
+                className="w-full mt-0.5 p-1.5 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-dusty-500"
+              />
+            </label>
+          </div>
           {members.length > 0 && (
             <select
               value={selectedAssignee}
               onChange={(e) => setSelectedAssignee(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md text-sm mb-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-dusty-500"
+              className="w-full p-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-dusty-500"
             >
               <option value="">Unassigned</option>
               {members.map((m) => (
@@ -139,7 +190,7 @@ const BoardList: React.FC<BoardListProps> = ({
         >
           + Add a card
         </button>
-      )}
+      ))}
     </div>
   );
 };

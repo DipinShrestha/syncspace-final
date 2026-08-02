@@ -1,19 +1,6 @@
-import { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-
-export const useSocket = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  useEffect(() => {
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5500';
-    // The backend verifies this token on connection (see chatSocket.js) and
-    // derives the real user id from it server-side — it no longer trusts a
-    // userId passed in individual event payloads.
-    const token = localStorage.getItem('token');
-    const s = io(socketUrl, { auth: { token } });
-    setSocket(s);
-    return () => {
-      s.disconnect();
-    };
-  }, []);
-  return socket;
-};
+// PERF FIX: this used to open a brand new socket.io connection on every
+// call — now it just reads the single shared connection from SocketContext
+// (see context/SocketContext.tsx for why). Re-exported under the same name
+// and import path so existing consumers (NotificationBell, BoardView)
+// didn't need to change their imports.
+export { useSocket } from '@/context/SocketContext';

@@ -72,7 +72,8 @@ module.exports = (io) => {
         const messages = await Message.find({ workspace: workspaceId })
           .sort({ createdAt: 1 })
           .populate('sender', 'name email avatar')
-          .limit(100);
+          .limit(100)
+          .lean();
         callback(messages);
       } catch (err) {
         callback({ error: err.message });
@@ -161,18 +162,20 @@ module.exports = (io) => {
     // Moved here (the socket server that's actually running) and the dead
     // signalingServer.js file has been removed.
 
-    // Someone clicked "Start Video Call" — let the rest of the workspace
-    // know so they get a live/persisted "incoming call" notification
-    // instead of only finding out if they happen to already be on the
-    // chat tab. data = { workspaceId, callerId, callerName }
+    // Someone clicked "Start Call" — let the rest of the workspace know so
+    // they get a live/persisted "incoming call" notification instead of only
+    // finding out if they happen to already be on the chat tab.
+    // data = { workspaceId, callerId, callerName, callType }
     socket.on('call-started', async (data) => {
       try {
         // `callerId` is no longer trusted from the client — using the
         // verified socket.userId means nobody can send a fake "X started a
         // call" notification while excluding themselves as an arbitrary
-        // other user. `callerName` is just display text, so it's fine as-is.
-        const { workspaceId, callerName } = data;
+        // other user. `callerName`/`callType` are just display text, so
+        // they're fine as-is.
+        const { workspaceId, callerName, callType } = data;
         const callerId = socket.userId;
+        const label = callType === 'audio' ? 'an audio call' : 'a video call';
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) return;
         const memberIds = [
@@ -184,7 +187,7 @@ module.exports = (io) => {
           const notification = await Notification.create({
             recipient: recipientId,
             type: 'incoming_call',
-            message: `${callerName} started a video call in "${workspace.name}"`,
+            message: `${callerName} started ${label} in "${workspace.name}"`,
             workspace: workspaceId,
           });
           io.to(`user-${recipientId}`).emit('notification', notification);

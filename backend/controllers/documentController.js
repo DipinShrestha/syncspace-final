@@ -45,7 +45,8 @@ const getDocumentsByWorkspace = async (req, res) => {
     const documents = await Document.find({ workspace: workspaceId })
       .populate('createdBy', 'name email')
       .populate('lastEditedBy', 'name email')
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
     res.json(documents);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -59,7 +60,8 @@ const getDocumentById = async (req, res) => {
   try {
     const document = await Document.findById(req.params.id)
       .populate('createdBy', 'name email')
-      .populate('lastEditedBy', 'name email');
+      .populate('lastEditedBy', 'name email')
+      .lean();
     if (!document) return res.status(404).json({ message: 'Document not found' });
     await checkWorkspaceAccess(document.workspace, req.user.id);
     res.json(document);

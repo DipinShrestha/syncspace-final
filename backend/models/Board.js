@@ -10,6 +10,9 @@ const boardSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Workspace',
       required: true,
+      // Every board-view load queries Board.find({ workspace: ... }) —
+      // indexed so it stays fast as boards grow.
+      index: true,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

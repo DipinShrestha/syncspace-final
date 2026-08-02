@@ -4,6 +4,7 @@ export interface Card {
   title: string;
   description?: string;
   labels?: string[];
+  startDate?: string;
   dueDate?: string;
   assignedTo?: string;
   position: number;

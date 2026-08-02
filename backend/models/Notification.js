@@ -26,4 +26,9 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// getNotifications does `find({ recipient }).sort({ createdAt: -1 })` —
+// the field-level index on `recipient` above only covers the filter; this
+// compound index covers the filter + sort together.
+notificationSchema.index({ recipient: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Notification', notificationSchema);

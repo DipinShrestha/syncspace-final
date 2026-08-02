@@ -40,12 +40,15 @@ const createWorkspace = async (req, res) => {
 const getWorkspaces = async (req, res) => {
   try {
     // Find workspaces where user is owner or member
+    // .lean() — this response is serialized straight to JSON and never
+    // saved back, so there's no need to pay for full Mongoose document
+    // hydration (getters/setters/change-tracking) on every dashboard load.
     const workspaces = await Workspace.find({
       $or: [
         { owner: req.user.id },
         { 'members.user': req.user.id }
       ]
-    }).populate('owner', 'name email').populate('members.user', 'name email');
+    }).populate('owner', 'name email').populate('members.user', 'name email').lean();
     res.json(workspaces);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -60,7 +63,8 @@ const getWorkspaceById = async (req, res) => {
     const workspace = await Workspace.findById(req.params.id)
       .populate('owner', 'name email')
       .populate('members.user', 'name email avatar')
-      .populate('pendingInvites.user', 'name email avatar');
+      .populate('pendingInvites.user', 'name email avatar')
+      .lean();
     if (!workspace) {
       return res.status(404).json({ message: 'Workspace not found' });
     }

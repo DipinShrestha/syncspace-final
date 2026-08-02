@@ -22,4 +22,9 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// load-messages does `Message.find({ workspace }).sort({ createdAt: 1 })` —
+// every chat tab open ran this unindexed. Compound index covers both the
+// filter and the sort in one pass.
+messageSchema.index({ workspace: 1, createdAt: 1 });
+
 module.exports = mongoose.model('Message', messageSchema);

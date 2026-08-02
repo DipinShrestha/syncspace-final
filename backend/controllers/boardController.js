@@ -46,7 +46,8 @@ const createBoard = async (req, res) => {
 const getBoardsByWorkspace = async (req, res) => {
   try {
     const { workspaceId } = req.params;
-    const workspace = await Workspace.findById(workspaceId);
+    // Just a permission check, never mutated/saved — .lean() here too.
+    const workspace = await Workspace.findById(workspaceId).lean();
     if (!workspace) {
       return res.status(404).json({ message: 'Workspace not found' });
     }
@@ -55,9 +56,11 @@ const getBoardsByWorkspace = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
+    // .lean() — read-only response, no .save() happens after this fetch.
     const boards = await Board.find({ workspace: workspaceId })
       .populate('createdBy', 'name email')
-      .populate('lists.cards');
+      .populate('lists.cards')
+      .lean();
     res.json(boards);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,11 +74,12 @@ const getBoardById = async (req, res) => {
   try {
     const board = await Board.findById(req.params.id)
       .populate('createdBy', 'name email')
-      .populate('lists.cards');
+      .populate('lists.cards')
+      .lean();
     if (!board) {
       return res.status(404).json({ message: 'Board not found' });
     }
-    const workspace = await Workspace.findById(board.workspace);
+    const workspace = await Workspace.findById(board.workspace).lean();
     const isMember = workspace.members.some(m => m.user.toString() === req.user.id);
     if (workspace.owner.toString() !== req.user.id && !isMember) {
       return res.status(403).json({ message: 'Not authorized' });
@@ -95,7 +99,7 @@ const updateBoard = async (req, res) => {
     if (!board) {
       return res.status(404).json({ message: 'Board not found' });
     }
-    const workspace = await Workspace.findById(board.workspace);
+    const workspace = await Workspace.findById(board.workspace).lean();
     const isMember = workspace.members.some(m => m.user.toString() === req.user.id);
     if (workspace.owner.toString() !== req.user.id && !isMember) {
       return res.status(403).json({ message: 'Not authorized' });
@@ -145,7 +149,7 @@ const addList = async (req, res) => {
     if (!board) {
       return res.status(404).json({ message: 'Board not found' });
     }
-    const workspace = await Workspace.findById(board.workspace);
+    const workspace = await Workspace.findById(board.workspace).lean();
     const isMember = workspace.members.some(m => m.user.toString() === req.user.id);
     if (workspace.owner.toString() !== req.user.id && !isMember) {
       return res.status(403).json({ message: 'Not authorized' });
@@ -203,14 +207,24 @@ const deleteList = async (req, res) => {
 const addCard = async (req, res) => {
   try {
     const { boardId, listIndex } = req.params;
-    const { title, description, dueDate, labels, assignedTo } = req.body;
+    const { title, description, startDate, dueDate, labels, assignedTo } = req.body;
     const board = await Board.findById(boardId);
     if (!board) return res.status(404).json({ message: 'Board not found' });
     if (!board.lists[listIndex]) return res.status(404).json({ message: 'List not found' });
 
+    // Card creation is restricted to the workspace owner only (per explicit
+    // product decision — this is stricter than every other board/list action
+    // above, which also allow admins/members).
+    const workspace = await Workspace.findById(board.workspace);
+    if (!workspace) return res.status(404).json({ message: 'Workspace not found' });
+    if (workspace.owner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Only the workspace owner can add cards' });
+    }
+
     const card = await Card.create({
       title,
       description,
+      startDate,
       dueDate,
       labels,
       assignedTo,
@@ -234,10 +248,11 @@ const updateCard = async (req, res) => {
     const card = await Card.findById(req.params.cardId);
     if (!card) return res.status(404).json({ message: 'Card not found' });
 
-    const { title, description, dueDate, labels, assignedTo, position, code, codeFileUrl, list } = req.body;
+    const { title, description, startDate, dueDate, labels, assignedTo, position, code, codeFileUrl, list } = req.body;
 
     if (title !== undefined) card.title = title;
     if (description !== undefined) card.description = description;
+    if (startDate !== undefined) card.startDate = startDate;
     if (dueDate !== undefined) card.dueDate = dueDate;
     if (labels !== undefined) card.labels = labels;
     if (assignedTo !== undefined) card.assignedTo = assignedTo;

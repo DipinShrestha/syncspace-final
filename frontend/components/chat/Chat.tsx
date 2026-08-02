@@ -2,10 +2,10 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
 import { useAuth } from '@/context/AuthContext';
+import { useSocket } from '@/hooks/useSocket';
 import toast from 'react-hot-toast';
-import { IconChat, IconSend } from '@/components/icons';
+import { IconChat, IconSend, IconPhone, IconVideoCam, IconChevronDown, IconPhoneOff } from '@/components/icons';
 
 function formatTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -25,50 +25,76 @@ interface Message {
 
 interface ChatProps {
   workspaceId: string;
+  // Call state is owned by the parent (workspace page) so the call panel
+  // can render above the chat and push it down while active — the picker
+  // dropdown lives here in the header, but starting/ending the actual call
+  // is handled one level up.
+  onStartCall?: (type: 'audio' | 'video') => void;
+  onEndCall?: () => void;
+  activeCallType?: 'audio' | 'video' | null;
 }
 
-export default function Chat({ workspaceId }: ChatProps) {
-  const [socket, setSocket] = useState<Socket | null>(null);
+export default function Chat({ workspaceId, onStartCall, onEndCall, activeCallType }: ChatProps) {
+  // Shared connection (see context/SocketContext.tsx) — this component no
+  // longer opens its own socket.
+  const socket = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagesLoaded, setMessagesLoaded] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
+  const [showCallMenu, setShowCallMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const callMenuRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
 
+  // Close the call-type dropdown on outside click.
   useEffect(() => {
-    if (!user) return;
+    const handleClick = (e: MouseEvent) => {
+      if (callMenuRef.current && !callMenuRef.current.contains(e.target as Node)) {
+        setShowCallMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5500';
-    // Backend verifies this token on connection and derives the real user
-    // id from it — join-workspace no longer trusts a client-supplied userId.
-    const token = localStorage.getItem('token');
-    const newSocket = io(socketUrl, { transports: ['websocket'], auth: { token } });
-    setSocket(newSocket);
+  // Join this workspace's chat room and load history. The socket connection
+  // itself is shared app-wide (SocketContext) and usually already connected
+  // by the time this mounts — so this joins immediately rather than waiting
+  // for a 'connect' event that may never fire again during this component's
+  // lifetime, and also re-joins if the connection drops and reconnects.
+  useEffect(() => {
+    if (!socket || !user) return;
 
-    newSocket.on('connect', () => {
-      console.log('Socket connected');
+    const joinAndLoad = () => {
       setIsConnected(true);
-      newSocket.emit('join-workspace', workspaceId, user._id, (response: { error?: string }) => {
+      socket.emit('join-workspace', workspaceId, user._id, (response: { error?: string }) => {
         if (response?.error) toast.error(response.error);
         else
-          newSocket.emit('load-messages', workspaceId, (msgs: Message[]) => {
+          socket.emit('load-messages', workspaceId, (msgs: Message[]) => {
             setMessages(msgs || []);
             setMessagesLoaded(true);
           });
       });
-    });
+    };
 
-    newSocket.on('new-message', (msg: Message) => setMessages((prev) => [...prev, msg]));
-    newSocket.on('disconnect', () => setIsConnected(false));
+    if (socket.connected) joinAndLoad();
+    socket.on('connect', joinAndLoad);
+
+    const handleNewMessage = (msg: Message) => setMessages((prev) => [...prev, msg]);
+    const handleDisconnect = () => setIsConnected(false);
+    socket.on('new-message', handleNewMessage);
+    socket.on('disconnect', handleDisconnect);
     // Task-assignment / invite notifications are now handled globally by
     // the NotificationBell in the Navbar (persisted + targeted at the right
     // user), not locally here.
 
     return () => {
-      newSocket.disconnect();
+      socket.off('connect', joinAndLoad);
+      socket.off('new-message', handleNewMessage);
+      socket.off('disconnect', handleDisconnect);
     };
-  }, [workspaceId, user]);
+  }, [workspaceId, user, socket]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -94,15 +120,68 @@ export default function Chat({ workspaceId }: ChatProps) {
   };
 
   return (
-    <div className="flex flex-col h-[60vh] sm:h-[70vh] bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="border-b p-3 sm:p-4 bg-gray-50 rounded-t-lg">
-        <h2 className="font-semibold text-gray-900 text-sm sm:text-base">Workspace Chat</h2>
-        <p className="text-xs text-gray-500 mt-0.5">
-          <span
-            className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${isConnected ? 'bg-sage-500' : 'bg-red-500'}`}
-          />
-          {isConnected ? 'Connected' : 'Disconnected'}
-        </p>
+    <div className="flex flex-col h-[60vh] sm:h-[70vh] glass rounded-2xl overflow-hidden">
+      <div className="border-b border-white/60 p-3 sm:p-4 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="font-semibold text-gray-900 text-sm sm:text-base">Workspace Chat</h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            <span
+              className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${isConnected ? 'bg-sage-500' : 'bg-red-500'}`}
+            />
+            {isConnected ? 'Connected' : 'Disconnected'}
+          </p>
+        </div>
+
+        {/* Call icon — same line as the title, right-aligned. Click opens a
+            dropdown to choose Audio call or Video call. If a call is
+            already active, this becomes a red "leave call" button instead. */}
+        <div className="relative flex-shrink-0" ref={callMenuRef}>
+          {activeCallType ? (
+            <button
+              onClick={() => onEndCall?.()}
+              title="Leave call"
+              className="flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-3 py-2 transition-all active:scale-95"
+            >
+              <IconPhoneOff className="w-4 h-4" />
+              <span className="hidden sm:inline">Leave call</span>
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => setShowCallMenu((v) => !v)}
+                title="Start a call"
+                className="flex items-center gap-1 w-10 h-10 sm:w-auto sm:px-3 justify-center glass-outline rounded-full transition-all active:scale-95 text-black"
+              >
+                <IconPhone className="w-4 h-4" />
+                <IconChevronDown className="w-3 h-3 hidden sm:block" />
+              </button>
+              {showCallMenu && (
+                <div className="modal-panel absolute right-0 mt-2 w-44 glass rounded-2xl p-1.5 z-10 shadow-lg">
+                  <button
+                    onClick={() => {
+                      setShowCallMenu(false);
+                      onStartCall?.('audio');
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-black hover:bg-white/70 transition-colors"
+                  >
+                    <IconPhone className="w-4 h-4 text-dusty-700" />
+                    Audio call
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowCallMenu(false);
+                      onStartCall?.('video');
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-black hover:bg-white/70 transition-colors"
+                  >
+                    <IconVideoCam className="w-4 h-4 text-dusty-700" />
+                    Video call
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
         {!messagesLoaded ? (
@@ -152,7 +231,7 @@ export default function Chat({ workspaceId }: ChatProps) {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="border-t p-3 sm:p-4 bg-gray-50 rounded-b-lg">
+      <div className="border-t border-white/60 p-3 sm:p-4">
         <div className="flex gap-2 items-end">
           <textarea
             value={newMessage}

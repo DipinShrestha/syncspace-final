@@ -5,10 +5,11 @@ const cardSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     description: { type: String, default: '' },
+    startDate: Date,
     dueDate: Date,
     labels: [String],
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    board: { type: mongoose.Schema.Types.ObjectId, ref: 'Board', required: true },
+    board: { type: mongoose.Schema.Types.ObjectId, ref: 'Board', required: true, index: true },
     position: { type: Number, default: 0 },
     // BUG FIX: 'list' field was missing from schema. analyticsController checks
     // card.list === 'done' and boardController saves card.list via updateCard.

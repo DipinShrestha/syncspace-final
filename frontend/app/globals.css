@@ -18,17 +18,17 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Dusty blue — anchored exactly on #82acbf at the 600 shade */
-  --color-dusty-50: #f0f5f7;
-  --color-dusty-100: #e0eaef;
-  --color-dusty-200: #cddee5;
-  --color-dusty-300: #bad1dc;
-  --color-dusty-400: #a8c5d2;
-  --color-dusty-500: #95b8c9;
-  --color-dusty-600: #82acbf;
-  --color-dusty-700: #6e92a2;
-  --color-dusty-800: #5b7886;
-  --color-dusty-900: #485f69;
+  /* Dusty blue — anchored exactly on #7AACFF at the 600 shade */
+  --color-dusty-50: #eff5ff;
+  --color-dusty-100: #deeaff;
+  --color-dusty-200: #cadeff;
+  --color-dusty-300: #b6d1ff;
+  --color-dusty-400: #a2c5ff;
+  --color-dusty-500: #8eb8ff;
+  --color-dusty-600: #7aacff;
+  --color-dusty-700: #6792d8;
+  --color-dusty-800: #5578b3;
+  --color-dusty-900: #435f8d;
 
   /* Sage green — anchored exactly on #89a174 at the 600 shade */
   --color-sage-50: #f1f4ee;

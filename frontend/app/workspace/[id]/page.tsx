@@ -55,6 +55,12 @@ function WorkspacePageInner() {
     tabParam && validTabs.includes(tabParam) ? tabParam : 'boards',
   );
 
+  // Call state lives here (not inside Chat or VideoCall) so the layout can
+  // decide what to render: no call → just chat at full height; call active
+  // → the call panel renders above chat and pushes it down. Chosen from the
+  // dropdown in Chat's header.
+  const [activeCallType, setActiveCallType] = useState<'audio' | 'video' | null>(null);
+
   // Single workspace document — named after the workspace
   const [workspaceDoc, setWorkspaceDoc] = useState<Document | null>(null);
   const [docLoading, setDocLoading] = useState(false);
@@ -200,18 +206,27 @@ function WorkspacePageInner() {
                 </div>
               )}
 
-              {/* Chat + Video */}
+              {/* Chat + Call — the call panel (when active) renders above
+                  chat and pushes it down; with no call running, only the
+                  full-height chat shows (no permanent empty call box). */}
               {activeTab === 'chat' && (
-                <div className="space-y-6">
-                  <Chat workspaceId={id as string} />
-                  <div className="border-t border-gray-200 pt-6">
-                    <h3 className="text-lg font-semibold text-black mb-3">Video Call</h3>
+                <div className="space-y-4">
+                  {activeCallType && (
                     <VideoCall
                       roomId={id as string}
                       userId={user?._id as string}
                       callerName={user?.name}
+                      mode={activeCallType}
+                      autoStart
+                      onEnd={() => setActiveCallType(null)}
                     />
-                  </div>
+                  )}
+                  <Chat
+                    workspaceId={id as string}
+                    activeCallType={activeCallType}
+                    onStartCall={(type) => setActiveCallType(type)}
+                    onEndCall={() => setActiveCallType(null)}
+                  />
                 </div>
               )}
 

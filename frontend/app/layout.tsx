@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
+import { SocketProvider } from '@/context/SocketContext';
 import { Toaster } from 'react-hot-toast';
 import PwaRegister from '@/components/PwaRegister';
 
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#82acbf',
+  themeColor: '#7AACFF',
   width: 'device-width',
   initialScale: 1,
 };
@@ -40,8 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="ambient-bg" />
         <PwaRegister />
         <AuthProvider>
-          {children}
-          <Toaster position="top-right" />
+          <SocketProvider>
+            {children}
+            <Toaster position="top-right" />
+          </SocketProvider>
         </AuthProvider>
       </body>
     </html>
