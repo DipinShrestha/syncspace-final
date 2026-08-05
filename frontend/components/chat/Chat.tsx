@@ -200,7 +200,7 @@ export default function Chat({ workspaceId, onStartCall, onEndCall, activeCallTy
             <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-3">
               <IconChat className="w-6 h-6" />
             </div>
-            <p className="text-sm text-gray-500">No messages yet. Say hello!</p>
+            <p className="text-sm text-gray-500">No messages till no. Say hello!</p>
           </div>
         ) : (
           messages.map((msg, i) => {
