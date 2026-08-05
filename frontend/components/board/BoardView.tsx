@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   DndContext,
-  closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -11,9 +10,7 @@ import {
   DragEndEvent,
   DragOverlay,
   defaultDropAnimationSideEffects,
-  DragOverEvent,
   pointerWithin,
-  rectIntersection,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -38,6 +35,10 @@ import { useAuth } from '@/context/AuthContext';
 import { useSocket } from '@/hooks/useSocket';
 import { IconLayers } from '@/components/icons';
 
+// ------------------------------------------------------------------
+// Types
+// ------------------------------------------------------------------
+
 interface Member {
   _id: string;
   name: string;
@@ -48,9 +49,123 @@ interface BoardViewProps {
   workspaceId: string;
 }
 
+// ------------------------------------------------------------------
+// Sub‑components (local)
+// ------------------------------------------------------------------
+
+function FilterBar({
+  members,
+  filterAssignee,
+  setFilterAssignee,
+  filterLabel,
+  setFilterLabel,
+  filterDueDate,
+  setFilterDueDate,
+  clearFilters,
+}: {
+  members: Member[];
+  filterAssignee: string;
+  setFilterAssignee: (v: string) => void;
+  filterLabel: string;
+  setFilterLabel: (v: string) => void;
+  filterDueDate: string;
+  setFilterDueDate: (v: string) => void;
+  clearFilters: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 p-2 glass rounded-lg">
+      <select
+        value={filterAssignee}
+        onChange={(e) => setFilterAssignee(e.target.value)}
+        className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
+      >
+        <option value="">All Assignees</option>
+        {members.map((m) => (
+          <option key={m._id} value={m._id}>
+            {m.name}
+          </option>
+        ))}
+      </select>
+      <select
+        value={filterLabel}
+        onChange={(e) => setFilterLabel(e.target.value)}
+        className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
+      >
+        <option value="">All Labels</option>
+        <option value="bug">Bug</option>
+        <option value="feature">Feature</option>
+        <option value="urgent">Urgent</option>
+      </select>
+      <input
+        type="date"
+        value={filterDueDate}
+        onChange={(e) => setFilterDueDate(e.target.value)}
+        className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
+      />
+      <button
+        onClick={clearFilters}
+        className="px-2 py-1.5 glass-outline rounded text-sm transition-all active:scale-95"
+      >
+        Clear Filters
+      </button>
+    </div>
+  );
+}
+
+function NewBoardModal({
+  isOpen,
+  onClose,
+  onCreate,
+  title,
+  setTitle,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreate: () => void;
+  title: string;
+  setTitle: (v: string) => void;
+}) {
+  if (!isOpen) return null;
+  return (
+    <div className="modal-overlay fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="modal-panel glass rounded-3xl p-6 w-full max-w-96">
+        <h2 className="text-xl mb-4 text-black font-semibold">Create New Board</h2>
+        <input
+          type="text"
+          placeholder="Board title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full glass-input rounded-lg p-2 mb-4 transition-colors"
+          autoFocus
+        />
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 glass-outline rounded-full transition-all active:scale-95 text-sm font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onCreate}
+            className="px-4 py-2 glass-btn rounded-full transition-all active:scale-95 text-sm font-medium"
+          >
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// Main component
+// ------------------------------------------------------------------
+
 export default function BoardView({ workspaceId }: BoardViewProps) {
   const { user } = useAuth();
   const socket = useSocket();
+
+  // ---------- state ----------
   const [boards, setBoards] = useState<Board[]>([]);
   const [currentBoard, setCurrentBoard] = useState<Board | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,60 +174,21 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
   const [newListTitle, setNewListTitle] = useState('');
   const [activeCard, setActiveCard] = useState<Card | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
-  // Card creation is owner-only (product decision) — track whether the
-  // current user is the workspace owner so BoardList can hide/show the
-  // "+ Add a card" control accordingly.
   const [isOwner, setIsOwner] = useState(false);
-  const [filterAssignee, setFilterAssignee] = useState<string>('');
-  const [filterLabel, setFilterLabel] = useState<string>('');
-  const [filterDueDate, setFilterDueDate] = useState<string>('');
-
-  // FIX: track live drag state so we can show the card preview in the correct
-  // destination list while the user is dragging (enables empty-list drops too).
+  const [filterAssignee, setFilterAssignee] = useState('');
+  const [filterLabel, setFilterLabel] = useState('');
+  const [filterDueDate, setFilterDueDate] = useState('');
   const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
 
+  // ---------- sensors ----------
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      // Require the user to move 5px before a drag starts so clicks still work.
       activationConstraint: { distance: 5 },
     }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  useEffect(() => {
-    if (workspaceId) {
-      fetchBoards();
-      fetchMembers();
-    }
-  }, [workspaceId]);
-
-  // Join the workspace's socket room and listen for live card updates
-  // (e.g. another member uploading a file attachment) so everyone viewing
-  // this board sees the change without needing to refresh.
-  useEffect(() => {
-    if (!socket || !workspaceId || !user?._id) return;
-
-    socket.emit('join-workspace', workspaceId, user._id, (_res: unknown) => {
-      // no-op callback; join-workspace already logs/handles errors server-side
-    });
-
-    const handleCardUpdated = (updatedCard: Card) => {
-      const patchLists = (lists: List[]) =>
-        lists.map((list) => ({
-          ...list,
-          cards: list.cards.map((c) => (c._id === updatedCard._id ? updatedCard : c)),
-        }));
-
-      setCurrentBoard((prev) => (prev ? { ...prev, lists: patchLists(prev.lists) } : prev));
-      setBoards((prev) => prev.map((b) => ({ ...b, lists: patchLists(b.lists) })));
-    };
-
-    socket.on('card-updated', handleCardUpdated);
-    return () => {
-      socket.off('card-updated', handleCardUpdated);
-    };
-  }, [socket, workspaceId, user?._id]);
-
+  // ---------- fetch functions ----------
   const fetchMembers = async () => {
     try {
       const res = await getWorkspaceById(workspaceId);
@@ -138,6 +214,40 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
     }
   };
 
+  // ---------- effects ----------
+  useEffect(() => {
+    if (workspaceId) {
+      fetchBoards();
+      fetchMembers();
+    }
+  }, [workspaceId]);
+
+  // Join socket room for live updates
+  useEffect(() => {
+    if (!socket || !workspaceId || !user?._id) return;
+
+    socket.emit('join-workspace', workspaceId, user._id, (_res: unknown) => {
+      // no-op
+    });
+
+    const handleCardUpdated = (updatedCard: Card) => {
+      const patchLists = (lists: List[]) =>
+        lists.map((list) => ({
+          ...list,
+          cards: list.cards.map((c) => (c._id === updatedCard._id ? updatedCard : c)),
+        }));
+
+      setCurrentBoard((prev) => (prev ? { ...prev, lists: patchLists(prev.lists) } : prev));
+      setBoards((prev) => prev.map((b) => ({ ...b, lists: patchLists(b.lists) })));
+    };
+
+    socket.on('card-updated', handleCardUpdated);
+    return () => {
+      socket.off('card-updated', handleCardUpdated);
+    };
+  }, [socket, workspaceId, user?._id]);
+
+  // ---------- board / list / card handlers ----------
   const handleCreateBoard = async () => {
     if (!newBoardTitle.trim()) return toast.error('Board title required');
     try {
@@ -262,12 +372,7 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
     }
   };
 
-  // ─── helpers ────────────────────────────────────────────────────────────────
-
-  /**
-   * Given a dnd-kit id, return { listIndex, cardIndex } within currentBoard.
-   * Returns null if not found.
-   */
+  // ---------- drag‑and‑drop helpers ----------
   const findCardPosition = (id: string) => {
     if (!currentBoard) return null;
     for (let li = 0; li < currentBoard.lists.length; li++) {
@@ -281,21 +386,15 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
     return null;
   };
 
-  /**
-   * Given a dnd-kit id, return the listIndex if the id is a list drop target.
-   */
   const findListIndex = (id: string): number => {
     if (!currentBoard) return -1;
-    // list-{index} format from useDroppable in BoardList
     const match = id.match(/^list-(\d+)$/);
     if (match) return parseInt(match[1], 10);
-    // also try matching by card lookup
     const pos = findCardPosition(id);
     return pos ? pos.listIndex : -1;
   };
 
-  // ─── drag handlers ───────────────────────────────────────────────────────────
-
+  // ---------- drag handlers ----------
   const handleDragStart = (event: any) => {
     if (event.active.data.current?.type === 'card') {
       setActiveCard(event.active.data.current.card);
@@ -312,47 +411,39 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
     const activeId = active.id.toString();
     const overId = over.id.toString();
 
-    // Only handle card drags
     if (!activeId.startsWith('card-')) return;
 
     const activePos = findCardPosition(activeId);
     if (!activePos) return;
 
-    // Determine target list and card position
     let targetListIndex: number;
     let targetCardIndex: number;
 
     if (overId.startsWith('card-')) {
-      // Dropped on another card
       const overPos = findCardPosition(overId);
       if (!overPos) return;
       targetListIndex = overPos.listIndex;
       targetCardIndex = overPos.cardIndex;
     } else {
-      // FIX: dropped on a list container (empty list or list padding area)
       targetListIndex = findListIndex(overId);
       if (targetListIndex === -1) return;
-      // Append to end of the target list
       targetCardIndex = currentBoard.lists[targetListIndex].cards.length;
     }
 
     const { listIndex: sourceListIndex, cardIndex: sourceCardIndex } = activePos;
     const movedCard = currentBoard.lists[sourceListIndex].cards[sourceCardIndex];
 
-    // Permission check: only assigned member can move between lists
     if (sourceListIndex !== targetListIndex && movedCard.assignedTo !== user?._id) {
       toast.error('Only the assigned member can move this card between columns');
       return;
     }
 
-    // Build updated lists optimistically
     const newLists = currentBoard.lists.map((list) => ({
       ...list,
       cards: [...list.cards],
     }));
 
     if (sourceListIndex === targetListIndex) {
-      // Reorder within same list
       if (sourceCardIndex === targetCardIndex) return;
       newLists[sourceListIndex].cards = arrayMove(
         newLists[sourceListIndex].cards,
@@ -360,13 +451,11 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
         targetCardIndex,
       );
     } else {
-      // FIX: move across lists — update card.list so analytics stays correct
       const updatedCard = {
         ...movedCard,
         list: currentBoard.lists[targetListIndex].title,
       };
       newLists[sourceListIndex].cards.splice(sourceCardIndex, 1);
-      // Clamp index in case we appended-to-end on an empty list
       const insertAt = Math.min(targetCardIndex, newLists[targetListIndex].cards.length);
       newLists[targetListIndex].cards.splice(insertAt, 0, updatedCard);
     }
@@ -375,26 +464,21 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
     setCurrentBoard(updatedBoard);
     setBoards((prev) => prev.map((b) => (b._id === currentBoard._id ? updatedBoard : b)));
 
-    // Persist
     try {
       if (sourceListIndex === targetListIndex) {
         await updateCard(movedCard._id, { position: targetCardIndex });
       } else {
-        // FIX: was doing activeId.split('-')[0] which produces the wrong id
-        // (e.g. 'card' from 'card-abc123'). Use movedCard._id directly.
         await moveCard(movedCard._id, {
           targetBoardId: currentBoard._id,
           targetListIndex,
           newPosition: targetCardIndex,
         });
-        // Keep card.list field in sync on the server
         await updateCard(movedCard._id, {
           list: currentBoard.lists[targetListIndex].title,
         });
       }
     } catch (err) {
       console.error('Failed to persist card move', err);
-      // Roll back on failure
       fetchBoards();
     }
   };
@@ -404,120 +488,69 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
     return currentBoard.lists.map((_, index) => `list-${index}`);
   };
 
-  // ─── render ──────────────────────────────────────────────────────────────────
+  // ---------- render helpers ----------
+  const clearFilters = () => {
+    setFilterAssignee('');
+    setFilterLabel('');
+    setFilterDueDate('');
+  };
 
-  if (loading) {
-    return (
-      <div className="animate-pulse">
-        <div className="flex gap-2 mb-4 border-b border-gray-200 pb-4">
-          <div className="h-8 w-24 bg-gray-200 rounded-lg" />
-          <div className="h-8 w-24 bg-gray-200 rounded-lg" />
-        </div>
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="bg-gray-100 rounded-md p-3 w-80 flex-shrink-0 space-y-2">
-              <div className="h-4 w-20 bg-gray-200 rounded mb-2" />
-              <div className="h-16 bg-gray-200 rounded" />
-              <div className="h-16 bg-gray-200 rounded" />
-            </div>
-          ))}
-        </div>
+  const renderLoading = () => (
+    <div className="animate-pulse">
+      <div className="flex gap-2 mb-4 border-b border-gray-200 pb-4">
+        <div className="h-8 w-24 bg-gray-200 rounded-lg" />
+        <div className="h-8 w-24 bg-gray-200 rounded-lg" />
       </div>
-    );
-  }
-
-  if (!currentBoard) {
-    return (
-      <div>
-        <div className="flex flex-col items-center justify-center text-center py-16">
-          <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-4">
-            <IconLayers className="w-7 h-7" />
+      <div className="flex gap-4 overflow-x-auto pb-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="bg-gray-100 rounded-md p-3 w-80 flex-shrink-0 space-y-2">
+            <div className="h-4 w-20 bg-gray-200 rounded mb-2" />
+            <div className="h-16 bg-gray-200 rounded" />
+            <div className="h-16 bg-gray-200 rounded" />
           </div>
-          <p className="text-black font-medium mb-1">No boards yet</p>
-          <p className="text-sm text-gray-500 mb-4">Create a board to start organizing tasks.</p>
-          <button
-            onClick={() => setShowNewBoardModal(true)}
-            className="px-4 py-2 glass-btn rounded-full text-sm font-medium transition-all active:scale-95"
-          >
-            + Create your first board
-          </button>
-        </div>
-        {showNewBoardModal && (
-          <div className="modal-overlay fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="modal-panel glass rounded-3xl p-6 w-full max-w-96">
-              <h2 className="text-xl mb-4 text-black font-semibold">Create New Board</h2>
-              <input
-                type="text"
-                placeholder="Board title"
-                value={newBoardTitle}
-                onChange={(e) => setNewBoardTitle(e.target.value)}
-                className="w-full glass-input rounded-lg p-2 mb-4 transition-colors"
-                autoFocus
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setShowNewBoardModal(false)}
-                  className="px-4 py-2 glass-outline rounded-full transition-all active:scale-95 text-sm font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateBoard}
-                  className="px-4 py-2 glass-btn rounded-full transition-all active:scale-95 text-sm font-medium"
-                >
-                  Create
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        ))}
       </div>
-    );
-  }
+    </div>
+  );
 
-  return (
+  const renderNoBoard = () => (
     <div>
-      {/* Filter Bar */}
-      <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 p-2 glass rounded-lg">
-        <select
-          value={filterAssignee}
-          onChange={(e) => setFilterAssignee(e.target.value)}
-          className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
-        >
-          <option value="">All Assignees</option>
-          {members.map((m) => (
-            <option key={m._id} value={m._id}>
-              {m.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filterLabel}
-          onChange={(e) => setFilterLabel(e.target.value)}
-          className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
-        >
-          <option value="">All Labels</option>
-          <option value="bug">Bug</option>
-          <option value="feature">Feature</option>
-          <option value="urgent">Urgent</option>
-        </select>
-        <input
-          type="date"
-          value={filterDueDate}
-          onChange={(e) => setFilterDueDate(e.target.value)}
-          className="glass-input rounded px-2 py-1.5 text-black text-sm transition-colors"
-        />
+      <div className="flex flex-col items-center justify-center text-center py-16">
+        <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-4">
+          <IconLayers className="w-7 h-7" />
+        </div>
+        <p className="text-black font-medium mb-1">No boards yet</p>
+        <p className="text-sm text-gray-500 mb-4">Create a board to start organizing tasks.</p>
         <button
-          onClick={() => {
-            setFilterAssignee('');
-            setFilterLabel('');
-            setFilterDueDate('');
-          }}
-          className="px-2 py-1.5 glass-outline rounded text-sm transition-all active:scale-95"
+          onClick={() => setShowNewBoardModal(true)}
+          className="px-4 py-2 glass-btn rounded-full text-sm font-medium transition-all active:scale-95"
         >
-          Clear Filters
+          + Create your first board
         </button>
       </div>
+      <NewBoardModal
+        isOpen={showNewBoardModal}
+        onClose={() => setShowNewBoardModal(false)}
+        onCreate={handleCreateBoard}
+        title={newBoardTitle}
+        setTitle={setNewBoardTitle}
+      />
+    </div>
+  );
+
+  const renderBoardContent = () => (
+    <>
+      {/* Filter Bar */}
+      <FilterBar
+        members={members}
+        filterAssignee={filterAssignee}
+        setFilterAssignee={setFilterAssignee}
+        filterLabel={filterLabel}
+        setFilterLabel={setFilterLabel}
+        filterDueDate={filterDueDate}
+        setFilterDueDate={setFilterDueDate}
+        clearFilters={clearFilters}
+      />
 
       {/* Board tabs + Add List */}
       <div className="flex flex-col sm:flex-row flex-wrap justify-between sm:items-center gap-3 mb-4 border-b border-gray-200 pb-4">
@@ -568,14 +601,9 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
       </div>
 
       {/* Kanban board */}
-      {/*
- FIX: use pointerWithin + rectIntersection collision strategy so that
- dragging over an empty list container registers as a valid drop target,
- not just dragging over existing cards.
- */}
       <DndContext
         sensors={sensors}
-        collisionDetection={pointerWithin}
+        collisionDetection={pointerWithin} // allows dropping on empty list containers
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
@@ -608,8 +636,6 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
                   }
                   members={members}
                   canAddCard={isOwner}
-                  // FIX: these props were declared but never passed — cards had
-                  // no delete, edit, or move-stage buttons working
                   onCardUpdated={fetchBoards}
                   onMoveStage={handleMoveStage}
                 />
@@ -630,32 +656,18 @@ export default function BoardView({ workspaceId }: BoardViewProps) {
       </DndContext>
 
       {/* New board modal */}
-      {showNewBoardModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="glass rounded-3xl p-6 w-96">
-            <h2 className="text-xl mb-4 text-black">Create New Board</h2>
-            <input
-              type="text"
-              placeholder="Board title"
-              value={newBoardTitle}
-              onChange={(e) => setNewBoardTitle(e.target.value)}
-              className="w-full glass-input rounded-lg p-2 mb-4"
-              autoFocus
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowNewBoardModal(false)}
-                className="px-4 py-2 glass-outline rounded-full"
-              >
-                Cancel
-              </button>
-              <button onClick={handleCreateBoard} className="px-4 py-2 glass-btn rounded-full">
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      <NewBoardModal
+        isOpen={showNewBoardModal}
+        onClose={() => setShowNewBoardModal(false)}
+        onCreate={handleCreateBoard}
+        title={newBoardTitle}
+        setTitle={setNewBoardTitle}
+      />
+    </>
   );
+
+  // ---------- main render ----------
+  if (loading) return renderLoading();
+  if (!currentBoard) return renderNoBoard();
+  return renderBoardContent();
 }
