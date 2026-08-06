@@ -103,3 +103,4 @@ export default function Analytics({ workspaceId }: { workspaceId: string }) {
     </div>
   );
 }
+
