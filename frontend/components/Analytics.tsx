@@ -2,91 +2,105 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
-// ... interfaces same ...
+interface MemberStats {
+  userId: string;
+  name: string;
+  tasksAssigned: number;
+  tasksCompleted: number;
+  completionRate: number;
+  messagesSent: number;
+  documentsEdited: number;
+}
+
+interface AnalyticsData {
+  summary: {
+    totalTasks: number;
+    completedTasks: number;
+    completionRate: number;
+    totalMessages: number;
+    totalDocuments: number;
+  };
+  members: MemberStats[];
+}
 
 export default function Analytics({ workspaceId }: { workspaceId: string }) {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('No authentication token found');
-          setLoading(false);
-          return;
-        }
-
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/analytics/${workspaceId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`HTTP ${res.status}: ${errText}`);
-        }
-
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/${workspaceId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        if (!res.ok) throw new Error();
         const json = await res.json();
-        console.log('✅ Analytics data:', json);
-
-        // Validate shape – provide defaults if missing
-        const safeData: AnalyticsData = {
-          summary: json.summary || { totalTasks: 0, completedTasks: 0, completionRate: 0, totalMessages: 0, totalDocuments: 0 },
-          members: json.members || [],
-        };
-
-        setData(safeData);
-      } catch (err: any) {
-        console.error('❌ Analytics fetch error:', err);
-        setError(err.message || 'Failed to load analytics');
+        setData(json);
+      } catch {
         toast.error('Failed to load analytics');
       } finally {
         setLoading(false);
       }
     };
-
     if (workspaceId) fetchAnalytics();
   }, [workspaceId]);
 
-  // --- loading / error states ---
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-dusty-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-gray-600 text-sm">Loading workspace analytics...</p>
+  if (loading) return <div className="p-8 text-black">Loading analytics...</div>;
+  if (!data) return <div className="p-8 text-black">No data available</div>;
+
+  return (
+    <div className="space-y-6 sm:space-y-8 animate-fade-in-up">
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-500">Total Tasks</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.totalTasks}</p>
+        </div>
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-500">Completed Tasks</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.completedTasks}</p>
+        </div>
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-500">Completion Rate</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.completionRate}%</p>
+        </div>
+        <div className="glass p-3 sm:p-4 rounded-xl transition-transform hover:scale-[1.02]">
+          <h3 className="text-xs sm:text-sm text-gray-500">Total Messages</h3>
+          <p className="text-xl sm:text-2xl font-bold text-black">{data.summary.totalMessages}</p>
         </div>
       </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="glass p-8 rounded-xl text-center">
-          <p className="text-red-600 font-medium">⚠️ {error}</p>
-          <p className="text-sm text-gray-400 mt-2">Please try refreshing or check your connection.</p>
+      {/* Member table */}
+      <div className="glass p-4 rounded-xl">
+        <h2 className="text-lg sm:text-xl font-semibold text-black mb-4">Member Contributions</h2>
+        <div className="overflow-x-auto scrollbar-none">
+          <table className="w-full text-sm text-left text-black">
+            <thead className="text-xs uppercase bg-gray-100">
+              <tr>
+                <th className="px-4 py-2">Member</th>
+                <th className="px-4 py-2">Tasks Assigned</th>
+                <th className="px-4 py-2">Tasks Completed</th>
+                <th className="px-4 py-2">Completion %</th>
+                <th className="px-4 py-2">Messages</th>
+                <th className="px-4 py-2">Doc Edits</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.members.map((member) => (
+                <tr key={member.userId} className="border-b border-gray-200">
+                  <td className="px-4 py-2 font-medium">{member.name}</td>
+                  <td className="px-4 py-2">{member.tasksAssigned}</td>
+                  <td className="px-4 py-2">{member.tasksCompleted}</td>
+                  <td className="px-4 py-2">{member.completionRate}%</td>
+                  <td className="px-4 py-2">{member.messagesSent}</td>
+                  <td className="px-4 py-2">{member.documentsEdited}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  if (!data) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="glass p-8 rounded-xl text-center">
-          <p className="text-gray-600">No analytics data available for this workspace yet.</p>
-          <p className="text-sm text-gray-400 mt-2">Start adding tasks and messages to see insights.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // --- rest of your UI (same as the polished version) ---
-  const { summary, members } = data;
-  // ... continue with the rest of the component ...
