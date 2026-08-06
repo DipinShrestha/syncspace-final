@@ -1,5 +1,5 @@
-// app/page.tsx
 'use client';
+
 import Link from 'next/link';
 import { useState, type ReactElement } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -20,22 +20,21 @@ import {
   IconSend,
 } from '@/components/icons';
 
-// ── Illustrative feature mockups ──────────────────────────────────────────
-// Small, self-contained "screenshots" built out of divs/icons rather than
-// real photos — each one is a simplified stand-in for the actual product
-// surface, styled with the same glass/rounded system as the live app so it
-// reads as "this is what it looks like", not a generic stock illustration.
+// ─────────────────────────────────────────────────────────────
+// 1. MOCKUP COMPONENTS (small visual demos)
+// ─────────────────────────────────────────────────────────────
 
 function BoardsMockup() {
-  const cols = [
+  const columns = [
     { label: 'To Do', chips: ['Design review', 'Write API docs'] },
     { label: 'In Progress', chips: ['Fix login bug'] },
     { label: 'Done', chips: ['Set up repo'] },
   ];
+
   return (
     <div className="glass rounded-3xl p-4 sm:p-5">
       <div className="flex gap-3">
-        {cols.map((col) => (
+        {columns.map((col) => (
           <div key={col.label} className="flex-1 min-w-0 bg-white/60 rounded-lg p-2 space-y-2">
             <div className="text-[11px] font-semibold text-gray-500 px-0.5">{col.label}</div>
             {col.chips.map((chip) => (
@@ -85,26 +84,32 @@ function CallMockup() {
         Video call in progress
       </div>
       <div className="flex justify-center gap-8 py-3">
-        <div className="flex flex-col items-center gap-1.5">
-          <div className="w-14 h-14 rounded-full bg-dusty-600 flex items-center justify-center text-black font-bold ring-4 ring-dusty-200">
-            B
+        {[
+          { initial: 'B', label: 'You', color: 'bg-dusty-600 ring-dusty-200' },
+          { initial: 'P', label: 'Pramisha', color: 'bg-sage-600 ring-sage-200' },
+        ].map((p) => (
+          <div key={p.initial} className="flex flex-col items-center gap-1.5">
+            <div
+              className={`w-14 h-14 rounded-full flex items-center justify-center text-black font-bold ring-4 ${p.color}`}
+            >
+              {p.initial}
+            </div>
+            <span className="text-[10px] text-gray-500">{p.label}</span>
           </div>
-          <span className="text-[10px] text-gray-500">You</span>
-        </div>
-        <div className="flex flex-col items-center gap-1.5">
-          <div className="w-14 h-14 rounded-full bg-sage-600 flex items-center justify-center text-black font-bold ring-4 ring-sage-200">
-            P
-          </div>
-          <span className="text-[10px] text-gray-500">Pramisha</span>
-        </div>
+        ))}
       </div>
       <div className="flex justify-center gap-2 mt-2">
-        <div className="w-8 h-8 rounded-full glass-outline flex items-center justify-center">
-          <IconMic className="w-3.5 h-3.5" />
-        </div>
-        <div className="w-8 h-8 rounded-full glass-outline flex items-center justify-center">
-          <IconVideoCam className="w-3.5 h-3.5" />
-        </div>
+        {[
+          { icon: IconMic, label: 'mic' },
+          { icon: IconVideoCam, label: 'cam' },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="w-8 h-8 rounded-full glass-outline flex items-center justify-center"
+          >
+            <item.icon className="w-3.5 h-3.5" />
+          </div>
+        ))}
         <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center">
           <IconPhone className="w-3.5 h-3.5" />
         </div>
@@ -122,11 +127,13 @@ function DocsMockup() {
           Pramisha is editing
         </span>
       </div>
-      <div className="h-2 w-full bg-gray-200 rounded-full" />
-      <div className="h-2 w-5/6 bg-gray-200 rounded-full" />
-      <div className="h-2 w-3/4 bg-gray-200 rounded-full" />
-      <div className="h-2 w-full bg-gray-200 rounded-full" />
-      <div className="h-2 w-2/3 bg-dusty-200 rounded-full" />
+      {[100, 83, 75, 100, 66].map((width, i) => (
+        <div
+          key={i}
+          className={`h-2 rounded-full ${i === 4 ? 'bg-dusty-200' : 'bg-gray-200'}`}
+          style={{ width: `${width}%` }}
+        />
+      ))}
     </div>
   );
 }
@@ -153,6 +160,7 @@ function NotificationsMockup() {
     { icon: IconPhone, text: 'Bipin started a video call', color: 'text-sage-700 bg-sage-50' },
     { icon: IconUsers, text: 'You were invited to "Design Team"', color: 'text-amber-700 bg-amber-50' },
   ];
+
   return (
     <div className="glass rounded-3xl p-4 sm:p-5 space-y-2">
       {items.map((item) => (
@@ -172,16 +180,17 @@ function MembersMockup() {
     <div className="glass rounded-3xl p-4 sm:p-5 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex -space-x-2">
-          {['B', 'P', 'S'].map((initial, i) => (
-            <div
-              key={initial}
-              className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold text-black ${
-                i === 0 ? 'bg-dusty-600' : i === 1 ? 'bg-sage-600' : 'bg-amber-500'
-              }`}
-            >
-              {initial}
-            </div>
-          ))}
+          {['B', 'P', 'S'].map((initial, i) => {
+            const colors = ['bg-dusty-600', 'bg-sage-600', 'bg-amber-500'];
+            return (
+              <div
+                key={initial}
+                className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold text-black ${colors[i]}`}
+              >
+                {initial}
+              </div>
+            );
+          })}
         </div>
         <span className="glass-btn rounded-full px-3 py-1 text-[11px] font-medium">+ Invite</span>
       </div>
@@ -245,6 +254,10 @@ function PwaMockup() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// 2. FEATURE DATA (descriptions + mockup pairing)
+// ─────────────────────────────────────────────────────────────
+
 interface Feature {
   icon: typeof IconLayers;
   iconBg: string;
@@ -254,7 +267,7 @@ interface Feature {
   Mockup: () => ReactElement;
 }
 
-const features: Feature[] = [
+const FEATURES: Feature[] = [
   {
     icon: IconLayers,
     iconBg: 'bg-dusty-50 text-dusty-700',
@@ -337,12 +350,182 @@ const features: Feature[] = [
   },
 ];
 
-export default function LandingPage() {
+// ─────────────────────────────────────────────────────────────
+// 3. NAVBAR COMPONENT (extracted)
+// ─────────────────────────────────────────────────────────────
+
+function Navbar() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const publicLinks = [
+    { href: '#features', label: 'FEATURES' },
+    { href: '#about', label: 'ABOUT US' },
+    { href: '#support', label: 'SUPPORT' },
+  ];
+
+  return (
+    <nav className="glass-nav fixed top-0 left-0 w-full z-50">
+      <div className="w-full px-4 sm:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="logo w-40 sm:w-[210px] transition-opacity hover:opacity-80">
+            <Link href="/">
+              <img src="/Gemini_Generated_Image_wf220zwf220zwf22.png" alt="SyncSpace Logo" />
+            </Link>
+          </div>
+
+          {/* Desktop Menu */}
+          <div className="desktop-main-menu hidden md:flex gap-6 items-center">
+            {!user ? (
+              <>
+                {publicLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <Link href="/login" className="text-black text-sm font-medium transition-opacity hover:opacity-60">
+                  LOGIN
+                </Link>
+                <Link
+                  href="/register"
+                  className="glass-btn px-5 py-2 rounded-xl text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]"
+                >
+                  SIGN UP
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/dashboard" className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60">
+                  DASHBOARD
+                </Link>
+                {publicLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <div className="flex items-center gap-4">
+                  <button onClick={logout} className="text-sm text-black transition-opacity hover:opacity-60">
+                    Logout
+                  </button>
+                  <NotificationBell />
+                  <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black transition-transform hover:scale-105 active:scale-95 overflow-hidden">
+                    {user.avatar && !user.avatar.includes('placeholder') ? (
+                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      user.name?.charAt(0).toUpperCase() || 'U'
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Mobile: hamburger + bell */}
+          <div className="md:hidden flex items-center gap-1">
+            {user && <NotificationBell />}
+            <button
+              className="text-black text-2xl w-9 h-9 flex items-center justify-center focus:outline-none transition-transform active:scale-90"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? '✕' : '☰'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile dropdown */}
+      <div
+        className={`md:hidden glass mx-4 mb-4 rounded-2xl p-4 space-y-1 overflow-hidden transition-all duration-300 ease-out ${
+          mobileMenuOpen
+            ? 'max-h-[28rem] opacity-100 mt-2'
+            : 'max-h-0 opacity-0 mt-0 pointer-events-none'
+        }`}
+      >
+        {!user ? (
+          <>
+            {publicLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/login"
+              className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              className="block glass-btn text-center text-sm font-medium px-4 py-2.5 rounded-xl mt-2 transition-all active:scale-95"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Sign Up
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/dashboard"
+              className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+            {publicLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <button
+              onClick={() => {
+                logout();
+                setMobileMenuOpen(false);
+              }}
+              className="block w-full text-left text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
+            >
+              Logout
+            </button>
+            <div className="flex justify-center pt-2">
+              <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black">
+                {user.name?.charAt(0).toUpperCase() || 'U'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4. MAIN PAGE COMPONENT
+// ─────────────────────────────────────────────────────────────
+
+export default function LandingPage() {
   return (
     <>
+      {/* Global style for nav underline animations – ideally moved to globals.css */}
       <style jsx global>{`
         .nav-link::after {
           content: '';
@@ -371,207 +554,7 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* NAVBAR */}
-      <nav className="glass-nav fixed top-0 left-0 w-full z-50">
-        <div className="w-full px-4 sm:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="logo w-40 sm:w-[210px] transition-opacity hover:opacity-80">
-              <Link href="/">
-                <img src="/Gemini_Generated_Image_wf220zwf220zwf22.png" alt="SyncSpace Logo" />
-              </Link>
-            </div>
-
-            {/* Desktop Menu – different based on auth */}
-            <div className="desktop-main-menu hidden md:flex gap-6 items-center">
-              {!user ? (
-                // Public menu
-                <>
-                  <Link
-                    href="#features"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    FEATURES
-                  </Link>
-                  <Link
-                    href="#about"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    ABOUT US
-                  </Link>
-                  <Link
-                    href="#support"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    SUPPORT
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    LOGIN
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="glass-btn px-5 py-2 rounded-xl text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]"
-                  >
-                    SIGN UP
-                  </Link>
-                </>
-              ) : (
-                // Authenticated menu
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    DASHBOARD
-                  </Link>
-                  <Link
-                    href="#features"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    FEATURES
-                  </Link>
-                  <Link
-                    href="#about"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    ABOUT
-                  </Link>
-                  <Link
-                    href="#support"
-                    className="nav-link text-black text-sm font-medium transition-opacity hover:opacity-60"
-                  >
-                    SUPPORT
-                  </Link>
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={logout}
-                      className="text-sm text-black transition-opacity hover:opacity-60"
-                    >
-                      Logout
-                    </button>
-                    <NotificationBell />
-                    <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black transition-transform hover:scale-105 active:scale-95 overflow-hidden">
-                      {user.avatar && !user.avatar.includes('placeholder') ? (
-                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                      ) : (
-                        user.name?.charAt(0).toUpperCase() || 'U'
-                      )}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Mobile: bell always visible, hamburger opens the rest of the menu */}
-            <div className="md:hidden flex items-center gap-1">
-              {user && <NotificationBell />}
-              <button
-                className="text-black text-2xl w-9 h-9 flex items-center justify-center focus:outline-none transition-transform active:scale-90"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? '✕' : '☰'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <div
-          className={`md:hidden glass mx-4 mb-4 rounded-2xl p-4 space-y-1 overflow-hidden transition-all duration-300 ease-out ${
-            mobileMenuOpen
-              ? 'max-h-[28rem] opacity-100 mt-2'
-              : 'max-h-0 opacity-0 mt-0 pointer-events-none'
-          }`}
-        >
-          {!user ? (
-            <>
-              <Link
-                href="#features"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Features
-              </Link>
-              <Link
-                href="#about"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link
-                href="#support"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Support
-              </Link>
-              <Link
-                href="/login"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="block glass-btn text-center text-sm font-medium px-4 py-2.5 rounded-xl mt-2 transition-all active:scale-95"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign Up
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/dashboard"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="#features"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Features
-              </Link>
-              <Link
-                href="#about"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link
-                href="#support"
-                className="block text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Support
-              </Link>
-              <button
-                onClick={() => {
-                  logout();
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full text-left text-black text-sm font-medium py-2 px-2 rounded-lg transition-colors hover:bg-gray-100"
-              >
-                Logout
-              </button>
-              <div className="flex justify-center pt-2">
-                <button className="w-10 h-10 rounded-full bg-dusty-600 flex items-center justify-center font-semibold text-black">
-                  {user.name?.charAt(0).toUpperCase() || 'U'}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </nav>
+      <Navbar />
 
       {/* HERO SECTION */}
       <section className="min-h-[100dvh] flex items-center justify-center px-4 sm:px-6 text-center pt-16">
@@ -581,8 +564,7 @@ export default function LandingPage() {
             Chat, boards, docs, and teamwork, all connected in one workspace.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            {!user ? (
-              // Public CTA buttons
+            {!useAuth().user ? (
               <>
                 <Link
                   href="/register"
@@ -598,7 +580,6 @@ export default function LandingPage() {
                 </Link>
               </>
             ) : (
-              // Logged‑in CTA
               <Link
                 href="/dashboard"
                 className="glass-btn px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-medium transition-all active:scale-95 hover:scale-[1.02]"
@@ -621,15 +602,13 @@ export default function LandingPage() {
           </p>
 
           <div className="space-y-14 sm:space-y-24">
-            {features.map((feature, i) => {
+            {FEATURES.map((feature, index) => {
               const Mockup = feature.Mockup;
-              const reverse = i % 2 === 1;
+              const isEven = index % 2 === 0;
               return (
                 <div
                   key={feature.title}
-                  className={`flex flex-col ${
-                    reverse ? 'md:flex-row-reverse' : 'md:flex-row'
-                  } items-center gap-8 sm:gap-12`}
+                  className={`flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 sm:gap-12`}
                 >
                   <div className="w-full md:w-1/2">
                     <Mockup />
