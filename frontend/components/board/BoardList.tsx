@@ -91,7 +91,7 @@ const BoardList: React.FC<BoardListProps> = ({
       >
         {list.cards.length === 0 && (
           <div className="h-full min-h-[4rem] flex items-center justify-center text-xs text-gray-400 border-2 border-dashed border-gray-200 rounded-md">
-            Drop a card here
+            No cards yet
           </div>
         )}
         <SortableContext
