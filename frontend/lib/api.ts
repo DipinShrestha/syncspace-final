@@ -111,6 +111,7 @@ export interface NotificationItem {
   message: string;
   workspace?: { _id: string; name: string } | string;
   card?: string;
+  callType?: 'audio' | 'video';
   read: boolean;
   createdAt: string;
 }

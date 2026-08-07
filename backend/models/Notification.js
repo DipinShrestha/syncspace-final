@@ -21,6 +21,7 @@ const notificationSchema = new mongoose.Schema(
     message: { type: String, required: true },
     workspace: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace' },
     card: { type: mongoose.Schema.Types.ObjectId, ref: 'Card' },
+    callType: { type: String, enum: ['audio', 'video'] },
     read: { type: Boolean, default: false },
   },
   { timestamps: true }

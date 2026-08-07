@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import NotificationBell from '@/components/NotificationBell';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -58,6 +59,9 @@ export default function Navbar() {
               Logout
             </button>
             <div className="normal-case">
+              <ThemeToggle compact />
+            </div>
+            <div className="normal-case">
               <NotificationBell />
             </div>
             {/* Avatar dropdown */}
@@ -99,17 +103,18 @@ export default function Navbar() {
 
       {/* Mobile: bell always visible, hamburger opens the rest of the menu */}
       <div className="md:hidden flex items-center gap-1">
+        <ThemeToggle compact />
         {user && <NotificationBell />}
         <button
           className="flex flex-col justify-center items-center w-8 h-8"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span
-            className={`block w-6 h-0.5 bg-black mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`}
+            className={`block w-6 h-0.5 bg-current mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`}
           />
-          <span className={`block w-6 h-0.5 bg-black mb-1 ${menuOpen ? 'opacity-0' : ''}`} />
+          <span className={`block w-6 h-0.5 bg-current mb-1 ${menuOpen ? 'opacity-0' : ''}`} />
           <span
-            className={`block w-6 h-0.5 bg-black transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}
+            className={`block w-6 h-0.5 bg-current transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}
           />
         </button>
       </div>
@@ -173,6 +178,7 @@ export default function Navbar() {
               >
                 Profile / Settings
               </Link>
+              <div className="normal-case"><ThemeToggle /></div>
               <button
                 className="text-black transition-opacity hover:opacity-60"
                 onClick={() => {

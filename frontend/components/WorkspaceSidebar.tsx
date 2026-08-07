@@ -1,8 +1,5 @@
 'use client';
 
-// Sidebar now includes a Members tab and accepts workspaceId + workspaceName
-// so the MembersPanel can be self-contained inside it.
-
 import {
   IconGrid,
   IconFileText,
@@ -19,13 +16,16 @@ interface WorkspaceSidebarProps {
   setActiveTab: (tab: Tab) => void;
   workspaceId: string;
   workspaceName: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function WorkspaceSidebar({
   activeTab,
   setActiveTab,
-  workspaceId,
   workspaceName,
+  isOpen,
+  onClose,
 }: WorkspaceSidebarProps) {
   const navItems = [
     { id: 'boards' as const, label: 'Boards', Icon: IconGrid },
@@ -36,28 +36,70 @@ export default function WorkspaceSidebar({
     { id: 'members' as const, label: 'Members', Icon: IconUsers },
   ];
 
+  const chooseTab = (tab: Tab) => {
+    setActiveTab(tab);
+    if (window.innerWidth < 768) onClose();
+  };
+
   return (
-    <aside className="glass w-full md:w-64 rounded-none md:rounded-r-3xl border-b md:border-b-0 p-2 md:p-4 flex-shrink-0 flex flex-col">
-      <div className="hidden md:block mb-8 px-1">
-        <h2 className="text-lg font-semibold text-black truncate">{workspaceName}</h2>
-      </div>
-      {/* Horizontal scrollable tab strip on mobile, vertical stack from md up */}
-      <nav className="flex md:flex-col gap-1.5 md:gap-2 overflow-x-auto md:overflow-visible pb-1 md:pb-0 -mx-2 px-2 md:mx-0 md:px-0 scrollbar-none">
-        {navItems.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex-shrink-0 flex items-center gap-2 md:gap-3 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150 whitespace-nowrap ${
-              activeTab === id
-                ? 'glass-active shadow-sm'
-                : 'text-black hover:bg-black/5 active:scale-95'
-            }`}
-          >
-            <Icon className="w-4 h-4 flex-shrink-0" aria-hidden />
-            <span>{label}</span>
-          </button>
-        ))}
-      </nav>
-    </aside>
+    <>
+      <button
+        type="button"
+        aria-label="Close workspace navigation"
+        onClick={onClose}
+        className={`fixed inset-0 top-16 z-30 bg-black/35 backdrop-blur-[1px] transition-opacity md:hidden ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+
+      <aside
+        className={`workspace-sidebar fixed md:relative left-0 top-16 md:top-0 z-40 md:z-auto h-[calc(100dvh-4rem)] md:h-full flex-shrink-0 border-r transition-all duration-300 ease-out overflow-hidden ${
+          isOpen
+            ? 'w-[270px] translate-x-0 opacity-100'
+            : 'w-[270px] -translate-x-full opacity-0 md:w-0 md:translate-x-0 md:opacity-0 md:border-r-0'
+        }`}
+      >
+        <div className="w-[270px] h-full p-4 flex flex-col">
+          <div className="flex items-start justify-between gap-3 px-1 pb-5 mb-3 border-b workspace-border">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] workspace-muted mb-1">
+                Workspace
+              </p>
+              <h2 className="text-lg font-semibold workspace-text truncate">{workspaceName}</h2>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="workspace-icon-button"
+              aria-label="Collapse sidebar"
+              title="Collapse sidebar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          <nav className="flex flex-col gap-1.5">
+            {navItems.map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                onClick={() => chooseTab(id)}
+                className={`workspace-nav-item ${activeTab === id ? 'is-active' : ''}`}
+              >
+                <Icon className="w-[18px] h-[18px] flex-shrink-0" aria-hidden />
+                <span>{label}</span>
+              </button>
+            ))}
+          </nav>
+
+          <div className="mt-auto pt-4 border-t workspace-border">
+            <p className="text-xs workspace-muted leading-relaxed">
+              Use the menu button at any time to hide or reopen this navigation.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }

@@ -20,13 +20,23 @@ const allowedExt = /\.(js|ts|py|java|cpp|c|cs|go|rb|php|html|css|json|txt|md|zip
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: (_req, file) => ({
-    folder: 'syncspace/card-files',
-    resource_type: 'auto', // let Cloudinary pick image/raw based on the file
-    type: 'upload',        // public delivery — avoids 401s on raw/pdf links
-    // keep the original filename (plus extension) visible in the URL
-    public_id: `${Date.now()}-${Math.round(Math.random() * 1e9)}-${file.originalname.replace(/\.[^/.]+$/, '')}`,
-  }),
+  params: (_req, file) => {
+    // Card attachments are documents/source archives, not images. Store them
+    // as public RAW assets so code files, archives, and PDFs are delivered as
+    // the original file instead of being treated like transformable images.
+    // NOTE: on Cloudinary FREE plans, PDF/ZIP delivery is still blocked until
+    // 'Allow delivery of PDF and ZIP files' is enabled in Console > Settings
+    // > Security. That account-level switch cannot be changed from this code.
+    const safeOriginalName = file.originalname.replace(/[^a-zA-Z0-9._-]+/g, '_');
+    return {
+      folder: 'syncspace/card-files',
+      resource_type: 'raw',
+      type: 'upload',
+      access_mode: 'public',
+      // Raw Cloudinary assets need the extension kept in the public id.
+      public_id: `${Date.now()}-${Math.round(Math.random() * 1e9)}-${safeOriginalName}`,
+    };
+  },
 });
 
 const upload = multer({

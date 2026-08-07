@@ -19,12 +19,15 @@ interface VideoCallProps {
   // grants camera/mic permission, so the call starts immediately on mount
   // instead of showing a second "Start Call" button to click.
   autoStart?: boolean;
+  // When false, this client is joining an existing incoming call and must
+  // not create a second 'call-started' notification for the workspace.
+  announceStart?: boolean;
   // Lets the parent (workspace page) know the call ended, so it can stop
   // rendering this component and let chat take the full-height space again.
   onEnd?: () => void;
 }
 
-export default function VideoCall({ roomId, userId, callerName, mode = 'video', autoStart, onEnd }: VideoCallProps) {
+export default function VideoCall({ roomId, userId, callerName, mode = 'video', autoStart, announceStart = true, onEnd }: VideoCallProps) {
   // Shared connection (see context/SocketContext.tsx) — no longer opens its
   // own socket, so an active call no longer means a 3rd concurrent
   // connection alongside NotificationBell's and Chat's.
@@ -65,14 +68,16 @@ export default function VideoCall({ roomId, userId, callerName, mode = 'video', 
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       setCallActive(true);
       setMediaError(false);
-      // Let the rest of the workspace know a call started, so they get a
-      // live/persisted notification even if they're not on the chat tab.
-      socket?.emit('call-started', {
-        workspaceId: roomId,
-        callerId: userId,
-        callerName: callerName || 'Someone',
-        callType: mode,
-      });
+      // Only the person who STARTS the call should announce it. A user who
+      // clicks 'Receive call' from a notification joins the same room but
+      // must not create another incoming-call notification.
+      if (announceStart) {
+        socket?.emit('call-started', {
+          workspaceId: roomId,
+          callerName: callerName || 'Someone',
+          callType: mode,
+        });
+      }
     } catch (error) {
       console.error('Error accessing camera/mic:', error);
       setMediaError(true);
@@ -93,6 +98,24 @@ export default function VideoCall({ roomId, userId, callerName, mode = 'video', 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart, socket]);
 
+  // The local <video> element does not exist until callActive becomes true.
+  // startCall() previously tried to assign srcObject before that element was
+  // mounted, so the other participant could see us while our own preview
+  // stayed blank. Re-attach the stream after React renders the video tile.
+  useEffect(() => {
+    if (mode !== 'video' || !callActive || !localStream || !localVideoRef.current) return;
+    localVideoRef.current.srcObject = localStream;
+    localVideoRef.current.play().catch(() => {});
+  }, [localStream, callActive, mode]);
+
+  // Do the same for the remote element so reconnects / re-renders cannot
+  // leave a valid remote MediaStream detached from the <video> tag.
+  useEffect(() => {
+    if (mode !== 'video' || !callActive || !remoteStream || !remoteVideoRef.current) return;
+    remoteVideoRef.current.srcObject = remoteStream;
+    remoteVideoRef.current.play().catch(() => {});
+  }, [remoteStream, callActive, mode]);
+
   // 4. Join the meeting room and handle signaling events. The socket is
   // shared app-wide now, so cleanup uses named handler references and
   // `.off(event, handler)` rather than a blanket `.off(event)` — the latter
@@ -102,7 +125,7 @@ export default function VideoCall({ roomId, userId, callerName, mode = 'video', 
     if (!socket || !peer || !callActive) return;
 
     // Join the room
-    socket.emit('join-room', roomId, userId);
+    socket.emit('join-room', roomId);
 
     const handlePeerCall = (call: MediaConnection) => {
       if (localStream) {
@@ -163,6 +186,7 @@ export default function VideoCall({ roomId, userId, callerName, mode = 'video', 
   };
 
   const endCall = () => {
+    socket?.emit('leave-room', roomId);
     activeCallRef.current?.close();
     activeCallRef.current = null;
     localStream?.getTracks().forEach((track) => track.stop());

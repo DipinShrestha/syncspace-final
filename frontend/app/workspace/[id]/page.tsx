@@ -1,6 +1,7 @@
 // app/workspace/[id]/page.tsx
 'use client';
-import { useEffect, useState, Suspense } from 'react';
+
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getWorkspaceById, getDocumentsByWorkspace, createDocument } from '@/lib/api';
@@ -24,12 +25,14 @@ interface Workspace {
   description: string;
 }
 
-interface Document {
+interface WorkspaceDocument {
   _id: string;
   title: string;
   content: string;
   updatedAt?: string;
 }
+
+const validTabs: Tab[] = ['boards', 'documents', 'chat', 'analytics', 'code', 'members'];
 
 export default function WorkspacePage() {
   return (
@@ -47,31 +50,60 @@ function WorkspacePageInner() {
 
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
-  // Notifications (chat/call) deep-link here via ?tab=chat — read it once
-  // on mount so clicking one lands directly on the right tab.
-  const validTabs: Tab[] = ['boards', 'documents', 'chat', 'analytics', 'code', 'members'];
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const tabParam = searchParams.get('tab') as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(
     tabParam && validTabs.includes(tabParam) ? tabParam : 'boards',
   );
 
-  // Call state lives here (not inside Chat or VideoCall) so the layout can
-  // decide what to render: no call → just chat at full height; call active
-  // → the call panel renders above chat and pushes it down. Chosen from the
-  // dropdown in Chat's header.
-  const [activeCallType, setActiveCallType] = useState<'audio' | 'video' | null>(null);
+  const initialCallParam = searchParams.get('call');
+  const [activeCallType, setActiveCallType] = useState<'audio' | 'video' | null>(
+    initialCallParam === 'audio' || initialCallParam === 'video' ? initialCallParam : null,
+  );
+  const [joiningIncomingCall, setJoiningIncomingCall] = useState(searchParams.get('join') === '1');
 
-  // Single workspace document — named after the workspace
-  const [workspaceDoc, setWorkspaceDoc] = useState<Document | null>(null);
+  const [workspaceDoc, setWorkspaceDoc] = useState<WorkspaceDocument | null>(null);
   const [docLoading, setDocLoading] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('syncspace-workspace-sidebar');
+    if (saved === 'open') {
+      setSidebarOpen(true);
+    } else if (saved === 'closed') {
+      setSidebarOpen(false);
+    } else {
+      setSidebarOpen(window.innerWidth >= 768);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('syncspace-workspace-sidebar', sidebarOpen ? 'open' : 'closed');
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    const requestedTab = searchParams.get('tab') as Tab | null;
+    if (requestedTab && validTabs.includes(requestedTab)) setActiveTab(requestedTab);
+
+    const requestedCall = searchParams.get('call');
+    if (requestedCall === 'audio' || requestedCall === 'video') {
+      setActiveTab('chat');
+      setJoiningIncomingCall(searchParams.get('join') === '1');
+      setActiveCallType(requestedCall);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
       return;
     }
-    if (user && id) fetchWorkspace();
+    if (user && id) void fetchWorkspace();
   }, [user, authLoading, id]);
+
+  useEffect(() => {
+    if (activeTab === 'documents' && workspace && !workspaceDoc) void loadOrCreateDoc();
+  }, [activeTab, workspace, workspaceDoc]);
 
   const fetchWorkspace = async () => {
     try {
@@ -85,25 +117,16 @@ function WorkspacePageInner() {
     }
   };
 
-  // When the user switches to the Documents tab, load or create the single doc.
-  useEffect(() => {
-    if (activeTab === 'documents' && workspace && !workspaceDoc) {
-      loadOrCreateDoc();
-    }
-  }, [activeTab, workspace]);
-
   const loadOrCreateDoc = async () => {
     if (!workspace) return;
     setDocLoading(true);
     try {
       const res = await getDocumentsByWorkspace(id as string);
-      const docs: Document[] = res.data;
+      const docs: WorkspaceDocument[] = res.data;
 
       if (docs.length > 0) {
-        // Use the first (and should be only) document
         setWorkspaceDoc(docs[0]);
       } else {
-        // Auto-create one document named after the workspace
         const created = await createDocument({
           title: workspace.name,
           content: JSON.stringify({ type: 'doc', content: [{ type: 'paragraph' }] }),
@@ -118,77 +141,104 @@ function WorkspacePageInner() {
     }
   };
 
+  const selectTab = (tab: Tab) => {
+    setActiveTab(tab);
+    router.replace(`/workspace/${id}?tab=${tab}`, { scroll: false });
+  };
+
   if (authLoading || loading) {
     return (
       <>
         <Navbar />
-        <div className="pt-16 min-h-screen bg-white">
-          <div className="flex flex-col md:flex-row md:h-[calc(100vh-4rem)] animate-pulse">
-            <div className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-gray-200 p-4 space-y-2 flex-shrink-0">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-9 bg-gray-100 rounded-lg" />
+        <div className="pt-16 min-h-screen app-page-bg">
+          <div className="flex h-[calc(100dvh-4rem)] animate-pulse">
+            <div className="hidden md:block w-64 border-r workspace-border p-4 space-y-2">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-10 app-skeleton rounded-lg" />
               ))}
             </div>
-            <div className="flex-1 p-4 sm:p-6">
-              <div className="h-7 w-56 bg-gray-100 rounded mb-2" />
-              <div className="h-4 w-80 bg-gray-100 rounded mb-6" />
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-32 bg-gray-100 rounded-xl" />
-                ))}
-              </div>
+            <div className="flex-1 p-6">
+              <div className="h-7 w-56 app-skeleton rounded mb-2" />
+              <div className="h-4 w-80 app-skeleton rounded mb-6" />
             </div>
           </div>
         </div>
       </>
     );
   }
+
   if (!workspace) return null;
 
   return (
     <>
       <Navbar />
-      <div className="pt-16 min-h-screen bg-white">
-        <div className="flex flex-col md:flex-row md:h-[calc(100vh-4rem)]">
-          {/* Sidebar now carries workspaceId + workspaceName for the Members tab.
- Stacks above the content as a horizontal tab strip on mobile,
- sits as a fixed left column from md up. */}
+      <div className="pt-16 h-[100dvh] app-page-bg overflow-hidden">
+        <div className="flex h-[calc(100dvh-4rem)] min-w-0">
           <WorkspaceSidebar
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            setActiveTab={selectTab}
             workspaceId={id as string}
             workspaceName={workspace.name}
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
           />
 
-          <div className="flex-1 overflow-auto">
-            <div className="p-4 sm:p-6">
-              {/* Header — InviteMember removed; it now lives inside the Members tab */}
-              <div className="mb-6">
-                <h1 className="text-xl sm:text-2xl font-bold text-black">{workspace.name}</h1>
-                <p className="text-sm sm:text-base text-gray-500">
-                  {workspace.description || 'No description'}
-                </p>
-              </div>
+          <main className="flex-1 min-w-0 h-full overflow-hidden flex flex-col">
+            {/* Compact workspace control bar. The old large workspace heading is
+                intentionally hidden in Documents so the editor gets the screen. */}
+            {activeTab !== 'documents' && (
+              <div className="workspace-content-header flex items-center gap-3 px-4 sm:px-6 py-3 border-b workspace-border flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen((open) => !open)}
+                  className="workspace-menu-button"
+                  aria-label={sidebarOpen ? 'Close workspace navigation' : 'Open workspace navigation'}
+                  title="Workspace navigation"
+                >
+                  <span />
+                  <span />
+                  <span />
+                </button>
 
-              {/* Boards */}
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl font-semibold workspace-text truncate">{workspace.name}</h1>
+                  <p className="text-xs sm:text-sm workspace-muted truncate">
+                    {workspace.description || 'No description'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'documents' && (
+              <div className="document-workspace-header flex items-center gap-3 px-3 sm:px-4 py-2 border-b workspace-border flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen((open) => !open)}
+                  className="workspace-menu-button"
+                  aria-label={sidebarOpen ? 'Close workspace navigation' : 'Open workspace navigation'}
+                  title="Workspace navigation"
+                >
+                  <span />
+                  <span />
+                  <span />
+                </button>
+                <IconFileText className="w-4 h-4 workspace-muted" />
+                <span className="text-xs sm:text-sm workspace-muted truncate">
+                  {workspace.name} / Document
+                </span>
+              </div>
+            )}
+
+            <div className={`flex-1 min-h-0 min-w-0 ${activeTab === 'documents' ? 'overflow-hidden p-0' : 'overflow-auto p-4 sm:p-6'}`}>
               {activeTab === 'boards' && <BoardView workspaceId={id as string} />}
 
-              {/* Documents — single doc, no list, no create/delete UI */}
               {activeTab === 'documents' && (
-                <div className="h-[75vh]">
+                <div className="h-full min-h-0">
                   {docLoading ? (
-                    <div className="flex-1 flex flex-col bg-white rounded-lg shadow-lg p-4 h-full animate-pulse">
-                      <div className="h-7 w-1/3 bg-gray-200 rounded mb-3" />
-                      <div className="flex gap-1 border-b pb-2 mb-3">
-                        {[0, 1, 2, 3].map((i) => (
-                          <div key={i} className="h-7 w-12 bg-gray-100 rounded" />
-                        ))}
-                      </div>
-                      <div className="space-y-2 flex-1">
-                        <div className="h-4 bg-gray-100 rounded w-full" />
-                        <div className="h-4 bg-gray-100 rounded w-5/6" />
-                        <div className="h-4 bg-gray-100 rounded w-2/3" />
-                      </div>
+                    <div className="h-full p-5 sm:p-8 animate-pulse document-loading-surface">
+                      <div className="h-8 w-1/3 app-skeleton rounded mb-4" />
+                      <div className="h-11 app-skeleton rounded mb-5" />
+                      <div className="max-w-4xl mx-auto h-[70%] app-skeleton rounded" />
                     </div>
                   ) : workspaceDoc ? (
                     <DocumentEditor
@@ -197,18 +247,15 @@ function WorkspacePageInner() {
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full text-center">
-                      <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-3">
+                      <div className="w-12 h-12 rounded-full app-soft-surface workspace-muted flex items-center justify-center mb-3">
                         <IconFileText className="w-6 h-6" />
                       </div>
-                      <p className="text-sm text-gray-500">Couldn't load the document. Try refreshing.</p>
+                      <p className="text-sm workspace-muted">Couldn&apos;t load the document. Try refreshing.</p>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Chat + Call — the call panel (when active) renders above
-                  chat and pushes it down; with no call running, only the
-                  full-height chat shows (no permanent empty call box). */}
               {activeTab === 'chat' && (
                 <div className="space-y-4">
                   {activeCallType && (
@@ -218,25 +265,35 @@ function WorkspacePageInner() {
                       callerName={user?.name}
                       mode={activeCallType}
                       autoStart
-                      onEnd={() => setActiveCallType(null)}
+                      announceStart={!joiningIncomingCall}
+                      onEnd={() => {
+                        setActiveCallType(null);
+                        setJoiningIncomingCall(false);
+                        router.replace(`/workspace/${id}?tab=chat`);
+                      }}
                     />
                   )}
                   <Chat
                     workspaceId={id as string}
                     activeCallType={activeCallType}
-                    onStartCall={(type) => setActiveCallType(type)}
-                    onEndCall={() => setActiveCallType(null)}
+                    onStartCall={(type) => {
+                      setJoiningIncomingCall(false);
+                      setActiveCallType(type);
+                    }}
+                    onEndCall={() => {
+                      setActiveCallType(null);
+                      setJoiningIncomingCall(false);
+                      router.replace(`/workspace/${id}?tab=chat`);
+                    }}
                   />
                 </div>
               )}
 
               {activeTab === 'analytics' && <Analytics workspaceId={id as string} />}
               {activeTab === 'code' && <LiveCodeEditor />}
-
-              {/* Members — replaces the old InviteMember banner */}
               {activeTab === 'members' && <MembersPanel workspaceId={id as string} />}
             </div>
-          </div>
+          </main>
         </div>
       </div>
     </>

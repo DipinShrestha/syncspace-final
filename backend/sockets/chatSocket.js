@@ -173,11 +173,21 @@ module.exports = (io) => {
         // call" notification while excluding themselves as an arbitrary
         // other user. `callerName`/`callType` are just display text, so
         // they're fine as-is.
-        const { workspaceId, callerName, callType } = data;
+        const { workspaceId, callType } = data;
         const callerId = socket.userId;
-        const label = callType === 'audio' ? 'an audio call' : 'a video call';
+        const normalizedCallType = callType === 'audio' ? 'audio' : 'video';
+        const label = normalizedCallType === 'audio' ? 'an audio call' : 'a video call';
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) return;
+
+        // A valid JWT alone is not enough to start a workspace call. Verify
+        // that the authenticated socket actually belongs to this workspace.
+        const isOwner = workspace.owner.toString() === callerId;
+        const isMember = workspace.members.some((m) => m.user.toString() === callerId);
+        if (!isOwner && !isMember) return;
+
+        const caller = await User.findById(callerId).select('name').lean();
+        const displayName = caller?.name || 'Someone';
         const memberIds = [
           workspace.owner.toString(),
           ...workspace.members.map((m) => m.user.toString()),
@@ -187,8 +197,9 @@ module.exports = (io) => {
           const notification = await Notification.create({
             recipient: recipientId,
             type: 'incoming_call',
-            message: `${callerName} started ${label} in "${workspace.name}"`,
+            message: `${displayName} started ${label} in "${workspace.name}"`,
             workspace: workspaceId,
+            callType: normalizedCallType,
           });
           io.to(`user-${recipientId}`).emit('notification', notification);
         }
@@ -197,16 +208,37 @@ module.exports = (io) => {
       }
     });
 
-    // Join a video-call room (separate from the chat workspace room so
-    // joining a call doesn't disturb the chat 'join-workspace' room state).
-    socket.on('join-room', (roomId, userId) => {
-      socket.join(`call-${roomId}`);
-      socket.to(`call-${roomId}`).emit('user-connected', userId);
+    // Join a call room only after validating workspace membership. The
+    // client no longer supplies a user id here; the verified JWT identity is
+    // used for PeerJS signaling and presence events.
+    socket.on('join-room', async (roomId) => {
+      try {
+        const workspace = await Workspace.findById(roomId).select('owner members.user').lean();
+        if (!workspace) return socket.emit('call-error', 'Workspace not found');
 
-      // Let the other party know when this user leaves the call.
-      socket.on('disconnect', () => {
-        socket.to(`call-${roomId}`).emit('user-disconnected', userId);
-      });
+        const userId = socket.userId;
+        const isOwner = workspace.owner.toString() === userId;
+        const isMember = workspace.members.some((m) => m.user.toString() === userId);
+        if (!isOwner && !isMember) return socket.emit('call-error', 'Not authorized for this call');
+
+        if (socket.callRoomId && socket.callRoomId !== roomId) {
+          socket.leave(`call-${socket.callRoomId}`);
+        }
+
+        socket.callRoomId = roomId;
+        socket.join(`call-${roomId}`);
+        socket.to(`call-${roomId}`).emit('user-connected', userId);
+      } catch (err) {
+        socket.emit('call-error', 'Unable to join call');
+      }
+    });
+
+    socket.on('leave-room', (roomId) => {
+      const safeRoomId = roomId || socket.callRoomId;
+      if (!safeRoomId) return;
+      socket.leave(`call-${safeRoomId}`);
+      socket.to(`call-${safeRoomId}`).emit('user-disconnected', socket.userId);
+      if (socket.callRoomId === safeRoomId) socket.callRoomId = null;
     });
 
     // Forward call offer to the other user in the room
@@ -225,6 +257,9 @@ module.exports = (io) => {
     });
 
     socket.on('disconnect', () => {
+      if (socket.callRoomId) {
+        socket.to(`call-${socket.callRoomId}`).emit('user-disconnected', socket.userId);
+      }
       console.log('🔴 Client disconnected:', socket.id);
     });
   });

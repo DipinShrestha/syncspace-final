@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, type ReactElement } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import NotificationBell from '@/components/NotificationBell';
+import ThemeToggle from '@/components/ThemeToggle';
 import {
   IconLayers,
   IconFileText,
@@ -488,7 +489,7 @@ export default function LandingPage() {
           height: 1px;
           left: 0;
           bottom: -4px;
-          background: black;
+          background: currentColor;
           transform: scaleX(0);
           transition: transform 0.3s ease;
         }
@@ -536,7 +537,7 @@ export default function LandingPage() {
           position: absolute;
           inset: 0 auto 0 0;
           width: 3px;
-          background: black;
+          background: currentColor;
           transform: scaleY(0);
           transform-origin: bottom;
           transition: transform 0.25s ease;
@@ -600,6 +601,7 @@ export default function LandingPage() {
                   >
                     LOGIN
                   </Link>
+                  <ThemeToggle compact />
                   <Link
                     href="/register"
                     className="glass-btn px-5 py-2 rounded-xl text-sm font-medium transition-all active:scale-95 hover:scale-[1.02]"
@@ -635,6 +637,7 @@ export default function LandingPage() {
                     SUPPORT
                   </Link>
                   <div className="flex items-center gap-4">
+                    <ThemeToggle compact />
                     <button
                       onClick={logout}
                       className="text-sm text-black transition-opacity hover:opacity-60"
@@ -656,6 +659,7 @@ export default function LandingPage() {
 
             {/* Mobile: bell always visible, hamburger opens the rest of the menu */}
             <div className="md:hidden flex items-center gap-1">
+              <ThemeToggle compact />
               {user && <NotificationBell />}
               <button
                 className="text-black text-2xl w-9 h-9 flex items-center justify-center focus:outline-none transition-transform active:scale-90"

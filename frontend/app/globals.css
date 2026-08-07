@@ -261,3 +261,635 @@ body {
   width: 100%;
   display: block;
 }
+
+/* ========================================================================== */
+/* SyncSpace day / night mode                                                  */
+/* ========================================================================== */
+
+:root,
+html[data-theme='light'] {
+  --app-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-surface-2: #f3f6f9;
+  --app-surface-3: #e9eef4;
+  --app-text: #111827;
+  --app-muted: #667085;
+  --app-border: rgba(17, 24, 39, 0.12);
+  --app-overlay: rgba(255, 255, 255, 0.78);
+  --editor-page: #ffffff;
+  --editor-canvas: #edf1f5;
+  --editor-text: #202124;
+}
+
+html[data-theme='dark'] {
+  --background: #090d12;
+  --foreground: #eef2f7;
+  --app-bg: #090d12;
+  --app-surface: #111821;
+  --app-surface-2: #161f2a;
+  --app-surface-3: #202b38;
+  --app-text: #eef2f7;
+  --app-muted: #9aa8b8;
+  --app-border: rgba(226, 232, 240, 0.13);
+  --app-overlay: rgba(15, 22, 31, 0.86);
+  --editor-page: #111821;
+  --editor-canvas: #080c11;
+  --editor-text: #eef2f7;
+  color-scheme: dark;
+}
+
+html,
+body {
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.app-page-bg {
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.workspace-text {
+  color: var(--app-text);
+}
+
+.workspace-muted {
+  color: var(--app-muted);
+}
+
+.workspace-border {
+  border-color: var(--app-border);
+}
+
+.app-soft-surface,
+.app-skeleton {
+  background: var(--app-surface-3);
+}
+
+/* Dark-mode compatibility for existing Tailwind utility-heavy screens. This
+   keeps older SyncSpace components readable without forcing every component
+   to duplicate theme conditions. */
+html[data-theme='dark'] .text-black,
+html[data-theme='dark'] .text-gray-900,
+html[data-theme='dark'] .text-gray-800,
+html[data-theme='dark'] .text-gray-700 {
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .text-gray-600,
+html[data-theme='dark'] .text-gray-500,
+html[data-theme='dark'] .text-gray-400 {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] [class~='bg-white'],
+html[data-theme='dark'] [class*='bg-white/'] {
+  background-color: var(--app-surface) !important;
+}
+
+html[data-theme='dark'] [class~='bg-gray-50'],
+html[data-theme='dark'] [class~='bg-gray-100'],
+html[data-theme='dark'] [class~='bg-gray-200'] {
+  background-color: var(--app-surface-2) !important;
+}
+
+html[data-theme='dark'] [class*='border-gray-'],
+html[data-theme='dark'] [class*='border-black/'] {
+  border-color: var(--app-border) !important;
+}
+
+html[data-theme='dark'] .hover\:bg-gray-100:hover,
+html[data-theme='dark'] .hover\:bg-black\/5:hover {
+  background-color: var(--app-surface-2) !important;
+}
+
+html[data-theme='dark'] .glass {
+  background: rgba(17, 24, 33, 0.78);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme='dark'] .glass-nav {
+  background: rgba(9, 13, 18, 0.84);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme='dark'] .glass-outline,
+html[data-theme='dark'] .glass-input {
+  background: rgba(17, 24, 33, 0.86);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] .glass-input::placeholder {
+  color: #7f8b99;
+}
+
+html[data-theme='dark'] .glass-input:focus {
+  background: rgba(23, 33, 44, 0.96);
+}
+
+html[data-theme='dark'] .card-hover:hover {
+  background: rgba(23, 33, 44, 0.92);
+}
+
+html[data-theme='dark'] .ambient-bg::before,
+html[data-theme='dark'] .ambient-bg::after {
+  opacity: 0.13;
+}
+
+html[data-theme='dark'] .nav-link::after {
+  background: currentColor;
+}
+
+/* Theme switch */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--app-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.theme-toggle-track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  padding: 2px;
+  background: var(--app-surface-3);
+  border: 1px solid var(--app-border);
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+html[data-theme='dark'] .theme-toggle-track {
+  background: #253449;
+}
+
+.theme-toggle-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  transform: translateX(0);
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 180ms ease;
+}
+
+.theme-toggle-thumb svg {
+  width: 12px;
+  height: 12px;
+}
+
+.theme-toggle-thumb.is-dark {
+  transform: translateX(20px);
+  color: #dbeafe;
+  background: #0f172a;
+}
+
+.theme-toggle-compact .theme-toggle-track {
+  width: 42px;
+}
+
+.theme-toggle-compact .theme-toggle-thumb.is-dark {
+  transform: translateX(18px);
+}
+
+/* ========================================================================== */
+/* Collapsible workspace navigation                                            */
+/* ========================================================================== */
+
+.workspace-sidebar {
+  background: color-mix(in srgb, var(--app-surface) 90%, transparent);
+  border-color: var(--app-border);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+.workspace-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
+  color: var(--app-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.workspace-nav-item:hover {
+  color: var(--app-text);
+  background: var(--app-surface-2);
+  transform: translateX(2px);
+}
+
+.workspace-nav-item.is-active {
+  color: #07111f;
+  background: linear-gradient(135deg, var(--color-dusty-500), var(--color-dusty-600));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.workspace-icon-button,
+.workspace-menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-text);
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border);
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.workspace-icon-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+}
+
+.workspace-menu-button {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.workspace-menu-button span {
+  width: 16px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.workspace-icon-button:hover,
+.workspace-menu-button:hover {
+  background: var(--app-surface-3);
+  transform: translateY(-1px);
+}
+
+.workspace-content-header,
+.document-workspace-header {
+  background: color-mix(in srgb, var(--app-surface) 88%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* ========================================================================== */
+/* Google-Docs-style rich text workspace                                       */
+/* ========================================================================== */
+
+.document-loading-surface,
+.document-editor-shell {
+  background: var(--editor-canvas);
+}
+
+.document-editor-shell {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--app-text);
+  overflow: hidden;
+}
+
+.document-focus-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  height: 100dvh;
+}
+
+.document-topbar {
+  min-height: 62px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 0.9rem 0.45rem;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.document-title-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--app-text);
+  font-size: 1.05rem;
+  line-height: 1.3;
+  font-weight: 650;
+}
+
+.document-title-input::placeholder {
+  color: var(--app-muted);
+}
+
+.document-save-state {
+  margin-top: 0.12rem;
+  color: var(--app-muted);
+  font-size: 0.7rem;
+}
+
+.doc-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.5rem 0.72rem;
+  border-radius: 7px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-2);
+  color: var(--app-text);
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.doc-secondary-button:hover {
+  background: var(--app-surface-3);
+  transform: translateY(-1px);
+}
+
+.document-toolbar {
+  min-height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  overflow-x: auto;
+  padding: 0.42rem 0.65rem;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.doc-tool-button,
+.doc-style-select {
+  min-height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--app-text);
+  font-size: 0.78rem;
+  line-height: 1;
+  font-weight: 550;
+}
+
+.doc-tool-button {
+  min-width: 32px;
+  padding: 0 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.doc-tool-button:hover:not(:disabled),
+.doc-tool-button.is-active {
+  background: var(--app-surface-3);
+}
+
+.doc-tool-button.is-active {
+  color: var(--color-dusty-800);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-dusty-600) 45%, transparent);
+}
+
+html[data-theme='dark'] .doc-tool-button.is-active {
+  color: #b9d5ff;
+}
+
+.doc-tool-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.doc-style-select {
+  min-width: 124px;
+  padding: 0 0.55rem;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.doc-style-select:hover,
+.doc-style-select:focus {
+  background: var(--app-surface-2);
+  border-color: var(--app-border);
+}
+
+.doc-style-select option {
+  color: var(--app-text);
+  background: var(--app-surface);
+}
+
+.doc-tool-separator {
+  width: 1px;
+  height: 22px;
+  flex: 0 0 1px;
+  margin: 0 0.18rem;
+  background: var(--app-border);
+}
+
+.document-workspace {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px 16px 64px;
+  background: var(--editor-canvas);
+}
+
+.document-page {
+  width: min(100%, 900px);
+  min-height: 1050px;
+  margin: 0 auto;
+  background: var(--editor-page);
+  color: var(--editor-text);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme='dark'] .document-page {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+}
+
+.syncspace-editor,
+.syncspace-editor > div,
+.syncspace-editor .ProseMirror {
+  min-height: 100%;
+}
+
+.syncspace-prosemirror {
+  min-height: 1050px;
+  padding: 64px 76px 96px;
+  color: var(--editor-text);
+  font-size: 16px;
+  line-height: 1.65;
+  caret-color: var(--editor-text);
+  word-break: break-word;
+}
+
+.syncspace-prosemirror > *:first-child {
+  margin-top: 0;
+}
+
+.syncspace-prosemirror p {
+  margin: 0.5em 0;
+}
+
+.syncspace-prosemirror h1,
+.syncspace-prosemirror h2,
+.syncspace-prosemirror h3 {
+  color: var(--editor-text);
+  font-weight: 700;
+  line-height: 1.24;
+  margin: 1.15em 0 0.5em;
+}
+
+.syncspace-prosemirror h1 { font-size: 2rem; }
+.syncspace-prosemirror h2 { font-size: 1.55rem; }
+.syncspace-prosemirror h3 { font-size: 1.24rem; }
+
+/* Tailwind's preflight removes list markers. Explicit editor styles make the
+   TipTap bullet/number commands visibly behave like a document editor. */
+.syncspace-prosemirror ul {
+  list-style-type: disc;
+  padding-left: 1.75rem;
+  margin: 0.55em 0;
+}
+
+.syncspace-prosemirror ol {
+  list-style-type: decimal;
+  padding-left: 1.75rem;
+  margin: 0.55em 0;
+}
+
+.syncspace-prosemirror ul ul { list-style-type: circle; }
+.syncspace-prosemirror ul ul ul { list-style-type: square; }
+.syncspace-prosemirror li { margin: 0.18em 0; }
+.syncspace-prosemirror li p { margin: 0; }
+
+.syncspace-prosemirror blockquote {
+  margin: 1rem 0;
+  padding: 0.35rem 0 0.35rem 1rem;
+  border-left: 3px solid var(--color-dusty-600);
+  color: var(--app-muted);
+}
+
+.syncspace-prosemirror code {
+  border-radius: 4px;
+  padding: 0.12rem 0.3rem;
+  background: var(--app-surface-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.syncspace-prosemirror pre {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  background: #101722;
+  color: #edf3f9;
+}
+
+.syncspace-prosemirror pre code {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.syncspace-prosemirror a {
+  color: #3977cc;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+html[data-theme='dark'] .syncspace-prosemirror a {
+  color: #8ab9ff;
+}
+
+.syncspace-prosemirror hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--app-border);
+}
+
+.syncspace-prosemirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--app-muted);
+  pointer-events: none;
+}
+
+.syncspace-prosemirror ::selection {
+  background: color-mix(in srgb, var(--color-dusty-600) 35%, transparent);
+}
+
+.document-statusbar {
+  min-height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.25rem 0.8rem;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-muted);
+  font-size: 0.68rem;
+}
+
+@media (max-width: 767px) {
+  .document-topbar {
+    min-height: 56px;
+    padding-inline: 0.7rem;
+  }
+
+  .doc-secondary-button {
+    padding-inline: 0.55rem;
+  }
+
+  .doc-secondary-button svg + * {
+    display: none;
+  }
+
+  .document-workspace {
+    padding: 0;
+  }
+
+  .document-page {
+    width: 100%;
+    min-height: 100%;
+    border-left: 0;
+    border-right: 0;
+    box-shadow: none;
+  }
+
+  .syncspace-prosemirror {
+    min-height: calc(100dvh - 196px);
+    padding: 28px 22px 72px;
+    font-size: 15px;
+  }
+}

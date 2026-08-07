@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { updateProfile, uploadAvatar } from '@/lib/api';
 import toast from 'react-hot-toast';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function OnboardingPage() {
   const { user, loading: authLoading } = useAuth();
@@ -71,6 +72,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-white px-4 py-12">
+      <div className="fixed top-4 right-4 z-20"><ThemeToggle /></div>
       <div className="max-w-md w-full p-6 sm:p-8 rounded-2xl glass animate-fade-in-up">
         <div className="text-center mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-black tracking-tight">
