@@ -18,6 +18,7 @@ import {
   IconCheck,
   IconCrown,
   IconSend,
+  IconChevronDown,
 } from '@/components/icons';
 
 // ── Illustrative feature mockups ──────────────────────────────────────────
@@ -337,9 +338,145 @@ const features: Feature[] = [
   },
 ];
 
+interface ManualStep {
+  number: string;
+  title: string;
+  summary: string;
+  icon: typeof IconLayers;
+  actions: string[];
+  result: string;
+}
+
+const manualSteps: ManualStep[] = [
+  {
+    number: '01',
+    title: 'Sign in securely',
+    summary: 'Enter SyncSpace with your Google account.',
+    icon: IconCheck,
+    actions: [
+      'Select Sign Up or Login from the home page.',
+      'Choose your Google account and approve the sign-in request.',
+      'For a new account, review your name and profile photo during onboarding.',
+    ],
+    result: 'SyncSpace verifies your Google identity, creates or finds your account, and opens an authenticated session.',
+  },
+  {
+    number: '02',
+    title: 'Create a workspace',
+    summary: 'Set up one central place for a team or project.',
+    icon: IconLayers,
+    actions: [
+      'Open Dashboard and select + New Workspace.',
+      'Add a clear workspace name and a short project description.',
+      'Open the workspace card from Your Workspaces to enter it.',
+    ],
+    result: 'The workspace becomes the main container for members, boards, messages, documents, calls, and analytics.',
+  },
+  {
+    number: '03',
+    title: 'Invite your team',
+    summary: 'Add members and control workspace access.',
+    icon: IconUsers,
+    actions: [
+      'Open the Members area inside the workspace.',
+      'Enter a teammate’s email address and send the invitation.',
+      'Manage member roles or remove access when required.',
+    ],
+    result: 'Invited users can access the workspace after signing in with the invited Google email address.',
+  },
+  {
+    number: '04',
+    title: 'Plan work on boards',
+    summary: 'Create, assign, and move task cards through each stage.',
+    icon: IconLayers,
+    actions: [
+      'Create or open a Kanban board inside the workspace.',
+      'Add task cards with descriptions, dates, labels, assignees, comments, and attachments.',
+      'Drag cards between lists to reflect the current work status.',
+    ],
+    result: 'The board gives the team one visual view of pending, active, and completed work.',
+  },
+  {
+    number: '05',
+    title: 'Communicate in real time',
+    summary: 'Use workspace chat, notifications, and calls.',
+    icon: IconChat,
+    actions: [
+      'Open Workspace Chat to send messages to connected members.',
+      'Use the call controls to start an audio or video call.',
+      'Check the notification bell for invitations, assignments, comments, messages, and call activity.',
+    ],
+    result: 'Socket.IO delivers supported live events, while WebRTC and PeerJS handle browser-based calls.',
+  },
+  {
+    number: '06',
+    title: 'Write shared documents',
+    summary: 'Keep project notes and documentation inside the workspace.',
+    icon: IconFileText,
+    actions: [
+      'Open Documents and create a new document.',
+      'Use the rich-text toolbar to format headings, lists, links, and other content.',
+      'Save changes so workspace members can open the latest stored version.',
+    ],
+    result: 'Project documentation stays connected to the same workspace instead of being scattered across separate tools.',
+  },
+  {
+    number: '07',
+    title: 'Write and run JavaScript',
+    summary: 'Use the built-in Monaco code editor for quick code work.',
+    icon: IconCode,
+    actions: [
+      'Open the Code Editor from the workspace navigation.',
+      'Write or paste JavaScript with syntax highlighting.',
+      'Run the code and review its output directly in the editor area.',
+    ],
+    result: 'The editor provides a convenient browser-based environment for demonstrations, reviews, and small code experiments.',
+  },
+  {
+    number: '08',
+    title: 'Review progress',
+    summary: 'Use analytics and activity updates to follow the project.',
+    icon: IconChart,
+    actions: [
+      'Open Analytics from the workspace navigation.',
+      'Review board and task statistics to understand current progress.',
+      'Return to the dashboard to switch between workspaces or create a new one.',
+    ],
+    result: 'Workspace information is summarized in one place so the team can identify progress and pending work.',
+  },
+];
+
+const workflowNodes = [
+  { label: 'Browser', detail: 'Next.js interface' },
+  { label: 'Authentication', detail: 'Google OAuth + JWT' },
+  { label: 'Application', detail: 'REST API + Socket.IO' },
+  { label: 'Data & files', detail: 'MongoDB + Cloudinary' },
+  { label: 'Calls', detail: 'WebRTC + PeerJS' },
+];
+
+const supportFaqs = [
+  {
+    question: 'Why can’t I open a workspace?',
+    answer: 'Confirm that you are signed in with the same Google email address that was invited. Ask the workspace owner to verify the invitation or add you again.',
+  },
+  {
+    question: 'Why are messages or notifications delayed?',
+    answer: 'Check your internet connection, refresh the page, and make sure the browser has not suspended the tab. Real-time features require an active connection to the SyncSpace server.',
+  },
+  {
+    question: 'Why is my microphone or camera not working?',
+    answer: 'Allow microphone and camera permission in the browser, close other applications using those devices, and rejoin the call. Some browsers may require HTTPS for media access.',
+  },
+  {
+    question: 'Where are uploaded files stored?',
+    answer: 'Uploaded file metadata is connected to SyncSpace records, while supported uploaded files are stored through Cloudinary.',
+  },
+];
+
 export default function LandingPage() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeManualStep, setActiveManualStep] = useState(0);
 
   return (
     <>
@@ -368,6 +505,59 @@ export default function LandingPage() {
         }
         .feature-card:hover {
           transform: translateY(-6px);
+        }
+        @keyframes manual-panel-in {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes workflow-scan {
+          0% {
+            transform: translateX(-120%);
+          }
+          100% {
+            transform: translateX(520%);
+          }
+        }
+        .manual-panel-enter {
+          animation: manual-panel-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .manual-step-button {
+          position: relative;
+          overflow: hidden;
+        }
+        .manual-step-button::before {
+          content: '';
+          position: absolute;
+          inset: 0 auto 0 0;
+          width: 3px;
+          background: black;
+          transform: scaleY(0);
+          transform-origin: bottom;
+          transition: transform 0.25s ease;
+        }
+        .manual-step-button:hover::before,
+        .manual-step-button[data-active='true']::before {
+          transform: scaleY(1);
+        }
+        .workflow-track {
+          position: relative;
+          overflow: hidden;
+        }
+        .workflow-track::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 22%;
+          background: linear-gradient(90deg, transparent, rgba(122, 172, 255, 0.25), transparent);
+          animation: workflow-scan 5.5s linear infinite;
+          pointer-events: none;
         }
       `}</style>
 
@@ -669,20 +859,243 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SUPPORT SECTION */}
+      {/* SUPPORT & USER MANUAL SECTION */}
       <section id="support" className="py-16 sm:py-24 px-4 sm:px-6 border-t border-gray-100">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-4xl font-bold text-black mb-6 tracking-tight">Support</h2>
-          <p className="text-gray-600 text-sm sm:text-lg leading-relaxed mb-6">
-            Have a question, found a bug, or want to suggest a feature? Reach out and we'll get
-            back to you.
-          </p>
-          <a
-            href="mailto:bipinshrestha266@gmail.com"
-            className="inline-block glass-btn px-6 py-3 rounded-xl text-sm sm:text-base font-medium transition-all active:scale-95 hover:scale-[1.02]"
-          >
-            Contact Us
-          </a>
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-3xl mb-10 sm:mb-14">
+            <p className="text-xs sm:text-sm font-semibold tracking-[0.24em] uppercase text-dusty-800 mb-3">
+              Support Centre
+            </p>
+            <h2 className="text-3xl sm:text-5xl font-bold text-black tracking-tight mb-5">
+              SyncSpace user manual
+            </h2>
+            <p className="text-gray-600 text-sm sm:text-lg leading-relaxed">
+              Follow the complete workflow below to sign in, create a workspace, invite your team,
+              manage tasks, communicate, write documents, run JavaScript, and review progress.
+            </p>
+          </div>
+
+          {/* Interactive manual: sharp-edged navigation + animated detail panel */}
+          <div className="grid lg:grid-cols-[0.86fr_1.5fr] border border-black/15 bg-white/45 backdrop-blur-xl shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
+            <div className="border-b lg:border-b-0 lg:border-r border-black/15">
+              <div className="px-5 py-4 border-b border-black/15 bg-black text-white">
+                <p className="text-[11px] tracking-[0.2em] uppercase text-white/60">Quick-start guide</p>
+                <p className="text-lg font-semibold mt-1">Choose a step</p>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-1">
+                {manualSteps.map((step, index) => {
+                  const StepIcon = step.icon;
+                  const active = activeManualStep === index;
+                  return (
+                    <button
+                      key={step.number}
+                      type="button"
+                      data-active={active}
+                      onClick={() => setActiveManualStep(index)}
+                      className={`manual-step-button min-h-24 text-left px-4 sm:px-5 py-4 border-b border-black/10 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-dusty-600 ${
+                        index % 2 === 0 ? 'sm:border-r lg:border-r-0' : ''
+                      } ${
+                        active
+                          ? 'bg-dusty-100/90 text-black translate-x-0'
+                          : 'bg-white/50 hover:bg-white hover:pl-6'
+                      }`}
+                      aria-pressed={active}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={`w-9 h-9 flex items-center justify-center border flex-shrink-0 transition-colors ${
+                            active ? 'border-black bg-black text-white' : 'border-black/20 bg-white text-black'
+                          }`}
+                        >
+                          <StepIcon className="w-4 h-4" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-[10px] font-bold tracking-[0.18em] text-gray-500 mb-1">
+                            STEP {step.number}
+                          </span>
+                          <span className="block text-sm font-semibold leading-tight">{step.title}</span>
+                          <span className="hidden sm:block text-xs text-gray-500 mt-1 leading-relaxed">
+                            {step.summary}
+                          </span>
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="relative min-h-[530px] p-5 sm:p-8 lg:p-10 overflow-hidden">
+              <div className="absolute -top-24 -right-24 w-72 h-72 bg-dusty-200/60 blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute -bottom-28 -left-20 w-72 h-72 bg-sage-200/60 blur-3xl rounded-full pointer-events-none" />
+
+              <div key={activeManualStep} className="manual-panel-enter relative z-10">
+                {(() => {
+                  const step = manualSteps[activeManualStep];
+                  const StepIcon = step.icon;
+                  return (
+                    <>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5 mb-8">
+                        <div>
+                          <div className="flex items-center gap-3 mb-5">
+                            <span className="w-12 h-12 border border-black bg-black text-white flex items-center justify-center">
+                              <StepIcon className="w-5 h-5" />
+                            </span>
+                            <span className="text-xs font-bold tracking-[0.22em] text-gray-500">
+                              STEP {step.number} / {String(manualSteps.length).padStart(2, '0')}
+                            </span>
+                          </div>
+                          <h3 className="text-2xl sm:text-4xl font-bold tracking-tight text-black mb-3">
+                            {step.title}
+                          </h3>
+                          <p className="text-sm sm:text-lg text-gray-600 leading-relaxed max-w-xl">
+                            {step.summary}
+                          </p>
+                        </div>
+                        <div className="w-full sm:w-28 border border-black/15 bg-white/60 px-3 py-3 text-center">
+                          <div className="text-2xl font-bold text-black">{step.number}</div>
+                          <div className="text-[10px] uppercase tracking-[0.18em] text-gray-500 mt-1">Manual step</div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 mb-7">
+                        {step.actions.map((action, actionIndex) => (
+                          <div
+                            key={action}
+                            className="group grid grid-cols-[42px_1fr] border border-black/15 bg-white/65 transition-all duration-300 hover:-translate-y-0.5 hover:border-black/35 hover:bg-white"
+                            style={{ animationDelay: `${actionIndex * 70}ms` }}
+                          >
+                            <div className="border-r border-black/15 flex items-center justify-center font-mono text-xs font-bold text-dusty-800 group-hover:bg-dusty-50 transition-colors">
+                              {String(actionIndex + 1).padStart(2, '0')}
+                            </div>
+                            <p className="px-4 py-4 text-sm sm:text-base text-gray-700 leading-relaxed">
+                              {action}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="border-l-4 border-sage-600 bg-sage-50/80 px-5 py-4">
+                        <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-sage-800 mb-1">
+                          What happens next
+                        </p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{step.result}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-8 pt-5 border-t border-black/10">
+                        <button
+                          type="button"
+                          onClick={() => setActiveManualStep((current) => Math.max(0, current - 1))}
+                          disabled={activeManualStep === 0}
+                          className="border border-black/20 bg-white px-4 py-2 text-xs sm:text-sm font-medium transition-all hover:bg-black hover:text-white disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-black"
+                        >
+                          Previous
+                        </button>
+                        <div className="flex gap-1.5" aria-hidden="true">
+                          {manualSteps.map((stepItem, index) => (
+                            <span
+                              key={stepItem.number}
+                              className={`h-1.5 transition-all duration-300 ${
+                                index === activeManualStep ? 'w-8 bg-black' : 'w-2 bg-black/15'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setActiveManualStep((current) => Math.min(manualSteps.length - 1, current + 1))
+                          }
+                          disabled={activeManualStep === manualSteps.length - 1}
+                          className="border border-black bg-black text-white px-4 py-2 text-xs sm:text-sm font-medium transition-all hover:bg-dusty-700 disabled:opacity-30"
+                        >
+                          Next step
+                        </button>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+
+          {/* Technical workflow strip */}
+          <div className="mt-10 sm:mt-14">
+            <div className="flex items-end justify-between gap-4 mb-5">
+              <div>
+                <p className="text-[11px] tracking-[0.2em] uppercase font-semibold text-gray-500 mb-2">
+                  System workflow
+                </p>
+                <h3 className="text-xl sm:text-3xl font-bold tracking-tight">How SyncSpace runs</h3>
+              </div>
+              <span className="hidden sm:block text-xs text-gray-500">From browser action to stored data</span>
+            </div>
+            <div className="workflow-track grid grid-cols-1 sm:grid-cols-5 border-t border-l border-black/15 bg-white/45">
+              {workflowNodes.map((node, index) => (
+                <div
+                  key={node.label}
+                  className="relative min-h-28 px-4 py-5 border-r border-b border-black/15 bg-white/50 transition-all duration-300 hover:bg-white hover:-translate-y-1"
+                >
+                  <div className="text-[10px] font-bold tracking-[0.18em] text-dusty-800 mb-4">
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
+                  <p className="font-semibold text-sm text-black">{node.label}</p>
+                  <p className="text-xs text-gray-500 mt-1">{node.detail}</p>
+                  {index < workflowNodes.length - 1 && (
+                    <span className="hidden sm:block absolute -right-2.5 top-1/2 -translate-y-1/2 z-10 w-5 h-5 bg-black text-white text-xs leading-5 text-center">
+                      →
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Troubleshooting + contact */}
+          <div className="grid lg:grid-cols-[1.45fr_0.75fr] gap-6 mt-10 sm:mt-14">
+            <div className="border border-black/15 bg-white/55">
+              <div className="px-5 sm:px-6 py-5 border-b border-black/15">
+                <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-500 mb-2">
+                  Common questions
+                </p>
+                <h3 className="text-xl sm:text-2xl font-bold">Troubleshooting guide</h3>
+              </div>
+              <div>
+                {supportFaqs.map((faq, index) => (
+                  <details key={faq.question} className="group border-b last:border-b-0 border-black/10">
+                    <summary className="list-none cursor-pointer px-5 sm:px-6 py-5 flex items-center justify-between gap-4 text-sm sm:text-base font-semibold hover:bg-white transition-colors">
+                      <span className="flex items-center gap-3">
+                        <span className="text-[10px] font-mono text-gray-400">{String(index + 1).padStart(2, '0')}</span>
+                        {faq.question}
+                      </span>
+                      <IconChevronDown className="w-4 h-4 flex-shrink-0 transition-transform duration-300 group-open:rotate-180" />
+                    </summary>
+                    <p className="px-12 sm:px-14 pb-5 text-sm text-gray-600 leading-relaxed">{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+
+            <div className="border border-black bg-black text-white p-6 sm:p-8 flex flex-col justify-between min-h-80">
+              <div>
+                <div className="w-11 h-11 border border-white/30 flex items-center justify-center mb-7">
+                  <IconSend className="w-5 h-5" />
+                </div>
+                <p className="text-[11px] tracking-[0.2em] uppercase text-white/50 mb-3">Still need help?</p>
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">Contact SyncSpace support</h3>
+                <p className="text-sm text-white/65 leading-relaxed">
+                  Report a bug, ask a question, or suggest a feature. Include the page name, the action you performed, and a screenshot when possible.
+                </p>
+              </div>
+              <a
+                href="mailto:bipinshrestha266@gmail.com?subject=SyncSpace%20Support%20Request"
+                className="mt-8 inline-flex items-center justify-between border border-white bg-white text-black px-5 py-3 text-sm font-semibold transition-all hover:bg-dusty-500"
+              >
+                Email support
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
